@@ -1,16 +1,22 @@
-# general
+#
+# General
+#
 env_short      = "p"
 env            = "prod"
-prefix         = "product"
-location       = "westeurope"
-location_short = "weu"
+prefix         = "fat"
+adgroup_prefix = "fatturazione"
+location       = "italynorth"
+location_short = "itn"
 
 tags = {
   CreatedBy   = "Terraform"
   Environment = "PROD"
-  Owner       = "product"
-  Source      = "https://github.com/pagopa/product-infra"
-  CostCenter  = "TS310 - PAGAMENTI & SERVIZI"
+  Owner       = "PagoPA ICT"
+  Source      = "https://github.com/pagopa/portale-fatturazione-infra"
+  CostCenter  = "TS230 - PagoPA ICT"
 }
 
-dns_zone_product_prefix = "product"
+#
+# DNS
+#
+dns_zone_portalefatturazione_prefix = "portalefatturazione"

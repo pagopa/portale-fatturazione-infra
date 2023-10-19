@@ -1,5 +1,3 @@
 # see https://help.github.com/en/articles/about-code-owners#example-of-a-codeowners-file
 
-* @pagopa/infrastructure-admins
-
-# * @pagopa/infrastructure-admins @pagopa/product-admin @pagopa/product-contributors
+* @pagopa/portalefatturazione-admin

@@ -1,7 +1,7 @@
 # general
 
 variable "prefix" {
-  type    = string
+  type = string
   validation {
     condition = (
       length(var.prefix) <= 6
@@ -14,9 +14,9 @@ variable "env" {
   type = string
   validation {
     condition = (
-      length(var.env) <= 3
+      length(var.env) <= 4
     )
-    error_message = "Max length is 3 chars."
+    error_message = "Max length is 4 chars."
   }
 }
 
@@ -45,4 +45,25 @@ variable "tags" {
   default = {
     CreatedBy = "Terraform"
   }
+}
+
+#
+# DNS
+#
+
+variable "dns_zone_portalefatturazione_prefix" {
+  type        = string
+  description = "DNS zone name"
+}
+
+variable "external_domain" {
+  type        = string
+  description = "DNS zone name"
+  default     = "pagopa.it"
+}
+
+variable "dns_default_ttl_sec" {
+  type        = number
+  description = "DNS record Time To Live"
+  default     = 3600
 }

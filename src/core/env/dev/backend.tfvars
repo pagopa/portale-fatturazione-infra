@@ -1,4 +1,4 @@
 resource_group_name  = "terraform-state-rg"
-storage_account_name = "tfinfdevproduct"
+storage_account_name = "tfinfdevfatturazione"
 container_name       = "terraform-state"
-key                  = "product-infra.core.tfstate"
+key                  = "fatturazione-infra.core.tfstate"
