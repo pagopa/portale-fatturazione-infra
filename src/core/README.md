@@ -29,7 +29,7 @@
 | <a name="module_dns_fwd"></a> [dns\_fwd](#module\_dns\_fwd) | ./.terraform/modules/__v3__/dns_forwarder/ | n/a |
 | <a name="module_dns_fwd_snet"></a> [dns\_fwd\_snet](#module\_dns\_fwd\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ./.terraform/modules/__v3__/key_vault/ | n/a |
-| <a name="module_private_endpoint_snet"></a> [private\_endpoint\_snet](#module\_private\_endpoint\_snet) | ./.terraform/modules/v3/subnet/ | n/a |
+| <a name="module_private_endpoint_snet"></a> [private\_endpoint\_snet](#module\_private\_endpoint\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
 | <a name="module_sa_storage"></a> [sa\_storage](#module\_sa\_storage) | ./.terraform/modules/__v3__/storage_account/ | n/a |
 | <a name="module_vnet"></a> [vnet](#module\_vnet) | ./.terraform/modules/__v3__/virtual_network/ | n/a |
 | <a name="module_vpn"></a> [vpn](#module\_vpn) | ./.terraform/modules/__v3__/vpn_gateway/ | n/a |
