@@ -20,19 +20,20 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_agw"></a> [agw](#module\_agw) | ./.terraform/modules/v3/app_gateway/ | n/a |
-| <a name="module_agw_snet"></a> [agw\_snet](#module\_agw\_snet) | ./.terraform/modules/v3/subnet/ | n/a |
-| <a name="module_app"></a> [app](#module\_app) | ./.terraform/modules/v3/app_service/ | n/a |
-| <a name="module_app_snet"></a> [app\_snet](#module\_app\_snet) | ./.terraform/modules/v3/subnet/ | n/a |
-| <a name="module_dls_storage"></a> [dls\_storage](#module\_dls\_storage) | ./.terraform/modules/v3/storage_account/ | n/a |
-| <a name="module_dns_fwd"></a> [dns\_fwd](#module\_dns\_fwd) | ./.terraform/modules/v3/dns_forwarder/ | n/a |
-| <a name="module_dns_fwd_snet"></a> [dns\_fwd\_snet](#module\_dns\_fwd\_snet) | ./.terraform/modules/v3/subnet/ | n/a |
-| <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ./.terraform/modules/v3/key_vault/ | n/a |
-| <a name="module_sa_storage"></a> [sa\_storage](#module\_sa\_storage) | ./.terraform/modules/v3/storage_account/ | n/a |
-| <a name="module_v3"></a> [v3](#module\_v3) | git::github.com/pagopa/terraform-azurerm-v3.git | d97d51148b02eb3225507eeef2ec25d52f4f343b |
-| <a name="module_vnet"></a> [vnet](#module\_vnet) | ./.terraform/modules/v3/virtual_network/ | n/a |
-| <a name="module_vpn"></a> [vpn](#module\_vpn) | ./.terraform/modules/v3/vpn_gateway/ | n/a |
-| <a name="module_vpn_snet"></a> [vpn\_snet](#module\_vpn\_snet) | ./.terraform/modules/v3/subnet/ | n/a |
+| <a name="module___v3__"></a> [\_\_v3\_\_](#module\_\_\_v3\_\_) | git::https://github.com/pagopa/terraform-azurerm-v3.git | d97d51148b02eb3225507eeef2ec25d52f4f343b |
+| <a name="module_agw"></a> [agw](#module\_agw) | ./.terraform/modules/__v3__/app_gateway/ | n/a |
+| <a name="module_agw_snet"></a> [agw\_snet](#module\_agw\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
+| <a name="module_app"></a> [app](#module\_app) | ./.terraform/modules/__v3__/app_service/ | n/a |
+| <a name="module_app_snet"></a> [app\_snet](#module\_app\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
+| <a name="module_dls_storage"></a> [dls\_storage](#module\_dls\_storage) | ./.terraform/modules/__v3__/storage_account/ | n/a |
+| <a name="module_dns_fwd"></a> [dns\_fwd](#module\_dns\_fwd) | ./.terraform/modules/__v3__/dns_forwarder/ | n/a |
+| <a name="module_dns_fwd_snet"></a> [dns\_fwd\_snet](#module\_dns\_fwd\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
+| <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ./.terraform/modules/__v3__/key_vault/ | n/a |
+| <a name="module_private_endpoint_snet"></a> [private\_endpoint\_snet](#module\_private\_endpoint\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
+| <a name="module_sa_storage"></a> [sa\_storage](#module\_sa\_storage) | ./.terraform/modules/__v3__/storage_account/ | n/a |
+| <a name="module_vnet"></a> [vnet](#module\_vnet) | ./.terraform/modules/__v3__/virtual_network/ | n/a |
+| <a name="module_vpn"></a> [vpn](#module\_vpn) | ./.terraform/modules/__v3__/vpn_gateway/ | n/a |
+| <a name="module_vpn_snet"></a> [vpn\_snet](#module\_vpn\_snet) | ./.terraform/modules/__v3__/subnet/ | n/a |
 
 ## Resources
 
@@ -54,6 +55,7 @@
 | [azurerm_private_dns_zone.scm_privatelink_azurewebsites_net](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.privatelink_azurewebsites_net_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.scm_privatelink_azurewebsites_net_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_endpoint.app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_public_ip.agw](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_resource_group.analytics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_resource_group.app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |

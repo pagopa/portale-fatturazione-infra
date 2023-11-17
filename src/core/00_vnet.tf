@@ -1,5 +1,5 @@
 module "vnet" {
-  source              = "./.terraform/modules/v3/virtual_network/"
+  source              = "./.terraform/modules/__v3__/virtual_network/"
   name                = format("%s-vnet", local.project)
   location            = azurerm_resource_group.networking.location
   resource_group_name = azurerm_resource_group.networking.name
@@ -13,7 +13,7 @@ module "vnet" {
 }
 
 module "private_endpoint_snet" {
-  source                                    = "./.terraform/modules/v3/subnet/"
+  source                                    = "./.terraform/modules/__v3__/subnet/"
   name                                      = format("%s-%s-snet", local.project, "private_endpoint")
   address_prefixes                          = var.cidr_pvt_endp_snet
   resource_group_name                       = azurerm_resource_group.networking.name

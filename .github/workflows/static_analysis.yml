@@ -16,6 +16,7 @@ jobs:
           FOLDERS: >
             .identity
             src/core
+            src/azuredevops/core
         run: |
           pids=()
 

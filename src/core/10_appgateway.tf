@@ -1,5 +1,5 @@
 module "agw_snet" {
-  source                                    = "./.terraform/modules/v3/subnet/"
+  source                                    = "./.terraform/modules/__v3__/subnet/"
   name                                      = format("%s-%s-snet", local.project, "agw")
   address_prefixes                          = var.cidr_agw_snet
   resource_group_name                       = azurerm_resource_group.networking.name
@@ -33,7 +33,7 @@ data "azurerm_key_vault_certificate" "agw_app" {
 }
 
 module "agw" {
-  source              = "./.terraform/modules/v3/app_gateway/"
+  source              = "./.terraform/modules/__v3__/app_gateway/"
   name                = format("%s-%s", local.project, "agw")
   resource_group_name = azurerm_resource_group.networking.name
   location            = azurerm_resource_group.networking.location
