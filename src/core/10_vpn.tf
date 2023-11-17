@@ -1,5 +1,5 @@
 module "vpn_snet" {
-  source                                    = "./.terraform/modules/v3/subnet/"
+  source                                    = "./.terraform/modules/__v3__/subnet/"
   name                                      = "GatewaySubnet" # vpn_gateway quirk, this is expected
   address_prefixes                          = var.cidr_vpn_snet
   resource_group_name                       = azurerm_resource_group.networking.name
@@ -13,7 +13,7 @@ data "azuread_application" "vpn_app" {
 }
 
 module "vpn" {
-  source              = "./.terraform/modules/v3/vpn_gateway/"
+  source              = "./.terraform/modules/__v3__/vpn_gateway/"
   name                = format("%s-%s", local.project, "vpn")
   resource_group_name = azurerm_resource_group.networking.name
   sku                 = "VpnGw1"
@@ -38,7 +38,7 @@ module "vpn" {
 
 ## dns forwarder
 module "dns_fwd_snet" {
-  source                                    = "./.terraform/modules/v3/subnet/"
+  source                                    = "./.terraform/modules/__v3__/subnet/"
   name                                      = format("%s-%s-snet", local.project, "dns-fwd")
   address_prefixes                          = var.cidr_dns_fwd_snet
   resource_group_name                       = azurerm_resource_group.networking.name
@@ -56,7 +56,7 @@ module "dns_fwd_snet" {
 }
 
 module "dns_fwd" {
-  source              = "./.terraform/modules/v3/dns_forwarder/"
+  source              = "./.terraform/modules/__v3__/dns_forwarder/"
   name                = format("%s-%s", local.project, "dns-fwd")
   location            = azurerm_resource_group.networking.location
   resource_group_name = azurerm_resource_group.networking.name

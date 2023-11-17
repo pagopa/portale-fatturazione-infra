@@ -1,5 +1,5 @@
 module "app_snet" {
-  source                                    = "./.terraform/modules/v3/subnet/"
+  source                                    = "./.terraform/modules/__v3__/subnet/"
   name                                      = format("%s-%s-snet", local.project, "app")
   address_prefixes                          = var.cidr_app_snet
   resource_group_name                       = azurerm_resource_group.networking.name
@@ -9,7 +9,7 @@ module "app_snet" {
 }
 
 module "app" {
-  source              = "./.terraform/modules/v3/app_service/"
+  source              = "./.terraform/modules/__v3__/app_service/"
   name                = format("%s-%s", local.project, "app-docker")
   resource_group_name = azurerm_resource_group.app.name
   location            = var.location

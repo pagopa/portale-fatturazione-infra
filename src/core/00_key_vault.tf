@@ -1,5 +1,5 @@
 module "key_vault" {
-  source                     = "./.terraform/modules/v3/key_vault/"
+  source                     = "./.terraform/modules/__v3__/key_vault/"
   name                       = format("%s-%s", local.project, "kv")
   location                   = azurerm_resource_group.kv.location
   resource_group_name        = azurerm_resource_group.kv.name

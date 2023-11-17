@@ -1,5 +1,5 @@
 module "vnet" {
-  source              = "./.terraform/modules/v3/virtual_network/"
+  source              = "./.terraform/modules/__v3__/virtual_network/"
   name                = format("%s-vnet", local.project)
   location            = azurerm_resource_group.networking.location
   resource_group_name = azurerm_resource_group.networking.name

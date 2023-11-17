@@ -2,7 +2,7 @@
 # dls storage
 #
 module "dls_storage" {
-  source                               = "./.terraform/modules/v3/storage_account/"
+  source                               = "./.terraform/modules/__v3__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "dls"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
@@ -38,7 +38,7 @@ resource "azurerm_storage_container" "dls_synapse" {
 #
 
 module "sa_storage" {
-  source                               = "./.terraform/modules/v3/storage_account/"
+  source                               = "./.terraform/modules/__v3__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sa"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
