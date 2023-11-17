@@ -1,3 +1,5 @@
+[![Static Analysis](https://github.com/pagopa/portale-fatturazione-infra/actions/workflows/static_analysis.yml/badge.svg?branch=main)](https://github.com/pagopa/portale-fatturazione-infra/actions/workflows/static_analysis.yml)
+
 # portalefatturazione-infra
 
 Terraform template repository for infrastructures projects
