@@ -56,7 +56,7 @@ resource "azurerm_private_endpoint" "sql" {
     name                           = format("%s-endpoint", azurerm_mssql_database.this.name)
     private_connection_resource_id = azurerm_mssql_database.this.id
     is_manual_connection           = false
-    subresource_names              = ["servers"]
+    subresource_names              = ["sqlServer"]
   }
 
   private_dns_zone_group {
