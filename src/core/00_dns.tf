@@ -38,8 +38,11 @@ resource "azurerm_dns_a_record" "agw" {
 }
 
 #
-# DNS Private Zone : https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration
+# dns private zone name list:
+# https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration
 #
+
+# app service
 resource "azurerm_private_dns_zone" "privatelink_azurewebsites_net" {
   name                = "privatelink.azurewebsites.net"
   resource_group_name = azurerm_resource_group.networking.name
@@ -61,5 +64,18 @@ resource "azurerm_private_dns_zone_virtual_network_link" "scm_privatelink_azurew
   name                  = module.vnet.name
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.scm_privatelink_azurewebsites_net.name
+  virtual_network_id    = module.vnet.id
+}
+
+# azure dns
+resource "azurerm_private_dns_zone" "privatelink_database_windows_net" {
+  name                = "privatelink.database.windows.net"
+  resource_group_name = azurerm_resource_group.networking.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_windows_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_database_windows_net.name
   virtual_network_id    = module.vnet.id
 }

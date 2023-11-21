@@ -45,3 +45,24 @@ resource "azurerm_mssql_database" "this" {
   storage_account_type = "Zone"
   tags                 = var.tags
 }
+
+resource "azurerm_private_endpoint" "sql" {
+  name                = format("%s-endpoint", azurerm_mssql_database.this.name)
+  location            = var.location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_snet.id
+
+  private_service_connection {
+    name                           = format("%s-endpoint", azurerm_mssql_database.this.name)
+    private_connection_resource_id = azurerm_mssql_database.this.id
+    is_manual_connection           = false
+    subresource_names              = ["servers"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_database_windows_net.id]
+  }
+
+  tags = var.tags
+}
