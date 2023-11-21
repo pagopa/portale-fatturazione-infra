@@ -55,6 +55,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsi
   virtual_network_id    = module.vnet.id
 }
 
+
 resource "azurerm_private_dns_zone" "scm_privatelink_azurewebsites_net" {
   name                = "scm.privatelink.azurewebsites.net"
   resource_group_name = azurerm_resource_group.networking.name
@@ -79,7 +80,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_w
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_database_windows_net.name
   virtual_network_id    = module.vnet.id
 }
-    
+
 # caa
 resource "azurerm_dns_caa_record" "this" {
   name                = "@"
