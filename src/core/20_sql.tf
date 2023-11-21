@@ -47,14 +47,14 @@ resource "azurerm_mssql_database" "this" {
 }
 
 resource "azurerm_private_endpoint" "sql" {
-  name                = format("%s-endpoint", azurerm_mssql_database.this.name)
+  name                = format("%s-endpoint", azurerm_mssql_server.this.name)
   location            = var.location
   resource_group_name = azurerm_resource_group.analytics.name
   subnet_id           = module.private_endpoint_snet.id
 
   private_service_connection {
-    name                           = format("%s-endpoint", azurerm_mssql_database.this.name)
-    private_connection_resource_id = azurerm_mssql_database.this.id
+    name                           = format("%s-endpoint", azurerm_mssql_server.this.name)
+    private_connection_resource_id = azurerm_mssql_server.this.id
     is_manual_connection           = false
     subresource_names              = ["sqlServer"]
   }
@@ -66,3 +66,8 @@ resource "azurerm_private_endpoint" "sql" {
 
   tags = var.tags
 }
+
+#import {
+#  to = azurerm_private_endpoint.sql
+#  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-analytics-rg/providers/Microsoft.Network/privateEndpoints/test"
+#}
