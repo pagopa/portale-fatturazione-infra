@@ -14,8 +14,8 @@ resource "azurerm_synapse_workspace" "this" {
   # FIXME https://github.com/hashicorp/terraform-provider-azurerm/pull/23659
   sql_administrator_login = "sqladminuser"
   aad_admin {
-    login     = data.azurerm_key_vault_secret.administrator.value
-    object_id = data.azuread_user.administrator.object_id
+    login     = data.azuread_group.adgroup_admin.display_name
+    object_id = data.azuread_group.adgroup_admin.object_id
     tenant_id = data.azurerm_client_config.current.tenant_id
   }
   azure_devops_repo {
