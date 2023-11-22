@@ -24,7 +24,7 @@
 #   subscription_name   = local.dev.subscription_name
 #   subscription_id     = local.dev.subscription_id
 #   location            = "westeurope" # italy north region does not support federated identities
-#   resource_group_name = "default-roleassignment-rg"
+#   resource_group_name = local.dev.key_vault_rg_name
 # }
 
 # # allow the identity of the service connection to access keyvault certs
