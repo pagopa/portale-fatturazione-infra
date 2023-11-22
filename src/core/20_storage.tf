@@ -59,3 +59,49 @@ resource "azurerm_storage_container" "sa_pfat" {
   storage_account_name  = module.sa_storage.name
   container_access_type = "private"
 }
+
+#
+# private endpoints
+#
+
+resource "azurerm_private_endpoint" "dls_storage_blob" {
+  name                = format("%s-blob-endpoint", module.dls_storage.name)
+  location            = var.location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_snet.id
+
+  private_service_connection {
+    name                           = format("%s-blob-endpoint", module.dls_storage.name)
+    private_connection_resource_id = module.dls_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+  }
+
+  tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "sa_storage_blob" {
+  name                = format("%s-blob-endpoint", module.sa_storage.name)
+  location            = var.location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_snet.id
+
+  private_service_connection {
+    name                           = format("%s-blob-endpoint", module.sa_storage.name)
+    private_connection_resource_id = module.sa_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+  }
+
+  tags = var.tags
+}
