@@ -1,9 +1,13 @@
 #
-# WARNING
 # data.azurerm_key_vault_secret.administrator require a manually managed kv
+#
+data "azurerm_resource_group" "pillar" {
+  name = format("%s-%s", local.project, "pillar-rg")
+}
+
 data "azurerm_key_vault" "pillar" {
   name                = format("%s-%s", local.project, "kv-pillar")
-  resource_group_name = azurerm_resource_group.kv.name
+  resource_group_name = data.azurerm_resource_group.pillar.name
 }
 
 data "azurerm_key_vault_secret" "administrator" {
