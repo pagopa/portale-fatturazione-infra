@@ -1,20 +1,3 @@
-#
-# WARNING
-# data.azurerm_key_vault_secret.administrator require a manually managed kv
-data "azurerm_key_vault" "pillar" {
-  name                = format("%s-%s", local.project, "kv-pillar")
-  resource_group_name = azurerm_resource_group.kv.name
-}
-
-data "azurerm_key_vault_secret" "administrator" {
-  name         = "administrator"
-  key_vault_id = data.azurerm_key_vault.pillar.id
-}
-
-data "azuread_user" "administrator" {
-  user_principal_name = data.azurerm_key_vault_secret.administrator.value
-}
-
 #tfsec:ignore:azure-database-no-public-access
 #tfsec:ignore:azure-database-enable-audit
 resource "azurerm_mssql_server" "this" {
@@ -25,8 +8,8 @@ resource "azurerm_mssql_server" "this" {
   # admin auth
   azuread_administrator {
     azuread_authentication_only = true
-    login_username              = data.azurerm_key_vault_secret.administrator.value
-    object_id                   = data.azuread_user.administrator.object_id
+    login_username              = data.azuread_group.adgroup_admin.display_name
+    object_id                   = data.azuread_group.adgroup_admin.object_id
     tenant_id                   = data.azurerm_client_config.current.tenant_id
   }
   public_network_access_enabled = true # FIXME
