@@ -15,7 +15,7 @@ resource "azurerm_synapse_workspace" "this" {
   sql_administrator_login = "sqladminuser"
   aad_admin {
     login     = data.azurerm_key_vault_secret.administrator.value
-    object_id = data.azuread_user.administrator.object_id
+    object_id = data.azuread_group.administrator.object_id
     tenant_id = data.azurerm_client_config.current.tenant_id
   }
   azure_devops_repo {
