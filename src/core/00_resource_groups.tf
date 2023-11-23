@@ -27,3 +27,9 @@ resource "azurerm_resource_group" "monitoring" {
   location = var.location
   tags     = var.tags
 }
+
+resource "azurerm_resource_group" "identity" {
+  name     = format("%s-%s-rg", local.project, "identity")
+  location = var.location
+  tags     = var.tags
+}
