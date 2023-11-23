@@ -82,7 +82,31 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_w
   virtual_network_id    = module.secondary_vnet.id
 }
 
-# caa
+# storage
+resource "azurerm_private_dns_zone" "privatelink_blob_core_windows_net" {
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = azurerm_resource_group.networking.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_windows_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_blob_core_windows_net.name
+  virtual_network_id    = module.vnet.id
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_windows_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_blob_core_windows_net.name
+  virtual_network_id    = module.secondary_vnet.id
+}
+
+#
+# other
+#
+
+# caa record
 resource "azurerm_dns_caa_record" "this" {
   name                = "@"
   zone_name           = azurerm_dns_zone.portalefatturazione[0].name

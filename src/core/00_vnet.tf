@@ -28,7 +28,7 @@ module "private_endpoint_snet" {
 module "secondary_vnet" {
   source              = "./.terraform/modules/__v3__/virtual_network/"
   name                = format("%s-secondary-vnet", local.project)
-  location            = azurerm_resource_group.networking.location
+  location            = var.secondary_location
   resource_group_name = azurerm_resource_group.networking.name
   # FIXME, move to variables
   ddos_protection_plan = {
