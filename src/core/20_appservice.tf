@@ -6,6 +6,13 @@ module "app_snet" {
   virtual_network_name                      = module.vnet.name
   private_endpoint_network_policies_enabled = true
   service_endpoints                         = []
+  delegation = {
+    name = "default"
+    service_delegation = {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
 module "app" {
@@ -21,12 +28,12 @@ module "app" {
   docker_image        = "registry.hub.docker.com/nginxdemos/nginx-hello"
   docker_image_tag    = "latest"
   # FIXME
-  # health_check_path   = "/status" 
-  allowed_subnets = [module.agw_snet.id]
-  allowed_ips     = []
-  subnet_id       = module.app_snet.id
+  # health_check_path   = "/status"
+  vnet_integration = true
+  allowed_subnets  = []
+  allowed_ips      = []
+  subnet_id        = module.app_snet.id
   app_settings = {
-    WEBSITE_DNS_SERVER                  = "168.63.129.16" # private DNS enabled resolver
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
     WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
   }
