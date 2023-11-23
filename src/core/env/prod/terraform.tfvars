@@ -41,3 +41,13 @@ secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
 # appgateway
 #
 agw_app_certificate_name = "portalefatturazione-pagopa-it"
+
+#
+# appservice
+#
+app_plan_sku_name = "P1v3"
+
+#
+# azure sql
+#
+sql_database_sku_name = "S0"
