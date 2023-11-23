@@ -155,7 +155,6 @@ variable "agw_app_certificate_name" {
 variable "app_plan_sku_name" {
   type        = string
   description = "the name of the app plan sku"
-  default     = "B1"
 }
 
 #
@@ -205,7 +204,6 @@ variable "sql_database_max_size_gb" {
 variable "sql_database_sku_name" {
   type        = string
   description = "the name of the database sku"
-  default     = "S0"
 }
 
 #
