@@ -66,9 +66,9 @@ resource "azurerm_storage_container" "sa_pfat" {
 
 resource "azurerm_private_endpoint" "dls_storage_blob" {
   name                = format("%s-blob-endpoint", module.dls_storage.name)
-  location            = var.location
+  location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = module.private_endpoint_secondary_snet.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.dls_storage.name)
@@ -87,9 +87,9 @@ resource "azurerm_private_endpoint" "dls_storage_blob" {
 
 resource "azurerm_private_endpoint" "sa_storage_blob" {
   name                = format("%s-blob-endpoint", module.sa_storage.name)
-  location            = var.location
+  location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = module.private_endpoint_secondary_snet.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.sa_storage.name)
