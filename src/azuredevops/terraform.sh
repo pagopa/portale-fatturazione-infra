@@ -47,12 +47,14 @@ if echo "init plan apply refresh import output state taint destroy" | grep -w "$
     terraform "$ACTION" -backend-config="${BACKEND_CONFIG_PATH}" $other
   elif [ "$ACTION" = "output" ] || [ "$ACTION" = "state" ] || [ "$ACTION" = "taint" ]; then
     # init terraform backend
+    echo "[INFO] init tf"
     terraform init -reconfigure -backend-config="${BACKEND_CONFIG_PATH}"
+    
     terraform "$ACTION" $other
   else
     # init terraform backend
-    # echo "[INFO] init tf"
-    # terraform init -reconfigure -backend-config="${BACKEND_CONFIG_PATH}"
+    echo "[INFO] init tf"
+    terraform init -reconfigure -backend-config="${BACKEND_CONFIG_PATH}"
 
     echo "[INFO] run tf with: ${ACTION} and other: >${other}<"
     terraform "${ACTION}" -var-file="${TF_VAR_FILE_PATH}" $other

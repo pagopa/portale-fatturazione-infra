@@ -24,7 +24,7 @@ module "tls_cert_service_conn_prod" {
   subscription_name   = local.prod.subscription_name
   subscription_id     = local.prod.subscription_id
   location            = "westeurope" # italy north region does not support federated identities
-  resource_group_name = "default-roleassignment-rg"
+  resource_group_name = local.prod.identity_rg_name
 }
 
 # allow the identity of the service connection to access keyvault certs
