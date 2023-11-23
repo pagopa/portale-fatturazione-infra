@@ -42,7 +42,7 @@ module "secondary_vnet" {
 # pvt endpoint snet on secondary
 module "private_endpoint_secondary_snet" {
   source                                    = "./.terraform/modules/__v3__/subnet/"
-  name                                      = format("%s-%s-snet", local.project, "secondary_private_endpoint")
+  name                                      = format("%s-%s-snet", local.project, "private_endpoint")
   address_prefixes                          = var.secondary_cidr_pvt_endp_snet
   resource_group_name                       = azurerm_resource_group.networking.name
   virtual_network_name                      = module.secondary_vnet.name

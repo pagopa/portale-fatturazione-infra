@@ -55,6 +55,13 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsi
   virtual_network_id    = module.vnet.id
 }
 
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsites_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_azurewebsites_net.name
+  virtual_network_id    = module.secondary_vnet.id
+}
+
 # azure sql
 resource "azurerm_private_dns_zone" "privatelink_database_windows_net" {
   name                = "privatelink.database.windows.net"
@@ -66,6 +73,13 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_w
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_database_windows_net.name
   virtual_network_id    = module.vnet.id
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_windows_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_database_windows_net.name
+  virtual_network_id    = module.secondary_vnet.id
 }
 
 # caa
