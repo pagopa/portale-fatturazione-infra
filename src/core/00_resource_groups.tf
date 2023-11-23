@@ -4,6 +4,12 @@ resource "azurerm_resource_group" "networking" {
   tags     = var.tags
 }
 
+resource "azurerm_resource_group" "secondary_networking" {
+  name     = format("%s-%s-rg", local.project, "secondary_networking")
+  location = var.secondary_location
+  tags     = var.tags
+}
+
 resource "azurerm_resource_group" "app" {
   name     = format("%s-%s-rg", local.project, "app")
   location = var.location

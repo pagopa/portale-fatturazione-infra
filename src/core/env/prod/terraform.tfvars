@@ -32,6 +32,12 @@ cidr_dns_fwd_snet  = ["10.0.62.248/29"] # we want 3 IPs only on this subnet (5 a
 cidr_vpn_snet      = ["10.0.63.0/24"]
 
 #
+# secondary networking
+#
+secondary_cidr_vnet          = ["10.1.0.0/18"]
+secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
+
+#
 # appgateway
 #
 agw_app_certificate_name = "portalefatturazione-pagopa-it"

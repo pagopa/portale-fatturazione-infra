@@ -113,7 +113,7 @@ variable "cidr_hsql_snet" {
 
 variable "cidr_pvt_endp_snet" {
   type        = list(string)
-  description = "cidr of the private endpoints subnet (all here)"
+  description = "cidr of the private endpoints subnet"
 }
 
 variable "cidr_vpn_snet" {
@@ -125,6 +125,21 @@ variable "cidr_dns_fwd_snet" {
   type        = list(string)
   description = "cidr of the dns forwarder subnet"
 }
+
+#
+# secondary networking
+#
+
+variable "secondary_cidr_vnet" {
+  type        = list(string)
+  description = "cidr of the secondary vnet"
+}
+
+variable "secondary_cidr_pvt_endp_snet" {
+  type        = list(string)
+  description = "cidr of the private endpoints subnet on secondary"
+}
+
 
 #
 # appgateway
