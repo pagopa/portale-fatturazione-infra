@@ -1,4 +1,4 @@
-variable "tlscert-portalefatturazione-pagopa-it" {
+variable "tlscert-api-portalefatturazione-pagopa-it" {
   default = {
     repository = {
       organization   = "pagopa"
@@ -9,7 +9,7 @@ variable "tlscert-portalefatturazione-pagopa-it" {
     pipeline = {
       enable_tls_cert = true
       path            = "TLS-Certificates"
-      dns_record_name = "" # empty: certificate is at the zone level
+      dns_record_name = "api" # empty: certificate is at the zone level
       dns_zone_name   = "portalefatturazione.pagopa.it"
       # common variables to all pipelines
       variables = {
@@ -23,7 +23,7 @@ variable "tlscert-portalefatturazione-pagopa-it" {
 }
 
 locals {
-  tlscert-portalefatturazione-pagopa-it = {
+  tlscert-api-portalefatturazione-pagopa-it = {
     # TODO use var.location, but currently italy north region does not support federated identities
     location                            = "westeurope"
     tenant_id                           = local.tenant_id
@@ -37,17 +37,17 @@ locals {
       module.tls_cert_service_conn_prod.service_endpoint_id,
     ]
   }
-  tlscert-portalefatturazione-pagopa-it-variables = {
+  tlscert-api-portalefatturazione-pagopa-it-variables = {
     KEY_VAULT_SERVICE_CONNECTION = module.tls_cert_service_conn_prod.service_endpoint_name,
     KEY_VAULT_NAME               = local.prod.key_vault_name
   }
-  tlscert-portalefatturazione-pagopa-it-variables_secret = {
+  tlscert-api-portalefatturazione-pagopa-it-variables_secret = {
   }
 }
 
-module "tlscert-portalefatturazione-pagopa-it-cert_az" {
+module "tlscert-api-portalefatturazione-pagopa-it-cert_az" {
   depends_on = [module.letsencrypt_prod]
-  count      = var.tlscert-portalefatturazione-pagopa-it.pipeline.enable_tls_cert == true ? 1 : 0
+  count      = var.tlscert-api-portalefatturazione-pagopa-it.pipeline.enable_tls_cert == true ? 1 : 0
 
   source = "git::https://github.com/pagopa/azuredevops-tf-modules.git//azuredevops_build_definition_tls_cert_federated?ref=v4.1.3"
   providers = {
@@ -55,43 +55,43 @@ module "tlscert-portalefatturazione-pagopa-it-cert_az" {
   }
 
   project_id = data.azuredevops_project.project.id
-  location   = local.tlscert-portalefatturazione-pagopa-it.location
-  repository = var.tlscert-portalefatturazione-pagopa-it.repository
+  location   = local.tlscert-api-portalefatturazione-pagopa-it.location
+  repository = var.tlscert-api-portalefatturazione-pagopa-it.repository
   #tfsec:ignore:general-secrets-no-plaintext-exposure
   #tfsec:ignore:GEN003
-  path                         = "${var.prefix}\\${var.tlscert-portalefatturazione-pagopa-it.pipeline.path}"
+  path                         = "${var.prefix}\\${var.tlscert-api-portalefatturazione-pagopa-it.pipeline.path}"
   github_service_connection_id = azuredevops_serviceendpoint_github.azure-devops-github-ro.id
 
-  dns_record_name         = var.tlscert-portalefatturazione-pagopa-it.pipeline.dns_record_name
-  dns_zone_name           = var.tlscert-portalefatturazione-pagopa-it.pipeline.dns_zone_name
-  dns_zone_resource_group = local.tlscert-portalefatturazione-pagopa-it.dns_zone_resource_group
-  tenant_id               = local.tlscert-portalefatturazione-pagopa-it.tenant_id
-  subscription_name       = local.tlscert-portalefatturazione-pagopa-it.subscription_name
-  subscription_id         = local.tlscert-portalefatturazione-pagopa-it.subscription_id
+  dns_record_name         = var.tlscert-api-portalefatturazione-pagopa-it.pipeline.dns_record_name
+  dns_zone_name           = var.tlscert-api-portalefatturazione-pagopa-it.pipeline.dns_zone_name
+  dns_zone_resource_group = local.tlscert-api-portalefatturazione-pagopa-it.dns_zone_resource_group
+  tenant_id               = local.tlscert-api-portalefatturazione-pagopa-it.tenant_id
+  subscription_name       = local.tlscert-api-portalefatturazione-pagopa-it.subscription_name
+  subscription_id         = local.tlscert-api-portalefatturazione-pagopa-it.subscription_id
 
-  credential_key_vault_name           = local.tlscert-portalefatturazione-pagopa-it.credential_key_vault_name
-  credential_key_vault_resource_group = local.tlscert-portalefatturazione-pagopa-it.credential_key_vault_resource_group
+  credential_key_vault_name           = local.tlscert-api-portalefatturazione-pagopa-it.credential_key_vault_name
+  credential_key_vault_resource_group = local.tlscert-api-portalefatturazione-pagopa-it.credential_key_vault_resource_group
 
   variables = merge(
-    var.tlscert-portalefatturazione-pagopa-it.pipeline.variables,
-    local.tlscert-portalefatturazione-pagopa-it-variables,
+    var.tlscert-api-portalefatturazione-pagopa-it.pipeline.variables,
+    local.tlscert-api-portalefatturazione-pagopa-it-variables,
   )
 
   variables_secret = merge(
-    var.tlscert-portalefatturazione-pagopa-it.pipeline.variables_secret,
-    local.tlscert-portalefatturazione-pagopa-it-variables_secret,
+    var.tlscert-api-portalefatturazione-pagopa-it.pipeline.variables_secret,
+    local.tlscert-api-portalefatturazione-pagopa-it-variables_secret,
   )
 
-  service_connection_ids_authorization = local.tlscert-portalefatturazione-pagopa-it.service_connection_ids_authorization
+  service_connection_ids_authorization = local.tlscert-api-portalefatturazione-pagopa-it.service_connection_ids_authorization
 
   schedules = {
-    days_to_build              = ["Fri"]
+    days_to_build              = ["Thu"]
     schedule_only_with_changes = false
-    start_hours                = 6
+    start_hours                = 3
     start_minutes              = 0
     time_zone                  = "(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna"
     branch_filter = {
-      include = [var.tlscert-portalefatturazione-pagopa-it.repository.branch_name]
+      include = [var.tlscert-api-portalefatturazione-pagopa-it.repository.branch_name]
       exclude = []
     }
   }

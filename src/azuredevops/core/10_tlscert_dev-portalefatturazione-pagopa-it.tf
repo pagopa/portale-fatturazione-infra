@@ -49,7 +49,7 @@
 #   depends_on = [module.letsencrypt_dev]
 #   count      = var.dev-tlscert-portalefatturazione-pagopa-it.pipeline.enable_tls_cert == true ? 1 : 0
 
-#   source = "git::https://github.com/pagopa/azuredevops-tf-modules.git//azuredevops_build_definition_tls_cert_federated?ref=v4.1.1"
+#   source = "git::https://github.com/pagopa/azuredevops-tf-modules.git//azuredevops_build_definition_tls_cert_federated?ref=v4.1.3"
 #   providers = {
 #     azurerm = azurerm.dev
 #   }
@@ -57,7 +57,6 @@
 #   project_id = data.azuredevops_project.project.id
 #   location   = local.dev-tlscert-portalefatturazione-pagopa-it.location
 #   repository = var.dev-tlscert-portalefatturazione-pagopa-it.repository
-#   name       = var.dev-tlscert-portalefatturazione-pagopa-it.pipeline.dns_zone_name
 #   #tfsec:ignore:general-secrets-no-plaintext-exposure
 #   #tfsec:ignore:GEN003
 #   path                         = "${var.prefix}\\${var.dev-tlscert-portalefatturazione-pagopa-it.pipeline.path}"

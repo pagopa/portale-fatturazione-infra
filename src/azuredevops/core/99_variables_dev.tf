@@ -5,6 +5,7 @@ locals {
     # key_vault_name    = var.dev_key_vault_name
     # key_vault_rg_name = var.dev_key_vault_rg_name
     # dns_zone_rg_name  = var.dev_dns_zone_rg_name
+    # identity_rg_name  = var.dev_identity_rg_name
   }
 }
 
@@ -26,4 +27,9 @@ variable "dev_subscription_name" {
 # variable "dev_dns_zone_rg_name" {
 #   type        = string
 #   description = "DEV DNS Zone resource group name"
+# }
+
+# variable "dev_identity_rg_name" {
+#   type        = string
+#   description = "DEV Managed Identity resource group name"
 # }
