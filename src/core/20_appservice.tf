@@ -6,6 +6,13 @@ module "app_snet" {
   virtual_network_name                      = module.vnet.name
   private_endpoint_network_policies_enabled = true
   service_endpoints                         = []
+  delegation = {
+    name = "default"
+    service_delegation = {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
 module "app" {
