@@ -3,7 +3,7 @@ repos:
     rev: 72c60aca479dce0593d6d28e2f006dbc484d8684 # v1.8.35
     hooks:
       - id: terraform_fmt
-      - id: terraform_docs
+      #- id: terraform_docs
       - id: terraform_tfsec
       - id: terraform_validate
         args:
