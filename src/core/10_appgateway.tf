@@ -27,8 +27,13 @@ resource "azurerm_user_assigned_identity" "agw" {
 
 
 # read the certificate before provisioning the appgateway
-data "azurerm_key_vault_certificate" "agw_app" {
-  name         = var.agw_app_certificate_name
+data "azurerm_key_vault_certificate" "agw_api_app" {
+  name         = var.agw_api_app_certificate_name
+  key_vault_id = module.key_vault.id
+}
+
+data "azurerm_key_vault_certificate" "agw_apex_app" {
+  name         = var.agw_apex_app_certificate_name
   key_vault_id = module.key_vault.id
 }
 
@@ -64,42 +69,74 @@ module "agw" {
   trusted_client_certificates = []
   # backends
   backends = {
-    app = {
+    app_api = {
       protocol                    = "Https"
-      host                        = format("%s-%s.%s", local.project, "app-docker", "azurewebsites.net")
+      host                        = format("%s-%s.%s", local.project, "app-api", "azurewebsites.net")
       port                        = 443
       ip_addresses                = null # with null value use fqdns
-      fqdns                       = [format("%s-%s.%s", local.project, "app-docker", "azurewebsites.net")]
+      fqdns                       = [format("%s-%s.%s", local.project, "app-api", "azurewebsites.net")]
       probe                       = "/index.html"
-      probe_name                  = "probe-app"
+      probe_name                  = "probe-app_api"
+      request_timeout             = 60
+      pick_host_name_from_backend = false # module quirk
+    },
+    app_fe = {
+      protocol                    = "Https"
+      host                        = format("%s-%s.%s", local.project, "app-fe", "azurewebsites.net")
+      port                        = 443
+      ip_addresses                = null # with null value use fqdns
+      fqdns                       = [format("%s-%s.%s", local.project, "app-fe", "azurewebsites.net")]
+      probe                       = "/index.html"
+      probe_name                  = "probe-app_fe"
       request_timeout             = 60
       pick_host_name_from_backend = false # module quirk
     },
   }
   # listeners
   listeners = {
-    app = {
+    api = {
+      protocol           = "Https"
+      host               = join(".", [var.dns_api_prefix, var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
+      port               = 443
+      ssl_profile_name   = null
+      firewall_policy_id = null
+      certificate = {
+        name = var.agw_api_app_certificate_name
+        id = replace(
+          data.azurerm_key_vault_certificate.agw_api_app.secret_id,
+          "/${data.azurerm_key_vault_certificate.agw_api_app.version}",
+          ""
+        )
+      }
+    }
+    apex = {
       protocol           = "Https"
       host               = join(".", [var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
       port               = 443
       ssl_profile_name   = null
       firewall_policy_id = null
       certificate = {
-        name = var.agw_app_certificate_name
+        name = var.agw_apex_app_certificate_name
         id = replace(
-          data.azurerm_key_vault_certificate.agw_app.secret_id,
-          "/${data.azurerm_key_vault_certificate.agw_app.version}",
+          data.azurerm_key_vault_certificate.agw_apex_app.secret_id,
+          "/${data.azurerm_key_vault_certificate.agw_apex_app.version}",
           ""
         )
       }
     }
   }
   routes = {
-    app = {
-      listener              = "app"
-      backend               = "app"
+    api = {
+      listener              = "api"
+      backend               = "app_api"
       rewrite_rule_set_name = null
       priority              = 10
+    }
+    apex = {
+      listener              = "apex"
+      backend               = "app_fe"
+      rewrite_rule_set_name = null
+      priority              = 20
     }
   }
   # identity

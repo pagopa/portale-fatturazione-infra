@@ -15,13 +15,13 @@ module "app_snet" {
   }
 }
 
-module "app" {
+module "app_api" {
   source              = "./.terraform/modules/__v3__/app_service/"
-  name                = format("%s-%s", local.project, "app-docker")
+  name                = format("%s-%s", local.project, "app-api")
   resource_group_name = azurerm_resource_group.app.name
   location            = var.location
   plan_type           = "internal"
-  plan_name           = format("%s-%s", local.project, "app-docker-plan")
+  plan_name           = format("%s-%s", local.project, "app-api-plan")
   sku_name            = var.app_plan_sku_name
   client_cert_enabled = false
   always_on           = false
@@ -34,21 +34,21 @@ module "app" {
   allowed_ips      = []
   subnet_id        = module.app_snet.id
   app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
-    WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false # disable SMB mount across scale instances of /home
+    WEBSITES_PORT                       = 8080  # look at EXPOSE port in Dockerfile of container
   }
   tags = var.tags
 }
 
-resource "azurerm_private_endpoint" "app" {
-  name                = format("%s-endpoint", module.app.name)
+resource "azurerm_private_endpoint" "app_api" {
+  name                = format("%s-endpoint", module.app_api.name)
   location            = var.location
   resource_group_name = azurerm_resource_group.app.name
   subnet_id           = module.private_endpoint_snet.id
 
   private_service_connection {
-    name                           = format("%s-endpoint", module.app.name)
-    private_connection_resource_id = module.app.id
+    name                           = format("%s-endpoint", module.app_api.name)
+    private_connection_resource_id = module.app_api.id
     is_manual_connection           = false
     subresource_names              = ["sites"]
   }
@@ -58,5 +58,34 @@ resource "azurerm_private_endpoint" "app" {
     private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
   }
 
+  tags = var.tags
+}
+
+#
+# frontend
+# this will be replaced by a cdn endpoint
+#
+module "app_fe" {
+  source              = "./.terraform/modules/__v3__/app_service/"
+  name                = format("%s-%s", local.project, "app-fe")
+  resource_group_name = azurerm_resource_group.app.name
+  location            = var.location
+  plan_type           = "internal"
+  plan_name           = format("%s-%s", local.project, "app-fe-plan")
+  sku_name            = var.app_plan_sku_name
+  client_cert_enabled = false
+  always_on           = false
+  docker_image        = "registry.hub.docker.com/nginxdemos/nginx-hello"
+  docker_image_tag    = "latest"
+  # FIXME
+  # health_check_path   = "/status"
+  vnet_integration = false
+  allowed_subnets  = [module.agw_snet.id]
+  allowed_ips      = []
+  subnet_id        = module.app_snet.id
+  app_settings = {
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false # disable SMB mount across scale instances of /home
+    WEBSITES_PORT                       = 8080  # look at EXPOSE port in Dockerfile of container
+  }
   tags = var.tags
 }
