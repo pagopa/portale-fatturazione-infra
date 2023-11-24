@@ -88,3 +88,15 @@ resource "azurerm_key_vault_access_policy" "agw_policy" {
   storage_permissions     = []
   certificate_permissions = ["Get", "List"]
 }
+
+#
+# policy cdn
+#
+resource "azurerm_key_vault_access_policy" "cdn_policy" {
+  key_vault_id            = module.key_vault.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = var.azuread_service_principal_azure_cdn_frontdoor_id
+  secret_permissions      = ["Get"]
+  storage_permissions     = []
+  certificate_permissions = ["Get"]
+}

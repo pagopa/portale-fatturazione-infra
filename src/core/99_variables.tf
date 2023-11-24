@@ -76,10 +76,32 @@ variable "dns_external_domain" {
   default     = "pagopa.it"
 }
 
+variable "dns_api_prefix" {
+  type        = string
+  description = "dns name of the api endpoint"
+  default     = "api"
+}
+
 variable "dns_default_ttl_sec" {
   type        = number
   description = "dns ttl"
   default     = 3600
+}
+
+#
+# cdn
+#
+variable "azuread_service_principal_azure_cdn_frontdoor_id" {
+  type        = string
+  description = "azure cdn front door principal id"
+  # this is the deafult value for tenant pagopa.it
+  default = "f3b3f72f-4770-47a5-8c1e-aa298003be12"
+}
+
+variable "cdn_storage_account_replication_type" {
+  type        = string
+  description = "storage account replication type for the cdn endpoint"
+  default     = "ZRS"
 }
 
 #
@@ -144,7 +166,7 @@ variable "secondary_cidr_pvt_endp_snet" {
 #
 # appgateway
 #
-variable "agw_app_certificate_name" {
+variable "agw_api_app_certificate_name" {
   type        = string
   description = "the certificate name on the kv for the api endpoint"
 }

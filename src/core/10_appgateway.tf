@@ -28,7 +28,7 @@ resource "azurerm_user_assigned_identity" "agw" {
 
 # read the certificate before provisioning the appgateway
 data "azurerm_key_vault_certificate" "agw_app" {
-  name         = var.agw_app_certificate_name
+  name         = var.agw_api_app_certificate_name
   key_vault_id = module.key_vault.id
 }
 
@@ -80,12 +80,12 @@ module "agw" {
   listeners = {
     app = {
       protocol           = "Https"
-      host               = join(".", [var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
+      host               = join(".", [var.dns_api_prefix, var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
       port               = 443
       ssl_profile_name   = null
       firewall_policy_id = null
       certificate = {
-        name = var.agw_app_certificate_name
+        name = var.agw_api_app_certificate_name
         id = replace(
           data.azurerm_key_vault_certificate.agw_app.secret_id,
           "/${data.azurerm_key_vault_certificate.agw_app.version}",
