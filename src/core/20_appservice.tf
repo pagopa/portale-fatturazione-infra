@@ -89,13 +89,12 @@ resource "azurerm_linux_web_app" "app_api" {
     }
     minimum_tls_version    = "1.2"
     vnet_route_all_enabled = true
-    ip_restriction {
-      virtual_network_subnet_id = module.agw_snet.id
-      name                      = "rule"
-    }
   }
   identity {
     type = "SystemAssigned"
+  }
+  lifecycle {
+    ignore_changes = [virtual_network_subnet_id]
   }
   tags = var.tags
 }
