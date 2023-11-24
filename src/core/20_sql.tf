@@ -3,7 +3,7 @@
 resource "azurerm_mssql_server" "this" {
   name                = format("%s-%s", local.project, "sqls")
   resource_group_name = azurerm_resource_group.analytics.name
-  location            = var.location
+  location            = azurerm_resource_group.analytics.location
   version             = var.sql_version
   # admin auth
   azuread_administrator {
@@ -31,7 +31,7 @@ resource "azurerm_mssql_database" "this" {
 
 resource "azurerm_private_endpoint" "sql" {
   name                = format("%s-endpoint", azurerm_mssql_server.this.name)
-  location            = var.location
+  location            = azurerm_resource_group.analytics.location
   resource_group_name = azurerm_resource_group.analytics.name
   subnet_id           = module.private_endpoint_snet.id
 

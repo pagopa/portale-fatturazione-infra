@@ -1,6 +1,6 @@
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
   name                = format("%s-%s", local.project, "law")
-  location            = var.location
+  location            = azurerm_resource_group.monitoring.location
   resource_group_name = azurerm_resource_group.monitoring.name
   sku                 = var.law_sku
   retention_in_days   = var.law_retention_in_days
@@ -11,7 +11,7 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
 # Application insights
 resource "azurerm_application_insights" "application_insights" {
   name                = format("%s-%s", local.project, "appinsights")
-  location            = var.location
+  location            = azurerm_resource_group.monitoring.location
   resource_group_name = azurerm_resource_group.monitoring.name
   application_type    = "other"
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
