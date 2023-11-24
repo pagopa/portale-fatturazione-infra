@@ -29,7 +29,7 @@ resource "azurerm_dns_ns_record" "dev_portalefatturazione_pagopa_it_ns" {
 # agw
 #
 resource "azurerm_dns_a_record" "agw" {
-  name                = "@"
+  name                = var.dns_api_prefix
   zone_name           = azurerm_dns_zone.portalefatturazione[0].name
   resource_group_name = azurerm_resource_group.networking.name
   records             = [azurerm_public_ip.agw.ip_address]

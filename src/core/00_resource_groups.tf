@@ -33,3 +33,9 @@ resource "azurerm_resource_group" "identity" {
   location = var.location
   tags     = var.tags
 }
+
+resource "azurerm_resource_group" "cdn" {
+  name     = format("%s-%s-rg", local.project, "cdn")
+  location = var.location
+  tags     = var.tags
+}

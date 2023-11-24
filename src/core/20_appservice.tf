@@ -34,8 +34,8 @@ module "app" {
   allowed_ips      = []
   subnet_id        = module.app_snet.id
   app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
-    WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false # disable SMB mount across scale instances of /home
+    WEBSITES_PORT                       = 8080  # look at EXPOSE port in Dockerfile of container
   }
   tags = var.tags
 }
