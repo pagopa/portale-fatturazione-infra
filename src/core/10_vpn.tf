@@ -18,7 +18,7 @@ module "vpn" {
   resource_group_name = azurerm_resource_group.networking.name
   sku                 = "VpnGw1"
   pip_sku             = "Basic"
-  location            = var.location
+  location            = azurerm_resource_group.networking.location
   subnet_id           = module.vpn_snet.id
   vpn_client_configuration = [
     {
