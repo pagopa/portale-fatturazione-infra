@@ -28,8 +28,19 @@ resource "azurerm_dns_ns_record" "dev_portalefatturazione_pagopa_it_ns" {
 #
 # agw
 #
-resource "azurerm_dns_a_record" "agw" {
+# to app-fe
+resource "azurerm_dns_a_record" "agw_apex" {
   name                = "@"
+  zone_name           = azurerm_dns_zone.portalefatturazione[0].name
+  resource_group_name = azurerm_resource_group.networking.name
+  records             = [azurerm_public_ip.agw.ip_address]
+  ttl                 = var.dns_default_ttl_sec
+  tags                = var.tags
+}
+
+# to app-api
+resource "azurerm_dns_a_record" "agw_api" {
+  name                = "api"
   zone_name           = azurerm_dns_zone.portalefatturazione[0].name
   resource_group_name = azurerm_resource_group.networking.name
   records             = [azurerm_public_ip.agw.ip_address]

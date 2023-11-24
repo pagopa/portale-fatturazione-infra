@@ -17,7 +17,7 @@ tags = {
 #
 # dns
 #
-dns_zone_portalefatturazione_prefix = "portalefatturazione" # FIXME
+dns_zone_portalefatturazione_prefix = "portalefatturazione"
 
 #
 # networking
@@ -40,7 +40,8 @@ secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
 #
 # appgateway
 #
-agw_app_certificate_name = "portalefatturazione-pagopa-it"
+agw_apex_app_certificate_name = "portalefatturazione-pagopa-it"
+agw_api_app_certificate_name  = "api-portalefatturazione-pagopa-it"
 
 #
 # appservice

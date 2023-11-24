@@ -76,6 +76,12 @@ variable "dns_external_domain" {
   default     = "pagopa.it"
 }
 
+variable "dns_api_prefix" {
+  type        = string
+  description = "dns name of the api endpoint"
+  default     = "api"
+}
+
 variable "dns_default_ttl_sec" {
   type        = number
   description = "dns ttl"
@@ -144,10 +150,16 @@ variable "secondary_cidr_pvt_endp_snet" {
 #
 # appgateway
 #
-variable "agw_app_certificate_name" {
+variable "agw_api_app_certificate_name" {
   type        = string
   description = "the certificate name on the kv for the api endpoint"
 }
+
+variable "agw_apex_app_certificate_name" {
+  type        = string
+  description = "the certificate name on the kv for the api endpoint"
+}
+
 
 #
 # appservice
