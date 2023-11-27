@@ -1,9 +1,9 @@
 #tfsec:ignore:azure-database-no-public-access
 #tfsec:ignore:azure-database-enable-audit
-resource "azurerm_mssql_server" "this" {
-  name                = format("%s-%s", local.project, "sqls")
+resource "azurerm_mssql_server" "server_weu" {
+  name                = format("%s-%s", local.project, "sqls-weu")
   resource_group_name = azurerm_resource_group.analytics.name
-  location            = azurerm_resource_group.analytics.location
+  location            = var.secondary_location
   version             = var.sql_version
   # admin auth
   azuread_administrator {
@@ -17,9 +17,9 @@ resource "azurerm_mssql_server" "this" {
   tags                          = var.tags
 }
 
-resource "azurerm_mssql_database" "this" {
-  name      = format("%s-%s", local.project, "db")
-  server_id = azurerm_mssql_server.this.id
+resource "azurerm_mssql_database" "db_weu" {
+  name      = format("%s-%s", local.project, "db-weu")
+  server_id = azurerm_mssql_server.server_weu.id
   collation = "SQL_Latin1_General_CP1_CI_AS"
   # max_size_gb          = var.sql_database_max_size_gb
   read_replica_count   = 1 # use only with HS sku
@@ -30,6 +30,7 @@ resource "azurerm_mssql_database" "this" {
   tags                 = var.tags
 }
 
+/*
 resource "azurerm_private_endpoint" "sql" {
   name                = format("%s-endpoint", azurerm_mssql_server.this.name)
   location            = azurerm_resource_group.analytics.location
@@ -47,3 +48,4 @@ resource "azurerm_private_endpoint" "sql" {
   }
   tags = var.tags
 }
+*/
