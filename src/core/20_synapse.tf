@@ -45,6 +45,18 @@ resource "azurerm_synapse_spark_pool" "sparkcls01" {
   auto_pause {
     delay_in_minutes = 15
   }
-
   tags = var.tags
+}
+
+# role assignments
+resource "azurerm_role_assignment" "synw_sa_storage_blob_data_contributor" {
+  scope                = module.sa_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
+  scope                = module.dls_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
