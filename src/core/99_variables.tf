@@ -207,11 +207,11 @@ variable "sql_version" {
   default     = "12.0"
 }
 
-variable "sql_database_max_size_gb" {
-  type        = number
-  description = "the max size in gb of the database"
-  default     = 250
-}
+# variable "sql_database_max_size_gb" {
+#   type        = number
+#   description = "the max size in gb of the database"
+#   default     = 250
+# }
 
 variable "sql_database_sku_name" {
   type        = string

@@ -18,10 +18,10 @@ resource "azurerm_mssql_server" "this" {
 }
 
 resource "azurerm_mssql_database" "this" {
-  name                 = format("%s-%s", local.project, "db")
-  server_id            = azurerm_mssql_server.this.id
-  collation            = "SQL_Latin1_General_CP1_CI_AS"
-  max_size_gb          = var.sql_database_max_size_gb
+  name      = format("%s-%s", local.project, "db")
+  server_id = azurerm_mssql_server.this.id
+  collation = "SQL_Latin1_General_CP1_CI_AS"
+  # max_size_gb          = var.sql_database_max_size_gb
   sku_name             = var.sql_database_sku_name
   zone_redundant       = true
   storage_account_type = "Zone"
