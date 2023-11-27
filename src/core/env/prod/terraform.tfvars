@@ -51,5 +51,5 @@ app_plan_sku_name = "P0v3"
 #
 # azure sql
 #
-sql_database_sku_name    = "S6"
+sql_database_sku_name    = "HS_Gen5_4"
 sql_database_max_size_gb = 1024
