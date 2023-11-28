@@ -15,7 +15,7 @@ module "dls_storage" {
   blob_delete_retention_days           = var.storage_delete_retention_days
   blob_container_delete_retention_days = var.storage_delete_retention_days
   allow_nested_items_to_be_public      = false
-  public_network_access_enabled        = true # FIXME
+  public_network_access_enabled        = false
   tags                                 = var.tags
 }
 
@@ -48,7 +48,7 @@ module "sa_storage" {
   blob_delete_retention_days           = var.storage_delete_retention_days
   blob_container_delete_retention_days = var.storage_delete_retention_days
   allow_nested_items_to_be_public      = false
-  public_network_access_enabled        = true # from datalake, over public network
+  public_network_access_enabled        = true # from/to datalake, over public network
   tags                                 = var.tags
 }
 
@@ -142,7 +142,7 @@ module "sap_storage" {
   blob_delete_retention_days           = var.storage_delete_retention_days
   blob_container_delete_retention_days = var.storage_delete_retention_days
   allow_nested_items_to_be_public      = false
-  public_network_access_enabled        = true # from datalake, over public network
+  public_network_access_enabled        = true # from/to sap, over public network
   tags                                 = var.tags
 }
 

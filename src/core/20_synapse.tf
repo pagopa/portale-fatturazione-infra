@@ -9,6 +9,8 @@ resource "azurerm_synapse_workspace" "this" {
   location                             = var.secondary_location # not available in italynorth
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.this.id
   managed_virtual_network_enabled      = true
+  data_exfiltration_protection_enabled = true
+  public_network_access_enabled        = true # FIXME
   # admin auth
   # azuread_authentication_only = true
   # FIXME https://github.com/hashicorp/terraform-provider-azurerm/pull/23659
@@ -17,13 +19,6 @@ resource "azurerm_synapse_workspace" "this" {
     login     = data.azuread_group.adgroup_admin.display_name
     object_id = data.azuread_group.adgroup_admin.object_id
     tenant_id = data.azurerm_client_config.current.tenant_id
-  }
-  azure_devops_repo {
-    account_name    = "pagopaspa"
-    branch_name     = "main"
-    repository_name = "portale-fatturazione-synapse"
-    project_name    = "fatturazione-projects"
-    root_folder     = "/"
   }
   identity {
     type = "SystemAssigned"
@@ -89,4 +84,65 @@ resource "azurerm_synapse_linked_service" "this" {
   depends_on = [
     azurerm_synapse_firewall_rule.this
   ]
+}
+
+# private endpoint
+resource "azurerm_private_endpoint" "web_azuresynapse" {
+  name                = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+  private_service_connection {
+    name                           = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
+    private_connection_resource_id = azurerm_synapse_private_link_hub.this.id
+    is_manual_connection           = false
+    subresource_names              = ["web"]
+  }
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azuresynapse_net.id]
+  }
+  tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "dev_azuresynapse" {
+  name                = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+  private_service_connection {
+    name                           = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
+    private_connection_resource_id = azurerm_synapse_workspace.this.id
+    is_manual_connection           = false
+    subresource_names              = ["dev"]
+  }
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_dev_azuresynapse_net.id]
+  }
+  tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "sql_azuresynapse" {
+  name                = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+  private_service_connection {
+    name                           = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
+    private_connection_resource_id = azurerm_synapse_workspace.this.id
+    is_manual_connection           = false
+    subresource_names              = ["sql"]
+  }
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.id]
+  }
+  tags = var.tags
+}
+
+resource "azurerm_synapse_private_link_hub" "this" {
+  name                = replace(format("%s-link-hub", azurerm_synapse_workspace.this.name), "-", "")
+  resource_group_name = azurerm_resource_group.analytics.name
+  location            = var.secondary_location
 }
