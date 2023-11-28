@@ -60,3 +60,33 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
+
+resource "azurerm_synapse_integration_runtime_azure" "this" {
+  name                 = format("%s-%s", local.project, "synw-integration-runtime")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  location             = var.secondary_location
+}
+
+resource "azurerm_synapse_firewall_rule" "this" {
+  name                 = "allowAll"
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  start_ip_address     = "0.0.0.0"         # FIXME
+  end_ip_address       = "255.255.255.255" # FIXME
+}
+
+resource "azurerm_synapse_linked_service" "this" {
+  name                 = format("%s-%s", local.project, "synw-linked-service-sql")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureSqlDatabase"
+  type_properties_json = <<JSON
+  {
+    "connectionString": "Server=tcp:${azurerm_mssql_server.this.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.this.name};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication='Active Directory Default';"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+  depends_on = [
+    azurerm_synapse_firewall_rule.this
+  ]
+}
