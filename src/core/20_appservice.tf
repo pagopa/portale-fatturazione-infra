@@ -45,8 +45,7 @@ resource "azurerm_linux_web_app" "app_fe" {
   site_config {
     always_on = false
     application_stack {
-      docker_image     = "registry.hub.docker.com/nginxdemos/nginx-hello"
-      docker_image_tag = "latest"
+      node_version = "18-lts"
     }
     minimum_tls_version    = "1.2"
     vnet_route_all_enabled = false
@@ -78,8 +77,9 @@ resource "azurerm_linux_web_app" "app_api" {
   site_config {
     always_on = false
     application_stack {
-      docker_image     = "registry.hub.docker.com/nginxdemos/nginx-hello"
-      docker_image_tag = "latest"
+      dotnet_version = "7.0" # FIXME
+      # dotnet_version is ignored
+      # wait https://github.com/hashicorp/terraform-provider-azurerm/commit/73832251e80c390a139688097ffdad3f2f2022e8
     }
     cors {
       allowed_origins = [
@@ -94,7 +94,10 @@ resource "azurerm_linux_web_app" "app_api" {
     type = "SystemAssigned"
   }
   lifecycle {
-    ignore_changes = [virtual_network_subnet_id]
+    ignore_changes = [
+      virtual_network_subnet_id,
+      site_config[0].application_stack[0].dotnet_version
+    ]
   }
   tags = var.tags
 }
