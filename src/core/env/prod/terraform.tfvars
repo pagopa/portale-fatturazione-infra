@@ -51,4 +51,4 @@ app_plan_sku_name = "P0v3"
 #
 # azure sql
 #
-sql_database_sku_name = "S0"
+sql_database_sku_name = "S6"
