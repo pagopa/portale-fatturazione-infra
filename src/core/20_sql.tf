@@ -12,7 +12,7 @@ resource "azurerm_mssql_server" "this" {
     object_id                   = data.azuread_group.adgroup_admin.object_id
     tenant_id                   = data.azurerm_client_config.current.tenant_id
   }
-  public_network_access_enabled = true # FIXME
+  public_network_access_enabled = false
   minimum_tls_version           = "1.2"
   tags                          = var.tags
 }
