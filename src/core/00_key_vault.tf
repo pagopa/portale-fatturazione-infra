@@ -88,3 +88,28 @@ resource "azurerm_key_vault_access_policy" "agw_policy" {
   storage_permissions     = []
   certificate_permissions = ["Get", "List"]
 }
+
+#
+# additional kv for app secrets
+#
+module "key_vault_app" {
+  source                     = "./.terraform/modules/__v3__/key_vault/"
+  name                       = format("%s-%s", local.project, "kv-app")
+  location                   = azurerm_resource_group.kv.location
+  resource_group_name        = azurerm_resource_group.kv.name
+  soft_delete_retention_days = var.kv_soft_delete_retention_days
+  sku_name                   = var.kv_sku_name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  tags                       = var.tags
+}
+
+# policy for app service access (api)
+resource "azurerm_key_vault_access_policy" "app_api_policy" {
+  key_vault_id            = module.key_vault_app.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = azurerm_linux_web_app.app_api.identity[0].principal_id
+  key_permissions         = []
+  secret_permissions      = ["Get", "List"]
+  storage_permissions     = []
+  certificate_permissions = []
+}
