@@ -7,8 +7,8 @@ resource "azurerm_mssql_server" "this" {
   # admin auth
   azuread_administrator {
     azuread_authentication_only = true
-    login_username              = data.azuread_group.adgroup_admin.display_name
-    object_id                   = data.azuread_group.adgroup_admin.object_id
+    login_username              = data.azuread_group.adgroup_admins.display_name
+    object_id                   = data.azuread_group.adgroup_admins.object_id
     tenant_id                   = data.azurerm_client_config.current.tenant_id
   }
   public_network_access_enabled = false
