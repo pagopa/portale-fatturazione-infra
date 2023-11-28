@@ -132,6 +132,64 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dfs_core_w
   virtual_network_id    = module.secondary_vnet.id
 }
 
+# synapse
+resource "azurerm_private_dns_zone" "privatelink_sql_azuresynapse_net" {
+  name                = "privatelink.sql.azuresynapse.net"
+  resource_group_name = azurerm_resource_group.networking.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_sql_azuresynapse_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.name
+  virtual_network_id    = module.vnet.id
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_sql_azuresynapse_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.name
+  virtual_network_id    = module.secondary_vnet.id
+}
+
+resource "azurerm_private_dns_zone" "privatelink_dev_azuresynapse_net" {
+  name                = "privatelink.dev.azuresynapse.net"
+  resource_group_name = azurerm_resource_group.networking.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dev_azuresynapse_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_dev_azuresynapse_net.name
+  virtual_network_id    = module.vnet.id
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dev_azuresynapse_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_dev_azuresynapse_net.name
+  virtual_network_id    = module.secondary_vnet.id
+}
+
+resource "azurerm_private_dns_zone" "privatelink_azuresynapse_net" {
+  name                = "privatelink.azuresynapse.net"
+  resource_group_name = azurerm_resource_group.networking.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azuresynapse_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_azuresynapse_net.name
+  virtual_network_id    = module.vnet.id
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azuresynapse_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_azuresynapse_net.name
+  virtual_network_id    = module.secondary_vnet.id
+}
+
 #
 # other
 #
