@@ -1,4 +1,3 @@
-#tfsec:ignore:azure-database-no-public-access
 #tfsec:ignore:azure-database-enable-audit
 resource "azurerm_mssql_server" "this" {
   name                = format("%s-%s", local.project, "sqls")
