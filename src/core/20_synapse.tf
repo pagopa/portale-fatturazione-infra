@@ -63,14 +63,6 @@ resource "azurerm_synapse_integration_runtime_azure" "this" {
   location             = var.secondary_location
 }
 
-# firewall rule
-resource "azurerm_synapse_firewall_rule" "this" {
-  name                 = "allowAll"
-  synapse_workspace_id = azurerm_synapse_workspace.this.id
-  start_ip_address     = "0.0.0.0"         # FIXME
-  end_ip_address       = "255.255.255.255" # FIXME
-}
-
 # linked service
 # FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
 resource "azurerm_synapse_linked_service" "this" {
@@ -85,9 +77,6 @@ resource "azurerm_synapse_linked_service" "this" {
   integration_runtime {
     name = azurerm_synapse_integration_runtime_azure.this.name
   }
-  depends_on = [
-    azurerm_synapse_firewall_rule.this
-  ]
 }
 
 # private endpoints
@@ -100,7 +89,7 @@ resource "azurerm_private_endpoint" "web_azuresynapse" {
     name                           = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_private_link_hub.this.id
     is_manual_connection           = false
-    subresource_names              = ["web"]
+    subresource_names              = ["Web"]
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
@@ -118,7 +107,7 @@ resource "azurerm_private_endpoint" "dev_azuresynapse" {
     name                           = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
     is_manual_connection           = false
-    subresource_names              = ["dev"]
+    subresource_names              = ["Dev"]
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
@@ -136,7 +125,25 @@ resource "azurerm_private_endpoint" "sql_azuresynapse" {
     name                           = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
     is_manual_connection           = false
-    subresource_names              = ["sql"]
+    subresource_names              = ["Sql"]
+  }
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.id]
+  }
+  tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "sql_ondemand_azuresynapse" {
+  name                = format("%s-sql-ondemand-endpoint", azurerm_synapse_workspace.this.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+  private_service_connection {
+    name                           = format("%s-sql-ondemand-endpoint", azurerm_synapse_workspace.this.name)
+    private_connection_resource_id = azurerm_synapse_workspace.this.id
+    is_manual_connection           = false
+    subresource_names              = ["SqlOnDemand"]
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
@@ -157,16 +164,10 @@ resource "azurerm_synapse_role_assignment" "admins" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Administrator"
   principal_id         = data.azuread_group.adgroup_admins.object_id
-  depends_on = [
-    azurerm_synapse_firewall_rule.this
-  ]
 }
 
 resource "azurerm_synapse_role_assignment" "developers" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Contributor"
   principal_id         = data.azuread_group.adgroup_developers.object_id
-  depends_on = [
-    azurerm_synapse_firewall_rule.this
-  ]
 }
