@@ -10,14 +10,14 @@ resource "azurerm_synapse_workspace" "this" {
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.this.id
   managed_virtual_network_enabled      = true
   data_exfiltration_protection_enabled = true
-  public_network_access_enabled        = true # FIXME
+  public_network_access_enabled        = false
   # admin auth
   # azuread_authentication_only = true
   # FIXME https://github.com/hashicorp/terraform-provider-azurerm/pull/23659
   sql_administrator_login = "sqladminuser"
   aad_admin {
-    login     = data.azuread_group.adgroup_admin.display_name
-    object_id = data.azuread_group.adgroup_admin.object_id
+    login     = data.azuread_group.adgroup_admins.display_name
+    object_id = data.azuread_group.adgroup_admins.object_id
     tenant_id = data.azurerm_client_config.current.tenant_id
   }
   identity {
@@ -56,12 +56,14 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
+# integration runtime
 resource "azurerm_synapse_integration_runtime_azure" "this" {
   name                 = format("%s-%s", local.project, "synw-integration-runtime")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   location             = var.secondary_location
 }
 
+# firewall rule
 resource "azurerm_synapse_firewall_rule" "this" {
   name                 = "allowAll"
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -69,6 +71,8 @@ resource "azurerm_synapse_firewall_rule" "this" {
   end_ip_address       = "255.255.255.255" # FIXME
 }
 
+# linked service
+# FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
 resource "azurerm_synapse_linked_service" "this" {
   name                 = format("%s-%s", local.project, "synw-linked-service-sql")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -86,7 +90,7 @@ resource "azurerm_synapse_linked_service" "this" {
   ]
 }
 
-# private endpoint
+# private endpoints
 resource "azurerm_private_endpoint" "web_azuresynapse" {
   name                = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
@@ -141,8 +145,28 @@ resource "azurerm_private_endpoint" "sql_azuresynapse" {
   tags = var.tags
 }
 
+# private link hub
 resource "azurerm_synapse_private_link_hub" "this" {
   name                = replace(format("%s-link-hub", azurerm_synapse_workspace.this.name), "-", "")
   resource_group_name = azurerm_resource_group.analytics.name
   location            = var.secondary_location
+}
+
+# synapse roles
+resource "azurerm_synapse_role_assignment" "admins" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Administrator"
+  principal_id         = data.azuread_group.adgroup_admins.object_id
+  depends_on = [
+    azurerm_synapse_firewall_rule.this
+  ]
+}
+
+resource "azurerm_synapse_role_assignment" "developers" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Contributor"
+  principal_id         = data.azuread_group.adgroup_developers.object_id
+  depends_on = [
+    azurerm_synapse_firewall_rule.this
+  ]
 }
