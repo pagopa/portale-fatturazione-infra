@@ -65,13 +65,57 @@ resource "azurerm_synapse_integration_runtime_azure" "this" {
 
 # linked service
 # FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
-resource "azurerm_synapse_linked_service" "this" {
-  name                 = format("%s-%s", local.project, "synw-linked-service-sql")
+resource "azurerm_synapse_linked_service" "sql" {
+  name                 = format("%s-synw-linked-service-%s", local.project, "sql")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDatabase"
   type_properties_json = <<JSON
   {
     "connectionString": "Server=tcp:${azurerm_mssql_server.this.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.this.name};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication='Active Directory Default';"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "sap_storage" {
+  name = format("%s-synw-linked-service-%s", local.project, "sap-storage")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+    "serviceEndpoint": "https://${module.sap_storage.name}.blob.core.windows.net/",
+    "accountKind: "StorageV2"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "sa_storage" {
+  name = format("%s-synw-linked-service-%s", local.project, "sa-storage")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+    "serviceEndpoint": "https://${module.sa_storage.name}.blob.core.windows.net/",
+    "accountKind: "StorageV2"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "dls_storage" {
+  name = format("%s-synw-linked-service-%s", local.project, "dls-storage")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type = "AzureBlobFS"
+  type_properties_json = <<JSON
+  {
+    "url": "https://${module.dls_storage.name}.dfs.core.windows.net/"
   }
   JSON
   integration_runtime {
