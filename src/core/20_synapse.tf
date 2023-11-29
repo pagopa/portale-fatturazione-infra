@@ -100,7 +100,7 @@ resource "azurerm_private_endpoint" "web_azuresynapse" {
     name                           = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_private_link_hub.this.id
     is_manual_connection           = false
-    subresource_names              = ["web"]
+    subresource_names              = ["Web"]
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
