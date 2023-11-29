@@ -9,8 +9,10 @@ module "key_vault" {
   tags                       = var.tags
 }
 
-## ad group policy ##
-resource "azurerm_key_vault_access_policy" "ad_group_policy" {
+#
+# policy admins
+#
+resource "azurerm_key_vault_access_policy" "adgroup_admins_policy" {
   key_vault_id = module.key_vault.id
 
   tenant_id = data.azurerm_client_config.current.tenant_id
@@ -99,4 +101,60 @@ resource "azurerm_key_vault_access_policy" "app_api_policy" {
   secret_permissions      = ["Get", "List"]
   storage_permissions     = []
   certificate_permissions = []
+}
+
+#
+# policy admins
+#
+resource "azurerm_key_vault_access_policy" "adgroup_admins_policy_app" {
+  key_vault_id = module.key_vault_app.id
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = data.azuread_group.adgroup_admins.object_id
+
+  key_permissions         = ["Get", "List", "Update", "Create", "Import", "Delete", ]
+  secret_permissions      = ["Get", "List", "Set", "Delete", ]
+  storage_permissions     = []
+  certificate_permissions = ["Get", "List", "Update", "Create", "Import", "Delete", "Restore", "Purge", "Recover", "ManageContacts", ]
+}
+
+#
+# policy developers
+#
+resource "azurerm_key_vault_access_policy" "adgroup_developers_policy_app" {
+  key_vault_id            = module.key_vault_app.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = data.azuread_group.adgroup_developers.object_id
+  key_permissions         = var.env_short == "d" ? ["Get", "List", "Update", "Create", "Import", "Delete", ] : ["Get", "List", "Update", "Create", "Import", ]
+  secret_permissions      = var.env_short == "d" ? ["Get", "List", "Set", "Delete", ] : ["Get", "List", "Set", ]
+  storage_permissions     = []
+  certificate_permissions = var.env_short == "d" ? ["Get", "List", "Update", "Create", "Import", "Delete", "Restore", "Purge", "Recover", "ManageContacts", ] : ["Get", "List", "Update", "Create", "Import", "Restore", "Recover", ]
+}
+
+#
+# policy externals
+#
+resource "azurerm_key_vault_access_policy" "adgroup_externals_policy_app" {
+  count                   = var.env_short == "d" ? 1 : 0
+  key_vault_id            = module.key_vault_app.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = data.azuread_group.adgroup_externals.object_id
+  key_permissions         = ["Get", "List", "Update", "Create", "Import", "Delete", ]
+  secret_permissions      = ["Get", "List", "Set", "Delete", ]
+  storage_permissions     = []
+  certificate_permissions = ["Get", "List", "Update", "Create", "Import", "Delete", "Restore", "Purge", "Recover", "ManageContacts", ]
+}
+
+#
+# policy security
+#
+resource "azurerm_key_vault_access_policy" "adgroup_security_policy_app" {
+  count                   = var.env_short == "d" ? 1 : 0
+  key_vault_id            = module.key_vault_app.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = data.azuread_group.adgroup_security.object_id
+  key_permissions         = ["Get", "List", "Update", "Create", "Import", "Delete", ]
+  secret_permissions      = ["Get", "List", "Set", "Delete", ]
+  storage_permissions     = []
+  certificate_permissions = ["Get", "List", "Update", "Create", "Import", "Delete", "Restore", "Purge", "Recover", "ManageContacts", ]
 }
