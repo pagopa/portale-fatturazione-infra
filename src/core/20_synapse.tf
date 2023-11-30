@@ -60,7 +60,7 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
 resource "azurerm_synapse_integration_runtime_azure" "this" {
   name                 = format("%s-%s", local.project, "synw-integration-runtime")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
-  location             = var.secondary_location
+  location             = "AutoResolve"
 }
 
 # linked service
@@ -75,7 +75,51 @@ resource "azurerm_synapse_linked_service" "sql" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "sap_storage" {
+  name = format("%s-synw-linked-service-%s", local.project, "sap-storage")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+    "serviceEndpoint": "https://${module.sap_storage.name}.blob.core.windows.net/",
+    "accountKind: "StorageV2"
+  }
+  JSON
+  integration_runtime {
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "sa_storage" {
+  name = format("%s-synw-linked-service-%s", local.project, "sa-storage")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+    "serviceEndpoint": "https://${module.sa_storage.name}.blob.core.windows.net/",
+    "accountKind: "StorageV2"
+  }
+  JSON
+  integration_runtime {
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "dls_storage" {
+  name = format("%s-synw-linked-service-%s", local.project, "dls-storage")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type = "AzureBlobFS"
+  type_properties_json = <<JSON
+  {
+    "url": "https://${module.dls_storage.name}.dfs.core.windows.net/"
+  }
+  JSON
+  integration_runtime {
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
   }
 }
 
