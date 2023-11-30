@@ -60,7 +60,7 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
 resource "azurerm_synapse_integration_runtime_azure" "this" {
   name                 = format("%s-%s", local.project, "synw-integration-runtime")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
-  location             = var.secondary_location
+  location             = "AutoResolve"
 }
 
 # linked service
@@ -75,7 +75,7 @@ resource "azurerm_synapse_linked_service" "sql" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
   }
 }
 
@@ -90,7 +90,7 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
   }
 }
 
@@ -105,7 +105,7 @@ resource "azurerm_synapse_linked_service" "sa_storage" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
   }
 }
 
@@ -119,7 +119,7 @@ resource "azurerm_synapse_linked_service" "dls_storage" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime" # azurerm_synapse_integration_runtime_azure.this.name
   }
 }
 
