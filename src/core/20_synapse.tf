@@ -71,7 +71,7 @@ resource "azurerm_synapse_linked_service" "sql" {
   type                 = "AzureSqlDatabase"
   type_properties_json = <<JSON
   {
-    "connectionString": "Server=tcp:${azurerm_mssql_server.this.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.this.name};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication='Active Directory Default';"
+    "connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=${azurerm_mssql_server.this.fully_qualified_domain_name};Initial Catalog=${azurerm_mssql_database.this.name}"
   }
   JSON
   integration_runtime {
