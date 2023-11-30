@@ -4,85 +4,62 @@
 ---- 00_azuread.tf for ad groups
 ---- 20_synapse.tf for the azurerm_synapse_workspace resource name
 
-DECLARE @group NVARCHAR(64);
-DECLARE @role NVARCHAR(64);
-DECLARE @auxiliary_role NVARCHAR(64);
-DECLARE @sql_statement NVARCHAR(MAX);
+DROP PROCEDURE IF EXISTS CreateUser;
+DROP PROCEDURE IF EXISTS AddRoleToUser;
+GO
 
--- fat-p-adgroup-admin -- db_owner role --
-SET @group = 'fat-p-adgroup-admin'
-SET @role = 'db_owner'
-IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = @group)
+CREATE PROCEDURE CreateUser
+    @user NVARCHAR(64)
+AS
 BEGIN
-    SET @sql_statement = 'CREATE USER ' + QUOTENAME(@group) + ' FROM EXTERNAL PROVIDER WITH DEFAULT_SCHEMA = [dbo]';
-    EXEC sp_executesql @sql_statement;
+    DECLARE @sql_statement NVARCHAR(MAX);
+    IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = @user)
+    BEGIN
+        SET @sql_statement = 'CREATE USER ' + QUOTENAME(@user) + ' FROM EXTERNAL PROVIDER WITH DEFAULT_SCHEMA = [dbo]';
+        EXEC sp_executesql @sql_statement;
+    END;
 END;
-IF NOT EXISTS (SELECT * FROM sys.database_role_members WHERE member_principal_id = (
-    SELECT principal_id FROM sys.database_principals WHERE name = @group
+GO
+
+CREATE PROCEDURE AddRoleToUser
+    @user NVARCHAR(64),
+    @role NVARCHAR(64)
+AS
+BEGIN
+    DECLARE @sql_statement NVARCHAR(MAX);
+    IF NOT EXISTS (SELECT * FROM sys.database_role_members WHERE member_principal_id = (
+    SELECT principal_id FROM sys.database_principals WHERE name = @user
     ) AND role_principal_id = (
         SELECT principal_id FROM sys.database_principals WHERE name = @role
     ))
-BEGIN
-	SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@role) + ' ADD MEMBER ' + QUOTENAME(@group);
-    EXEC sp_executesql @sql_statement;
+    BEGIN
+	    SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@role) + ' ADD MEMBER ' + QUOTENAME(@user);
+        EXEC sp_executesql @sql_statement;
+    END;
 END;
+GO
 
--- fat-p-adgroup-developers -- db_ddladmin role --
-SET @group = 'fat-p-adgroup-developers'
-SET @role = 'db_ddladmin'
-IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = @group)
-BEGIN
-    SET @sql_statement = 'CREATE USER ' + QUOTENAME(@group) + ' FROM EXTERNAL PROVIDER WITH DEFAULT_SCHEMA = [dbo]';
-    EXEC sp_executesql @sql_statement;
-END;
-IF NOT EXISTS (SELECT * FROM sys.database_role_members WHERE member_principal_id = (
-    SELECT principal_id FROM sys.database_principals WHERE name = @group
-    ) AND role_principal_id = (
-        SELECT principal_id FROM sys.database_principals WHERE name = @role
-    ))
-BEGIN
-	SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@role) + ' ADD MEMBER ' + QUOTENAME(@group);
-    EXEC sp_executesql @sql_statement;
-END;
+DECLARE @user NVARCHAR(64);
 
--- fat-p-synw -- db_datareader + db_datawriter role --
-SET @group = 'fat-p-synw'
-SET @role = 'db_datareader'
-SET @auxiliary_role = 'db_datawriter'
-IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = @group)
-BEGIN
-    SET @sql_statement = 'CREATE USER ' + QUOTENAME(@group) + ' FROM EXTERNAL PROVIDER WITH DEFAULT_SCHEMA = [dbo]';
-    EXEC sp_executesql @sql_statement;
-END;
-IF NOT EXISTS (SELECT * FROM sys.database_role_members WHERE member_principal_id = (
-    SELECT principal_id FROM sys.database_principals WHERE name = @group
-    ) AND role_principal_id = (
-        SELECT principal_id FROM sys.database_principals WHERE name = @role
-    ))
-BEGIN
-	SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@role) + ' ADD MEMBER ' + QUOTENAME(@group);
-    EXEC sp_executesql @sql_statement;
-    SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@auxiliary_role) + ' ADD MEMBER ' + QUOTENAME(@group);
-    EXEC sp_executesql @sql_statement;
-END;
+-- fat-p-adgroup-admin --
+SET @user = 'fat-p-adgroup-admin'
+EXEC CreateUser @user
+EXEC AddRoleToUser @user, 'db_owner'
 
--- fat-p-app-api -- db_datareader + db_datawriter role --
-SET @group = 'fat-p-app-api'
-SET @role = 'db_datareader'
-SET @auxiliary_role = 'db_datawriter'
-IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = @group)
-BEGIN
-    SET @sql_statement = 'CREATE USER ' + QUOTENAME(@group) + ' FROM EXTERNAL PROVIDER WITH DEFAULT_SCHEMA = [dbo]';
-    EXEC sp_executesql @sql_statement;
-END;
-IF NOT EXISTS (SELECT * FROM sys.database_role_members WHERE member_principal_id = (
-    SELECT principal_id FROM sys.database_principals WHERE name = @group
-    ) AND role_principal_id = (
-        SELECT principal_id FROM sys.database_principals WHERE name = @role
-    ))
-BEGIN
-	SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@role) + ' ADD MEMBER ' + QUOTENAME(@group);
-    EXEC sp_executesql @sql_statement;
-    SET @sql_statement = 'ALTER ROLE ' + QUOTENAME(@auxiliary_role) + ' ADD MEMBER ' + QUOTENAME(@group);
-    EXEC sp_executesql @sql_statement;
-END;
+-- fat-p-adgroup-developers --
+SET @user = 'fat-p-adgroup-developers'
+EXEC CreateUser @user
+EXEC AddRoleToUser @user, 'db_datareader'
+EXEC AddRoleToUser @user, 'db_datawriter'
+
+-- fat-p-synw --
+SET @user = 'fat-p-synw'
+EXEC CreateUser @user
+EXEC AddRoleToUser @user, 'db_datareader'
+EXEC AddRoleToUser @user, 'db_datawriter'
+
+-- fat-p-app-api --
+SET @user = 'fat-p-app-api'
+EXEC CreateUser @user
+EXEC AddRoleToUser @user, 'db_datareader'
+EXEC AddRoleToUser @user, 'db_datawriter'
