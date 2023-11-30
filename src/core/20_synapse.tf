@@ -10,7 +10,7 @@ resource "azurerm_synapse_workspace" "this" {
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.this.id
   managed_virtual_network_enabled      = true
   data_exfiltration_protection_enabled = true
-  public_network_access_enabled        = false
+  public_network_access_enabled        = true
   # admin auth
   # azuread_authentication_only = true
   # FIXME https://github.com/hashicorp/terraform-provider-azurerm/pull/23659
@@ -170,4 +170,32 @@ resource "azurerm_synapse_role_assignment" "developers" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Contributor"
   principal_id         = data.azuread_group.adgroup_developers.object_id
+}
+
+resource "azurerm_synapse_managed_private_endpoint" "sql" {
+  name                 = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = azurerm_mssql_server.this.id
+  subresource_name     = "sqlServer"
+}
+
+resource "azurerm_synapse_managed_private_endpoint" "sa_storage" {
+  name                 = format("%s-sa-storage-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = module.sa_storage.id
+  subresource_name     = "blob"
+}
+
+resource "azurerm_synapse_managed_private_endpoint" "sap_storage" {
+  name                 = format("%s-sap-storage-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = module.sap_storage.id
+  subresource_name     = "blob"
+}
+
+resource "azurerm_synapse_managed_private_endpoint" "dls_storage" {
+  name                 = format("%s-dls-storage-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = module.dls_storage.id
+  subresource_name     = "dls"
 }
