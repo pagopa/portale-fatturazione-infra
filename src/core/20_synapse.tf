@@ -65,8 +65,8 @@ resource "azurerm_synapse_integration_runtime_azure" "this" {
 
 # linked service
 # FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
-resource "azurerm_synapse_linked_service" "this" {
-  name                 = format("%s-%s", local.project, "synw-linked-service-sql")
+resource "azurerm_synapse_linked_service" "sql" {
+  name                 = format("%s-%s", local.prefix, "sql")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDatabase"
   type_properties_json = <<JSON
@@ -74,6 +74,65 @@ resource "azurerm_synapse_linked_service" "this" {
     "connectionString": "Server=tcp:${azurerm_mssql_server.this.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.this.name};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication='Active Directory Default';"
   }
   JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "sap_storage" {
+  name                 = format("%s-%s", local.prefix, "sap")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+    "connectionString": "${module.sap_storage.primary_blob_connection_string}"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "sa_storage" {
+  name                 = format("%s-%s", local.prefix, "sa")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+    "connectionString": "${module.sa_storage.primary_blob_connection_string}"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "dls_storage" {
+  name                 = format("%s-%s", local.prefix, "adls") # different agreed naming convention
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureBlobFS"
+  type_properties_json = <<JSON
+  {
+    "url": "https://${module.dls_storage.name}.dfs.core.windows.net/"
+  }
+  JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "delta" {
+  name                 = format("%s-%s", local.prefix, "delta") # different agreed naming convention
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureSqlDW"
+  type_properties_json = <<JSON
+  {
+    "connectionString": "Data Source=tcp:${azurerm_synapse_workspace.this.name}-ondemand.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  }
+  JSON
+  parameters = {
+    DBName = ""
+  }
   integration_runtime {
     name = azurerm_synapse_integration_runtime_azure.this.name
   }
