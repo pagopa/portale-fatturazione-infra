@@ -75,7 +75,7 @@ module "agw" {
       port                        = 443
       ip_addresses                = null # with null value use fqdns
       fqdns                       = [format("%s-%s.%s", local.project, "app-api", "azurewebsites.net")]
-      probe                       = "/index.html"
+      probe                       = "/health"
       probe_name                  = "probe-app_api"
       request_timeout             = 60
       pick_host_name_from_backend = false # module quirk
@@ -86,7 +86,7 @@ module "agw" {
       port                        = 443
       ip_addresses                = null # with null value use fqdns
       fqdns                       = [format("%s-%s.%s", local.project, "app-fe", "azurewebsites.net")]
-      probe                       = "/index.html"
+      probe                       = "/health"
       probe_name                  = "probe-app_fe"
       request_timeout             = 60
       pick_host_name_from_backend = false # module quirk

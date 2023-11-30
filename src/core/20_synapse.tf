@@ -10,7 +10,7 @@ resource "azurerm_synapse_workspace" "this" {
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.this.id
   managed_virtual_network_enabled      = true
   data_exfiltration_protection_enabled = true
-  public_network_access_enabled        = true
+  public_network_access_enabled        = false
   # admin auth
   # azuread_authentication_only = true
   # FIXME https://github.com/hashicorp/terraform-provider-azurerm/pull/23659
@@ -27,7 +27,7 @@ resource "azurerm_synapse_workspace" "this" {
 }
 
 resource "azurerm_synapse_spark_pool" "sparkcls01" {
-  name                 = "sparkcls01"
+  name                 = replace(format("%s-%s", local.project, "sparkcls01"), "-", "")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small" # FIXME
@@ -66,7 +66,7 @@ resource "azurerm_synapse_integration_runtime_azure" "this" {
 # linked service
 # FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
 resource "azurerm_synapse_linked_service" "sql" {
-  name                 = format("%s-%s", local.prefix, "sql")
+  name                 = format("%s-%s", var.prefix, "sql")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDatabase"
   type_properties_json = <<JSON
@@ -80,7 +80,7 @@ resource "azurerm_synapse_linked_service" "sql" {
 }
 
 resource "azurerm_synapse_linked_service" "sap_storage" {
-  name                 = format("%s-%s", local.prefix, "sap")
+  name                 = format("%s-%s", var.prefix, "sap")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
@@ -94,7 +94,7 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "sa_storage" {
-  name                 = format("%s-%s", local.prefix, "sa")
+  name                 = format("%s-%s", var.prefix, "sa")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
@@ -108,7 +108,7 @@ resource "azurerm_synapse_linked_service" "sa_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "dls_storage" {
-  name                 = format("%s-%s", local.prefix, "adls") # different agreed naming convention
+  name                 = format("%s-%s", var.prefix, "adls") # different agreed naming convention
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobFS"
   type_properties_json = <<JSON
@@ -122,7 +122,7 @@ resource "azurerm_synapse_linked_service" "dls_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "delta" {
-  name                 = format("%s-%s", local.prefix, "delta") # different agreed naming convention
+  name                 = format("%s-%s", var.prefix, "delta") # different agreed naming convention
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDW"
   type_properties_json = <<JSON
@@ -231,6 +231,7 @@ resource "azurerm_synapse_role_assignment" "developers" {
   principal_id         = data.azuread_group.adgroup_developers.object_id
 }
 
+# managed_private_endpoint must be manual approved on target resource
 resource "azurerm_synapse_managed_private_endpoint" "sql" {
   name                 = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -238,6 +239,7 @@ resource "azurerm_synapse_managed_private_endpoint" "sql" {
   subresource_name     = "sqlServer"
 }
 
+# managed_private_endpoint must be manual approved on target resource
 resource "azurerm_synapse_managed_private_endpoint" "sa_storage" {
   name                 = format("%s-sa-storage-endpoint", azurerm_synapse_workspace.this.name)
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -245,6 +247,7 @@ resource "azurerm_synapse_managed_private_endpoint" "sa_storage" {
   subresource_name     = "blob"
 }
 
+# managed_private_endpoint must be manual approved on target resource
 resource "azurerm_synapse_managed_private_endpoint" "sap_storage" {
   name                 = format("%s-sap-storage-endpoint", azurerm_synapse_workspace.this.name)
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -252,9 +255,18 @@ resource "azurerm_synapse_managed_private_endpoint" "sap_storage" {
   subresource_name     = "blob"
 }
 
-resource "azurerm_synapse_managed_private_endpoint" "dls_storage" {
-  name                 = format("%s-dls-storage-endpoint", azurerm_synapse_workspace.this.name)
+# managed_private_endpoint must be manual approved on target resource
+resource "azurerm_synapse_managed_private_endpoint" "dls_storage_blob" {
+  name                 = format("%s-dls-storage-blob-endpoint", azurerm_synapse_workspace.this.name)
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.dls_storage.id
-  subresource_name     = "dls"
+  subresource_name     = "dfs"
+}
+
+# managed_private_endpoint must be manual approved on target resource
+resource "azurerm_synapse_managed_private_endpoint" "dls_storage_dfs" {
+  name                 = format("%s-dls-storage-dfs-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = module.dls_storage.id
+  subresource_name     = "blob"
 }

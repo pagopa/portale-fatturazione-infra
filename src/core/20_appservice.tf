@@ -42,17 +42,19 @@ resource "azurerm_linux_web_app" "app_fe" {
     WEBSITE_DNS_SERVER                  = "168.63.129.16" # would have been inherited from module
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
     WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
+    SCM_DO_BUILD_DURING_DEPLOYMENT      = "false"
   }
 
   site_config {
-    always_on         = false
-    use_32_bit_worker = false
-    ftps_state        = "Disabled"
-    http2_enabled     = true
-    # app_command_line        = "dotnet PortaleFatture.BE.Api.dll" # TODO Fixme
+    always_on               = false
+    use_32_bit_worker       = false
+    ftps_state              = "Disabled"
+    http2_enabled           = true
+    app_command_line        = "pm2 serve /home/site/wwwroot --no-daemon --spa"
     minimum_tls_version     = "1.2"
     scm_minimum_tls_version = "1.2"
     vnet_route_all_enabled  = true
+    health_check_path       = "/health"
 
     application_stack {
       node_version = "18-lts"
@@ -101,6 +103,7 @@ resource "azurerm_linux_web_app" "app_api" {
     minimum_tls_version     = "1.2"
     scm_minimum_tls_version = "1.2"
     vnet_route_all_enabled  = true
+    health_check_path       = "/health"
 
     application_stack {
       dotnet_version = "7.0" # FIXME
