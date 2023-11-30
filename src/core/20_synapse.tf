@@ -80,13 +80,12 @@ resource "azurerm_synapse_linked_service" "sql" {
 }
 
 resource "azurerm_synapse_linked_service" "sap_storage" {
-  name = format("%s-synw-linked-service-%s", local.project, "sap-storage")
+  name                 = format("%s-synw-linked-service-%s", local.project, "sap-storage")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
-  type = "AzureBlobStorage"
+  type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "serviceEndpoint": "https://${module.sap_storage.name}.blob.core.windows.net/",
-    "accountKind: "StorageV2"
+    "connectionString": "${module.sap_storage.primary_blob_connection_string}"
   }
   JSON
   integration_runtime {
@@ -95,13 +94,12 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "sa_storage" {
-  name = format("%s-synw-linked-service-%s", local.project, "sa-storage")
+  name                 = format("%s-synw-linked-service-%s", local.project, "sa-storage")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
-  type = "AzureBlobStorage"
+  type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "serviceEndpoint": "https://${module.sa_storage.name}.blob.core.windows.net/",
-    "accountKind: "StorageV2"
+    "connectionString": "${module.sa_storage.primary_blob_connection_string}"
   }
   JSON
   integration_runtime {
@@ -110,14 +108,31 @@ resource "azurerm_synapse_linked_service" "sa_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "dls_storage" {
-  name = format("%s-synw-linked-service-%s", local.project, "dls-storage")
+  name                 = format("%s-synw-linked-service-%s", local.project, "dls-storage")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
-  type = "AzureBlobFS"
+  type                 = "AzureBlobFS"
   type_properties_json = <<JSON
   {
     "url": "https://${module.dls_storage.name}.dfs.core.windows.net/"
   }
   JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.this.name
+  }
+}
+
+resource "azurerm_synapse_linked_service" "delta" {
+  name                 = format("%s-synw-linked-service-%s", local.project, "delta")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureSqlDW"
+  type_properties_json = <<JSON
+  {
+    "connectionString": "Data Source=tcp:${azurerm_synapse_workspace.this.name}-ondemand.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  }
+  JSON
+  parameters = {
+    DBName = ""
+  }
   integration_runtime {
     name = azurerm_synapse_integration_runtime_azure.this.name
   }
