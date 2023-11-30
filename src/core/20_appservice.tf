@@ -35,20 +35,28 @@ resource "azurerm_linux_web_app" "app_fe" {
   resource_group_name        = azurerm_resource_group.app.name
   service_plan_id            = azurerm_service_plan.app.id
   client_certificate_enabled = false
+  https_only                 = true
+  client_affinity_enabled    = false
   app_settings = {
     APPINSIGHTS_SAMPLING_PERCENTAGE     = 5               # would have been inherited from module
     WEBSITE_DNS_SERVER                  = "168.63.129.16" # would have been inherited from module
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
     WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
   }
-  https_only = true
+
   site_config {
-    always_on = false
+    always_on         = false
+    use_32_bit_worker = false
+    ftps_state        = "Disabled"
+    http2_enabled     = true
+    # app_command_line        = "dotnet PortaleFatture.BE.Api.dll" # TODO Fixme
+    minimum_tls_version     = "1.2"
+    scm_minimum_tls_version = "1.2"
+    vnet_route_all_enabled  = true
+
     application_stack {
       node_version = "18-lts"
     }
-    minimum_tls_version    = "1.2"
-    vnet_route_all_enabled = false
     ip_restriction {
       virtual_network_subnet_id = module.agw_snet.id
       name                      = "rule"
@@ -67,15 +75,33 @@ resource "azurerm_linux_web_app" "app_api" {
   resource_group_name        = azurerm_resource_group.app.name
   service_plan_id            = azurerm_service_plan.app.id
   client_certificate_enabled = false
+  https_only                 = true
+  client_affinity_enabled    = false
+
   app_settings = {
     APPINSIGHTS_SAMPLING_PERCENTAGE     = 5               # would have been inherited from module
     WEBSITE_DNS_SERVER                  = "168.63.129.16" # would have been inherited from module
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
     WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
+    CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
+    JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=JwtSecret)"
+    JWT_VALID_AUDIENCE                  = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
+    JWT_VALID_ISSUER                    = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
+    KEY_VAULT_NAME                      = module.key_vault_app.name
+    SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
+    SELF_CARE_URI                       = "https://uat.selfcare.pagopa.it" # TODO Fixme with https://selfcare.pagopa.it and set as variable
   }
-  https_only = true
+
   site_config {
-    always_on = false
+    always_on               = false
+    use_32_bit_worker       = false
+    ftps_state              = "Disabled"
+    http2_enabled           = true
+    app_command_line        = "dotnet PortaleFatture.BE.Api.dll"
+    minimum_tls_version     = "1.2"
+    scm_minimum_tls_version = "1.2"
+    vnet_route_all_enabled  = true
+
     application_stack {
       dotnet_version = "7.0" # FIXME
       # dotnet_version is ignored
@@ -87,8 +113,6 @@ resource "azurerm_linux_web_app" "app_api" {
       ]
       support_credentials = true
     }
-    minimum_tls_version    = "1.2"
-    vnet_route_all_enabled = true
   }
   identity {
     type = "SystemAssigned"
