@@ -66,7 +66,7 @@ resource "azurerm_synapse_integration_runtime_azure" "this" {
 # linked service
 # FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
 resource "azurerm_synapse_linked_service" "sql" {
-  name                 = format("%s-%s", var.prefix, "sql")
+  name                 = format("%s_%s", var.prefix, "sql")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDatabase"
   type_properties_json = <<JSON
@@ -80,12 +80,13 @@ resource "azurerm_synapse_linked_service" "sql" {
 }
 
 resource "azurerm_synapse_linked_service" "sap_storage" {
-  name                 = format("%s-%s", var.prefix, "sap")
+  name                 = format("%s_%s", var.prefix, "sap_sa")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "connectionString": "${module.sap_storage.primary_blob_connection_string}"
+    "serviceEndpoint": "https://${module.sap_storage.name}.blob.core.windows.net/",
+    "accountKind": "StorageV2"
   }
   JSON
   integration_runtime {
@@ -94,12 +95,13 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "sa_storage" {
-  name                 = format("%s-%s", var.prefix, "sa")
+  name                 = format("%s_%s", var.prefix, "stage_sa")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "connectionString": "${module.sa_storage.primary_blob_connection_string}"
+    "serviceEndpoint": "https://${module.sa_storage.name}.blob.core.windows.net/",
+    "accountKind": "StorageV2"
   }
   JSON
   integration_runtime {
@@ -108,7 +110,7 @@ resource "azurerm_synapse_linked_service" "sa_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "dls_storage" {
-  name                 = format("%s-%s", var.prefix, "adls") # different agreed naming convention
+  name                 = format("%s_%s", var.prefix, "adls") # different agreed naming convention
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobFS"
   type_properties_json = <<JSON
@@ -122,7 +124,7 @@ resource "azurerm_synapse_linked_service" "dls_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "delta" {
-  name                 = format("%s-%s", var.prefix, "delta") # different agreed naming convention
+  name                 = format("%s_%s", var.prefix, "delta") # different agreed naming convention
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDW"
   type_properties_json = <<JSON
