@@ -91,7 +91,7 @@ resource "azurerm_linux_web_app" "app_api" {
     JWT_VALID_ISSUER                    = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
     KEY_VAULT_NAME                      = module.key_vault_app.name
     SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
-    SELF_CARE_URI                       = "https://selfcare.pagopa.it"
+    SELF_CARE_URI                       = var.app_api_config_selfcare_url
     SELF_CARE_TIMEOUT                   = true
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
