@@ -27,7 +27,7 @@ resource "azurerm_synapse_workspace" "this" {
 }
 
 resource "azurerm_synapse_spark_pool" "sparkcls01" {
-  name                 = replace(format("%s-%s", local.project, "sparkcls01"), "-", "")
+  name                 = "sparkcls01" # name must be sparkcls01, notebooks use this reference
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small" # FIXME

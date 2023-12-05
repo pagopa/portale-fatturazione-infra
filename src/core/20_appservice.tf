@@ -92,6 +92,8 @@ resource "azurerm_linux_web_app" "app_api" {
     KEY_VAULT_NAME                      = module.key_vault_app.name
     SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
     SELF_CARE_URI                       = "https://selfcare.pagopa.it" # TODO Fixme with https://selfcare.pagopa.it and set as variable
+    SELF_CARE_TIMEOUT                   = "false"
+    CORS_ORIGINS                        = join(".", [var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
   }
 
   site_config {
