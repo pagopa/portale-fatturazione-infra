@@ -113,7 +113,7 @@ resource "azurerm_linux_web_app" "app_api" {
     cors {
       allowed_origins = [
         # ACAO header is schema aware (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin)
-        format("%s://%s", "https", join(".", [var.dns_zone_portalefatturazione_prefix, var.dns_external_domain]))
+        "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
       ]
       support_credentials = true
     }
