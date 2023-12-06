@@ -27,7 +27,7 @@ resource "azurerm_synapse_workspace" "this" {
 }
 
 resource "azurerm_synapse_spark_pool" "sparkcls01" {
-  name                 = replace(format("%s-%s", local.project, "sparkcls01"), "-", "")
+  name                 = "sparkcls01" # name must be sparkcls01, notebooks use this reference
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small" # FIXME
@@ -56,6 +56,12 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
+resource "azurerm_role_assignment" "synw_sap_storage_blob_data_contributor" {
+  scope                = module.sap_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+}
+
 # integration runtime
 resource "azurerm_synapse_integration_runtime_azure" "this" {
   name                 = format("%s-%s", local.project, "synw-integration-runtime")
@@ -66,7 +72,7 @@ resource "azurerm_synapse_integration_runtime_azure" "this" {
 # linked service
 # FIXME azure sql public_network_access_enabled = false -> azurerm_synapse_linked_service.this depends_on pvt endpoints?
 resource "azurerm_synapse_linked_service" "sql" {
-  name                 = format("%s-%s", var.prefix, "sql")
+  name                 = format("%s_%s", var.prefix, "sql")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDatabase"
   type_properties_json = <<JSON
@@ -80,12 +86,13 @@ resource "azurerm_synapse_linked_service" "sql" {
 }
 
 resource "azurerm_synapse_linked_service" "sap_storage" {
-  name                 = format("%s-%s", var.prefix, "sap")
+  name                 = format("%s_%s", var.prefix, "sap_sa")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "connectionString": "${module.sap_storage.primary_blob_connection_string}"
+    "serviceEndpoint": "https://${module.sap_storage.name}.blob.core.windows.net/",
+    "accountKind": "StorageV2"
   }
   JSON
   integration_runtime {
@@ -94,12 +101,13 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "sa_storage" {
-  name                 = format("%s-%s", var.prefix, "sa")
+  name                 = format("%s_%s", var.prefix, "stage_sa")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "connectionString": "${module.sa_storage.primary_blob_connection_string}"
+    "serviceEndpoint": "https://${module.sa_storage.name}.blob.core.windows.net/",
+    "accountKind": "StorageV2"
   }
   JSON
   integration_runtime {
@@ -108,7 +116,7 @@ resource "azurerm_synapse_linked_service" "sa_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "dls_storage" {
-  name                 = format("%s-%s", var.prefix, "adls") # different agreed naming convention
+  name                 = format("%s_%s", var.prefix, "adls") # different agreed naming convention
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobFS"
   type_properties_json = <<JSON
@@ -122,7 +130,7 @@ resource "azurerm_synapse_linked_service" "dls_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "delta" {
-  name                 = format("%s-%s", var.prefix, "delta") # different agreed naming convention
+  name                 = format("%s_%s", var.prefix, "delta") # different agreed naming convention
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureSqlDW"
   type_properties_json = <<JSON

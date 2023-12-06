@@ -57,6 +57,7 @@ SET @user = 'fat-p-synw'
 EXEC CreateUser @user
 EXEC AddRoleToUser @user, 'db_datareader'
 EXEC AddRoleToUser @user, 'db_datawriter'
+EXEC AddRoleToUser @user, 'ddladmin'
 
 -- fat-p-app-api --
 SET @user = 'fat-p-app-api'
