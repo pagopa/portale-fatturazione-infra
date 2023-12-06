@@ -95,7 +95,7 @@ resource "azurerm_linux_web_app" "app_api" {
     SELF_CARE_TIMEOUT                   = true
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
-    CORS_ORIGINS = format("%s://%s", "https", join(".", [var.dns_zone_portalefatturazione_prefix, var.dns_external_domain]))
+    CORS_ORIGINS = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
   }
 
   site_config {
