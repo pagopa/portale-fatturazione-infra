@@ -56,6 +56,12 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
+resource "azurerm_role_assignment" "synw_sap_storage_blob_data_contributor" {
+  scope                = module.sap_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+}
+
 # integration runtime
 resource "azurerm_synapse_integration_runtime_azure" "this" {
   name                 = format("%s-%s", local.project, "synw-integration-runtime")
