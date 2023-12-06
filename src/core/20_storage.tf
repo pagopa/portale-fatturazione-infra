@@ -59,7 +59,7 @@ module "sa_storage" {
 }
 
 resource "azurerm_storage_container" "sa_stage" {
-  name                  = "stage"
+  name                  = "pfstage"
   storage_account_name  = module.sa_storage.name
   container_access_type = "private"
 }
