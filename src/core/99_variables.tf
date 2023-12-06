@@ -170,9 +170,9 @@ variable "app_plan_sku_name" {
 }
 
 variable "app_api_config_selfcare_url" {
-  type = string
+  type        = string
   description = "the url of the selfcare service"
-  default = "https://selfcare.pagopa.it"
+  default     = "https://selfcare.pagopa.it"
 }
 
 #
