@@ -52,3 +52,12 @@ app_plan_sku_name = "P0v3"
 # azure sql
 #
 sql_database_sku_name = "S6"
+
+#
+# storage
+#
+storage_sa_rule_ips = [
+  "18.159.227.69",
+  "18.192.147.151",
+  "3.126.198.129"
+]

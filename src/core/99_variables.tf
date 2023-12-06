@@ -204,6 +204,18 @@ variable "storage_delete_retention_days" {
   default     = 30
 }
 
+variable "storage_sa_rule_ips" {
+  type        = list(string)
+  description = "ips used in the sa storage account network rules"
+  default     = []
+}
+
+variable "storage_sap_rule_ips" {
+  type        = list(string)
+  description = "ips used in the sap storage account network rules"
+  default     = []
+}
+
 #
 # azure sql
 #
