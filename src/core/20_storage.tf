@@ -34,7 +34,7 @@ resource "azurerm_storage_container" "dls_synapse" {
 #
 # sa storage
 #
-
+#tfsec:ignore:azure-storage-default-action-deny Reason: DataLake needs to upload blob to this storage, we applied ip restrictions
 module "sa_storage" {
   source                               = "./.terraform/modules/__v3__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sa"), "-", "")
@@ -134,7 +134,7 @@ resource "azurerm_private_endpoint" "sa_storage_blob" {
 #
 # sap storage
 #
-
+#tfsec:ignore:azure-storage-default-action-deny Reason: SAP needs to read blob from this storage, we applied ip restrictions
 module "sap_storage" {
   source                               = "./.terraform/modules/__v3__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sap"), "-", "")

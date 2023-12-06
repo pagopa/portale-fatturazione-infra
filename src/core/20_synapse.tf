@@ -101,7 +101,7 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
 }
 
 resource "azurerm_synapse_linked_service" "sa_storage" {
-  name                 = format("%s_%s", var.prefix, "stage_sa")
+  name                 = format("%s_%s", var.prefix, "sa")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON

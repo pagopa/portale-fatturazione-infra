@@ -87,12 +87,14 @@ resource "azurerm_linux_web_app" "app_api" {
     WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
     CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
     JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=JwtSecret)"
+    ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=AdminKey)"
     JWT_VALID_AUDIENCE                  = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
     JWT_VALID_ISSUER                    = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
     KEY_VAULT_NAME                      = module.key_vault_app.name
     SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
     SELF_CARE_URI                       = var.app_api_config_selfcare_url
     SELF_CARE_TIMEOUT                   = true
+    SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
     CORS_ORIGINS = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
