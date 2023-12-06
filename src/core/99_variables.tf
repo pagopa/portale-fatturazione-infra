@@ -169,6 +169,12 @@ variable "app_plan_sku_name" {
   description = "the name of the app plan sku"
 }
 
+variable "app_api_config_selfcare_url" {
+  type = string
+  description = "the url of the selfcare service"
+  default = "https://selfcare.pagopa.it"
+}
+
 #
 # kv
 #
