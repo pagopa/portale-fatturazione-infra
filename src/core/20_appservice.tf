@@ -43,6 +43,7 @@ resource "azurerm_linux_web_app" "app_fe" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
     WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
     SCM_DO_BUILD_DURING_DEPLOYMENT      = "false"
+    APPLICATION_INSIGHTS                = azurerm_application_insights.application_insights.connection_string
   }
 
   site_config {
@@ -97,7 +98,8 @@ resource "azurerm_linux_web_app" "app_api" {
     SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
-    CORS_ORIGINS = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+    CORS_ORIGINS         = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+    APPLICATION_INSIGHTS = azurerm_application_insights.application_insights.connection_string
   }
 
   site_config {
