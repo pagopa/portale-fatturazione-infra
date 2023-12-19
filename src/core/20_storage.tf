@@ -145,7 +145,6 @@ module "sap_storage" {
   access_tier                          = "Hot"
   account_replication_type             = "ZRS"
   blob_versioning_enabled              = true
-  blob_delete_retention_days           = var.storage_delete_retention_days
   blob_container_delete_retention_days = var.storage_delete_retention_days
   allow_nested_items_to_be_public      = false
   public_network_access_enabled        = true
