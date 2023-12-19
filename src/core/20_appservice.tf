@@ -1,3 +1,7 @@
+data "azuread_application" "portalefatturazione" {
+  display_name = format("%s-%s", local.project, "portalefatturazione") # hardcoded, created in eng-azure-authorization
+}
+
 module "app_snet" {
   source                                    = "./.terraform/modules/__v3__/subnet/"
   name                                      = format("%s-%s-snet", local.project, "app")
@@ -100,6 +104,9 @@ resource "azurerm_linux_web_app" "app_api" {
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
     CORS_ORIGINS         = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     APPLICATION_INSIGHTS = azurerm_application_insights.application_insights.connection_string
+    AZUREAD_INSTANCE     = "https://login.microsoftonline.com/"
+    AZUREAD_TENANTID     = data.azurerm_client_config.current.tenant_id
+    AZUREAD_CLIENTID     = data.azuread_application.portalefatturazione.application_id
   }
 
   site_config {
