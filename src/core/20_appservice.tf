@@ -107,6 +107,7 @@ resource "azurerm_linux_web_app" "app_api" {
     AZUREAD_INSTANCE     = "https://login.microsoftonline.com/"
     AZUREAD_TENANTID     = data.azurerm_client_config.current.tenant_id
     AZUREAD_CLIENTID     = data.azuread_application.portalefatturazione.application_id
+    AZUREAD_ADGROUP      = "fat-${var.env_short}-adgroup-"
   }
 
   site_config {
