@@ -85,10 +85,10 @@ module "tlscert-api-portalefatturazione-pagopa-it-cert_az" {
   service_connection_ids_authorization = local.tlscert-api-portalefatturazione-pagopa-it.service_connection_ids_authorization
 
   schedules = {
-    days_to_build              = ["Thu"]
+    days_to_build              = ["Tue"]
     schedule_only_with_changes = false
-    start_hours                = 3
-    start_minutes              = 0
+    start_hours                = 9
+    start_minutes              = 45
     time_zone                  = "(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna"
     branch_filter = {
       include = [var.tlscert-api-portalefatturazione-pagopa-it.repository.branch_name]
