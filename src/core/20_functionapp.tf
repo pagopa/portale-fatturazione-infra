@@ -1,6 +1,6 @@
 
 resource "azurerm_storage_account" "function_send_email" {
-  name                     = replace("${local.project}sendemail${var.env_short}", "-", "")
+  name                     = replace("${local.project}sendemailsa", "-", "")
   location                 = azurerm_resource_group.app.location
   resource_group_name      = azurerm_resource_group.app.name
   account_tier             = "Standard"
