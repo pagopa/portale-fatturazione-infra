@@ -30,7 +30,8 @@ resource "azurerm_linux_function_app" "send_email" {
     # health_check_path       = "/health" TODO
 
     application_stack {
-      dotnet_version = "7.0" # FIXME
+      dotnet_version              = "7.0" # FIXME
+      use_dotnet_isolated_runtime = true
       # dotnet_version is ignored
       # wait https://github.com/hashicorp/terraform-provider-azurerm/commit/73832251e80c390a139688097ffdad3f2f2022e8
     }
