@@ -28,6 +28,19 @@ resource "azurerm_mssql_database" "this" {
   tags                 = var.tags
 }
 
+resource "azurerm_mssql_database" "this_az" {
+  name                 = format("%s-%s", local.project, "db-az")
+  server_id            = azurerm_mssql_server.this.id
+  collation            = "SQL_Latin1_General_CP1_CI_AS"
+  max_size_gb          = var.sql_database_max_size_gb
+  sku_name             = "HS_Gen5_4"
+  read_replica_count   = 1
+  read_scale           = false
+  zone_redundant       = true
+  storage_account_type = "Zone"
+  tags                 = var.tags
+}
+
 resource "azurerm_private_endpoint" "sql" {
   name                = format("%s-endpoint", azurerm_mssql_server.this.name)
   location            = azurerm_resource_group.analytics.location
