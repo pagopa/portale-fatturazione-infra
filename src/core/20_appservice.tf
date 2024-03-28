@@ -19,11 +19,10 @@ module "app_snet" {
   }
 }
 
-# TODO
-# resource "azurerm_subnet_nat_gateway_association" "app_snet" {
-#   nat_gateway_id = module.nat_gateway.id
-#   subnet_id      = module.app_snet.id
-# }
+resource "azurerm_subnet_nat_gateway_association" "app_snet" {
+  nat_gateway_id = module.nat_gateway.id
+  subnet_id      = module.app_snet.id
+}
 
 # plan
 resource "azurerm_service_plan" "app" {
