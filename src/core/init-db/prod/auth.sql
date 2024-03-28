@@ -64,3 +64,9 @@ SET @user = 'fat-p-app-api'
 EXEC CreateUser @user
 EXEC AddRoleToUser @user, 'db_datareader'
 EXEC AddRoleToUser @user, 'db_datawriter'
+
+-- fat-p-send-email --
+SET @user = 'fat-p-send-email'
+EXEC CreateUser @user
+EXEC AddRoleToUser @user, 'db_datareader'
+EXEC AddRoleToUser @user, 'db_datawriter'
