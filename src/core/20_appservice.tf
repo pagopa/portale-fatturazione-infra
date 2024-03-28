@@ -19,6 +19,12 @@ module "app_snet" {
   }
 }
 
+# TODO
+# resource "azurerm_subnet_nat_gateway_association" "app_snet" {
+#   nat_gateway_id = module.nat_gateway.id
+#   subnet_id      = module.app_snet.id
+# }
+
 # plan
 resource "azurerm_service_plan" "app" {
   name                     = format("%s-%s", local.project, "app-plan")
@@ -98,7 +104,7 @@ resource "azurerm_linux_web_app" "app_api" {
     KEY_VAULT_NAME                      = module.key_vault_app.name
     SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
     SELF_CARE_URI                       = var.app_api_config_selfcare_url
-    SELF_CARE_TIMEOUT                   = true
+    SELF_CARE_TIMEOUT                   = false
     SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
@@ -111,7 +117,7 @@ resource "azurerm_linux_web_app" "app_api" {
   }
 
   site_config {
-    always_on               = false
+    always_on               = true
     use_32_bit_worker       = false
     ftps_state              = "Disabled"
     http2_enabled           = true
