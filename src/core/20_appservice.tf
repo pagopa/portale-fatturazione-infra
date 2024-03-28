@@ -99,6 +99,8 @@ resource "azurerm_linux_web_app" "app_api" {
     CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
     JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=JwtSecret)"
     ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=AdminKey)"
+    STORAGE_CONNECTIONSTRING            = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.rel_storage_connection_string.name})"
+    STORAGE_REL_FOLDER                  = azurerm_storage_container.rel_rel.name
     JWT_VALID_AUDIENCE                  = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
     JWT_VALID_ISSUER                    = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
     KEY_VAULT_NAME                      = module.key_vault_app.name

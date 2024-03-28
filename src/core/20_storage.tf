@@ -212,6 +212,12 @@ resource "azurerm_storage_container" "rel_rel" {
   container_access_type = "private"
 }
 
+resource "azurerm_key_vault_secret" "rel_storage_connection_string" {
+  name         = "RelStorageConnectionString"
+  value        = module.rel_storage.primary_connection_string
+  key_vault_id = module.key_vault_app.id
+}
+
 resource "azurerm_private_endpoint" "rel_storage_blob" {
   name                = format("%s-blob-endpoint", module.rel_storage.name)
   location            = var.secondary_location
