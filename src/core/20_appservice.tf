@@ -19,11 +19,10 @@ module "app_snet" {
   }
 }
 
-# TODO
-# resource "azurerm_subnet_nat_gateway_association" "app_snet" {
-#   nat_gateway_id = module.nat_gateway.id
-#   subnet_id      = module.app_snet.id
-# }
+resource "azurerm_subnet_nat_gateway_association" "app_snet" {
+  nat_gateway_id = module.nat_gateway.id
+  subnet_id      = module.app_snet.id
+}
 
 # plan
 resource "azurerm_service_plan" "app" {
@@ -31,6 +30,7 @@ resource "azurerm_service_plan" "app" {
   location                 = azurerm_resource_group.app.location
   resource_group_name      = azurerm_resource_group.app.name
   sku_name                 = var.app_plan_sku_name
+  worker_count             = 3
   os_type                  = "Linux"
   per_site_scaling_enabled = false
   zone_balancing_enabled   = true
@@ -57,7 +57,7 @@ resource "azurerm_linux_web_app" "app_fe" {
   }
 
   site_config {
-    always_on               = false
+    always_on               = true
     use_32_bit_worker       = false
     ftps_state              = "Disabled"
     http2_enabled           = true
@@ -77,6 +77,16 @@ resource "azurerm_linux_web_app" "app_fe" {
   }
   identity {
     type = "SystemAssigned"
+  }
+  logs {
+    detailed_error_messages = false
+    failed_request_tracing  = false
+    http_logs {
+      file_system {
+        retention_in_days = 7
+        retention_in_mb   = 100
+      }
+    }
   }
   tags = var.tags
 }
@@ -108,12 +118,14 @@ resource "azurerm_linux_web_app" "app_api" {
     SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
-    CORS_ORIGINS         = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
-    APPLICATION_INSIGHTS = azurerm_application_insights.application_insights.connection_string
-    AZUREAD_INSTANCE     = "https://login.microsoftonline.com/"
-    AZUREAD_TENANTID     = data.azurerm_client_config.current.tenant_id
-    AZUREAD_CLIENTID     = data.azuread_application.portalefatturazione.application_id
-    AZUREAD_ADGROUP      = "fat-${var.env_short}-adgroup-"
+    CORS_ORIGINS             = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+    APPLICATION_INSIGHTS     = azurerm_application_insights.application_insights.connection_string
+    AZUREAD_INSTANCE         = "https://login.microsoftonline.com/"
+    AZUREAD_TENANTID         = data.azurerm_client_config.current.tenant_id
+    AZUREAD_CLIENTID         = data.azuread_application.portalefatturazione.application_id
+    AZUREAD_ADGROUP          = "fat-${var.env_short}-adgroup-"
+    STORAGE_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
+    STORAGE_REL_FOLDER       = "rel"
   }
 
   site_config {
@@ -143,6 +155,17 @@ resource "azurerm_linux_web_app" "app_api" {
   identity {
     type = "SystemAssigned"
   }
+  logs {
+    detailed_error_messages = false
+    failed_request_tracing  = false
+    http_logs {
+      file_system {
+        retention_in_days = 7
+        retention_in_mb   = 100
+      }
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,

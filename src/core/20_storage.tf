@@ -206,6 +206,12 @@ module "rel_storage" {
   tags                                 = var.tags
 }
 
+resource "azurerm_key_vault_secret" "rel_storage_connection_string" {
+  name         = "RelStorageConnectionString"
+  value        = module.rel_storage.primary_connection_string
+  key_vault_id = module.key_vault_app.id
+}
+
 resource "azurerm_storage_container" "rel_rel" {
   name                  = "rel"
   storage_account_name  = module.rel_storage.name

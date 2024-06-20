@@ -33,6 +33,13 @@ resource "azurerm_linux_function_app" "send_email" {
       dotnet_version = "7.0" # FIXME
       # dotnet_version is ignored
       # wait https://github.com/hashicorp/terraform-provider-azurerm/commit/73832251e80c390a139688097ffdad3f2f2022e8
+      use_dotnet_isolated_runtime = true
+    }
+    cors {
+      allowed_origins = [
+        "https://portal.azure.com",
+      ]
+      support_credentials = true
     }
   }
 
