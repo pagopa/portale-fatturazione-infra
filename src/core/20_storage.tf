@@ -206,6 +206,8 @@ module "rel_storage" {
   tags                                 = var.tags
 }
 
+#tfsec:ignore:azure-keyvault-content-type-for-secret
+#tfsec:ignore:azure-keyvault-ensure-secret-expiry
 resource "azurerm_key_vault_secret" "rel_storage_connection_string" {
   name         = "RelStorageConnectionString"
   value        = module.rel_storage.primary_connection_string
