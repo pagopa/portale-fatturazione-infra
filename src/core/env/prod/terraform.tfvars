@@ -59,7 +59,8 @@ sql_database_sku_name = "S6"
 storage_sa_rule_ips = [
   "18.159.227.69",
   "18.192.147.151",
-  "3.126.198.129"
+  "3.126.198.129",
+  "93.42.64.143" # unknown ip
 ]
 
 storage_sap_rule_ips = [

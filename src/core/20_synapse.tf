@@ -23,7 +23,14 @@ resource "azurerm_synapse_workspace" "this" {
   identity {
     type = "SystemAssigned"
   }
+
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      azure_devops_repo, # manual configuration
+    ]
+  }
 }
 
 resource "azurerm_synapse_spark_pool" "sparkcls01" {
@@ -81,12 +88,12 @@ resource "azurerm_synapse_linked_service" "sql" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime"
   }
 }
 
 resource "azurerm_synapse_linked_service" "sap_storage" {
-  name                 = format("%s_%s", var.prefix, "sap_sa")
+  name                 = format("%s_%s", var.prefix, "sap")
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
@@ -96,7 +103,7 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime"
   }
 }
 
@@ -111,7 +118,7 @@ resource "azurerm_synapse_linked_service" "sa_storage" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime"
   }
 }
 
@@ -125,7 +132,7 @@ resource "azurerm_synapse_linked_service" "dls_storage" {
   }
   JSON
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime"
   }
 }
 
@@ -142,7 +149,31 @@ resource "azurerm_synapse_linked_service" "delta" {
     DBName = ""
   }
   integration_runtime {
-    name = azurerm_synapse_integration_runtime_azure.this.name
+    name = "AutoResolveIntegrationRuntime"
+  }
+}
+
+data "azurerm_key_vault_secret" "synapse_sendemail_fnkey" {
+  name         = "synapse-sendemail-fnkey"
+  key_vault_id = module.key_vault_app.id
+}
+
+resource "azurerm_synapse_linked_service" "sendemail" {
+  name                 = format("%s_%s", var.prefix, "sendemail")
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureFunction"
+  type_properties_json = <<JSON
+  {
+    "functionAppUrl": "https://${azurerm_linux_function_app.send_email.name}.azurewebsites.net/api/",
+    "functionKey": 
+      {
+        "type": "SecureString",
+        "value": "${data.azurerm_key_vault_secret.synapse_sendemail_fnkey.value}"
+      }
+  }
+  JSON
+  integration_runtime {
+    name = "AutoResolveIntegrationRuntime"
   }
 }
 
@@ -277,4 +308,12 @@ resource "azurerm_synapse_managed_private_endpoint" "dls_storage_dfs" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.dls_storage.id
   subresource_name     = "blob"
+}
+
+# managed_private_endpoint must be manual approved on target resource
+resource "azurerm_synapse_managed_private_endpoint" "sendemail" {
+  name                 = format("%s-sendemail-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = azurerm_linux_function_app.send_email.id
+  subresource_name     = "sites"
 }
