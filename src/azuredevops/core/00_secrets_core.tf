@@ -13,5 +13,7 @@ module "secret_core" {
 
   secrets = [
     "azure-devops-github-ro-TOKEN",
+    # TODO create this in the keyvault
+    "azure-devops-github-rw-TOKEN",
   ]
 }
