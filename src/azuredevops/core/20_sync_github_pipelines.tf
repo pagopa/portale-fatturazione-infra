@@ -1,6 +1,6 @@
 
 variable "repos_to_sync" {
-  description = "Repository to sync to GitHub"
+  description = "Repositories to sync to GitHub"
   type = list(object({
     organization = string
     name         = string
@@ -11,30 +11,30 @@ variable "repos_to_sync" {
     {
       organization = "pagopa"
       name         = "portale-fatturazione-be"
-      branch_name  = "refs/heads/master"
-      yml_path     = "azure-pipelines.yml"
+      branch_name  = "refs/heads/main"
+      yml_path     = ".devops/sync-github.yml"
     },
     {
       organization = "pagopa"
       name         = "portale-fatturazione-fe"
-      branch_name  = "refs/heads/master"
-      yml_path     = "azure-pipelines.yml"
+      branch_name  = "refs/heads/main"
+      yml_path     = ".devops/sync-github.yml"
     },
     {
       organization = "pagopa"
       name         = "portale-fatturazione-synapse"
-      branch_name  = "refs/heads/master"
-      yml_path     = "azure-pipelines.yml"
+      branch_name  = "refs/heads/main"
+      yml_path     = ".devops/sync-github.yml"
     },
   ]
 }
 
-resource "azuredevops_build_definition" "sync_backend_to_github" {
+resource "azuredevops_build_definition" "sync_repo_to_github" {
   for_each = { for repo in var.repos_to_sync : "${repo.organization}/${repo.name}" => repo }
 
   project_id = data.azuredevops_project.project.id
-  name       = "sync-backend"
-  path       = "${var.prefix}\\GitHub-Sync"
+  name       = "sync-${each.value.name}-to-github"
+  path       = "\\${var.prefix}\\GitHub-Sync"
 
   repository {
     repo_type   = "GitHub"
@@ -52,7 +52,7 @@ resource "azuredevops_build_definition" "sync_backend_to_github" {
 
   variable {
     name           = "GITHUB_REPO"
-    value          = "pagopa/portale-fatturazione-be"
+    value          = "${each.value.organization}/${each.value.name}"
     allow_override = false
   }
 
