@@ -29,16 +29,23 @@ variable "repos_to_sync" {
   ]
 }
 
+data "azuredevops_git_repository" "repo" {
+  for_each = { for repo in var.repos_to_sync : repo.name => repo }
+
+  project_id = data.azuredevops_project.project.id
+  name       = each.value.name
+}
+
 resource "azuredevops_build_definition" "sync_repo_to_github" {
-  for_each = { for repo in var.repos_to_sync : "${repo.organization}/${repo.name}" => repo }
+  for_each = { for repo in var.repos_to_sync : repo.name => repo }
 
   project_id = data.azuredevops_project.project.id
   name       = "sync-${each.value.name}-to-github"
   path       = "\\${var.prefix}\\GitHub-Sync"
 
   repository {
-    repo_type   = "GitHub"
-    repo_id     = "${each.value.organization}/${each.value.name}"
+    repo_type   = "TfsGit"
+    repo_id     = data.azuredevops_git_repository.repo[each.value.name].id
     branch_name = each.value.branch_name
     yml_path    = each.value.yml_path
   }
