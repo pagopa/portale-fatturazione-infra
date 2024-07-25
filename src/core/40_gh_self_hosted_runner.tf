@@ -79,8 +79,7 @@ module "container_app_job_runner" {
   key_vault = {
     resource_group_name = module.key_vault.resource_group_name
     name                = module.key_vault.name
-    # TODO name
-    secret_name = "github-bot-cicd"
+    secret_name         = "github-runner-bot-cicd"
   }
 
   # sets reference to the log analytics workspace you want to use for logging
