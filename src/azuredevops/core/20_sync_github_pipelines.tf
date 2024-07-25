@@ -1,4 +1,16 @@
 
+variable "github_bot" {
+  description = "GitHub Bot for syncing repos"
+  type = object({
+    name  = string
+    email = string
+  })
+  default = {
+    name  = "portalefatturazione-pagopa-github-bot"
+    email = "portalefatturazione-pagopa-github-bot@pagopa.it"
+  }
+}
+
 variable "repos_to_sync" {
   description = "Repositories to sync to GitHub"
   type = list(object({
@@ -48,6 +60,13 @@ resource "azuredevops_build_definition" "sync_repo_to_github" {
     repo_id     = data.azuredevops_git_repository.repo[each.value.name].id
     branch_name = each.value.branch_name
     yml_path    = each.value.yml_path
+  }
+
+  variable {
+    name           = "GITHUB_USER"
+    value          = var.github_bot.name
+    is_secret      = false
+    allow_override = false
   }
 
   variable {
