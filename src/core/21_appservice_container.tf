@@ -39,7 +39,7 @@ resource "azurerm_linux_web_app" "app_api_container" {
   client_certificate_enabled    = false
   https_only                    = true
   client_affinity_enabled       = false
-  public_network_access_enabled = false
+  public_network_access_enabled = true
 
   app_settings = local.app_api_container.app_settings
 
@@ -131,7 +131,7 @@ resource "azurerm_linux_web_app_slot" "app_api_container_staging" {
   client_certificate_enabled    = false
   https_only                    = true
   client_affinity_enabled       = false
-  public_network_access_enabled = false
+  public_network_access_enabled = true
 
   app_settings = local.app_api_container.app_settings
 
