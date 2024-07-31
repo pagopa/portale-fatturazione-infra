@@ -1,4 +1,4 @@
-prefix    = "product"
+prefix    = "fat"
 env_short = "p"
 env       = "prod"
 
