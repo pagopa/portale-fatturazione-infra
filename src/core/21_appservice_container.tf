@@ -1,4 +1,9 @@
 
+# infrastructure for a new app-service with container runtime
+# this is temporary and should replace the existing app-service
+# with .NET runtime
+
+
 locals {
   app_api_container = {
     app_settings = {
