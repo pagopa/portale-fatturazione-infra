@@ -2,9 +2,13 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/azure/azapi" {
-  version = "1.14.0"
+  version     = "1.14.0"
+  constraints = "~> 1.12"
   hashes = [
+    "h1:8UJUnecUZ60NCW06NssnYrSB0URrFI+WL9tq5x739mY=",
     "h1:D8AhiIgpSH6pG05WuslOg3XS0O9I5VxOoD3W3i8N+Xo=",
+    "h1:KgFpW6RGIxM4msyhGC2ZRNy872ycc49xzDpV2rMv+BI=",
+    "h1:YAHejAqRNWYYZIPwsV5gCXfPrKznKO32CLX1PkHTLpc=",
     "zh:083709be750b878dfb33747ba1d326d23619a0ed654f95bce9c808e424923c90",
     "zh:261b5060297b732d97b4363ad753355bfee00e93d773fd329023a5619b964c39",
     "zh:51adfdaeb1b2c3d9e7aeba97c9c73d469712223dd125b14d90377d445d1cd3df",
@@ -45,7 +49,7 @@ provider "registry.terraform.io/hashicorp/azuread" {
 
 provider "registry.terraform.io/hashicorp/azurerm" {
   version     = "3.71.0"
-  constraints = ">= 3.30.0, >= 3.39.0, <= 3.71.0, <= 3.76.0"
+  constraints = ">= 3.30.0, ~> 3.50, <= 3.71.0, <= 3.76.0"
   hashes = [
     "h1:QI0iaPNi0qAOIbXptd4ZObi0D5X1jojom5774GtEspA=",
     "h1:nTc6DFS9euNgUkNylQ/AxNYN9Ln1dyL+WVIBNcict7Y=",

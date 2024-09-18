@@ -31,6 +31,12 @@ module "__v3__" {
   source = "git::https://github.com/pagopa/terraform-azurerm-v3.git?ref=d97d51148b02eb3225507eeef2ec25d52f4f343b"
 }
 
+// add recent version for smooth and gradual migration
+module "__v3__8_28_2__" {
+  # https://github.com/pagopa/terraform-azurerm-v3/releases/tag/v8.28.2
+  source = "git::https://github.com/pagopa/terraform-azurerm-v3.git?ref=4d6f6c0e95493ae12458dd1dbf643a27328e2383"
+}
+
 data "azurerm_subscription" "current" {}
 
 data "azurerm_client_config" "current" {}
