@@ -126,6 +126,13 @@ resource "azurerm_linux_web_app" "app_api" {
     AZUREAD_ADGROUP          = "fat-${var.env_short}-adgroup-"
     STORAGE_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
     STORAGE_REL_FOLDER       = "rel"
+
+    STORAGE_DOCUMENTI_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=DlsStorageConnectionString)"
+    STORAGE_DOCUMENTI_FOLDER           = "reportaccertamenti"
+    SYNAPSE_WORKSPACE_NAME             = azurerm_synapse_workspace.this.name
+    PIPELINE_NAME_SAP                  = "SendJsonToSap",
+    SYNAPSE_SUBSCRIPTIONID             = data.azurerm_client_config.current.subscription_id
+    SYNAPSE_RESOURCEGROUPNAME          = azurerm_synapse_workspace.this.resource_group_name
   }
 
   site_config {
@@ -173,6 +180,12 @@ resource "azurerm_linux_web_app" "app_api" {
     ]
   }
   tags = var.tags
+}
+
+resource "azurerm_role_assignment" "api_synapse_user" {
+  scope                = azurerm_synapse_workspace.this.id
+  role_definition_name = "Synapse User"
+  principal_id         = azurerm_linux_web_app.app_api.identity[0].principal_id
 }
 
 # vnet integration
