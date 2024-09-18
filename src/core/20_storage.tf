@@ -31,6 +31,14 @@ resource "azurerm_storage_container" "dls_synapse" {
   container_access_type = "private"
 }
 
+#tfsec:ignore:azure-keyvault-content-type-for-secret
+#tfsec:ignore:azure-keyvault-ensure-secret-expiry
+resource "azurerm_key_vault_secret" "dls_storage_connection_string" {
+  name         = "DlsStorageConnectionString"
+  value        = module.dls_storage.primary_connection_string
+  key_vault_id = module.key_vault_app.id
+}
+
 #
 # sa storage
 #
