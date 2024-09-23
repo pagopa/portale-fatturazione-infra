@@ -47,7 +47,7 @@ agw_api_app_certificate_name  = "api-portalefatturazione-pagopa-it"
 #
 # appservice
 #
-app_plan_sku_name = "P0v3"
+app_plan_sku_name = "P1v3"
 
 #
 # azure sql
