@@ -153,6 +153,7 @@ resource "azurerm_synapse_linked_service" "delta" {
   }
 }
 
+# TODO use https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/function_app_host_keys
 data "azurerm_key_vault_secret" "synapse_sendemail_fnkey" {
   name         = "synapse-sendemail-fnkey"
   key_vault_id = module.key_vault_app.id

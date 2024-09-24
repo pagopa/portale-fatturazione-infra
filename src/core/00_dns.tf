@@ -9,7 +9,7 @@ resource "azurerm_dns_zone" "portalefatturazione" {
   tags                = var.tags
 }
 
-# prod-only record to "previous" env dns delegation
+# prod-only record to "previous" env dns delegation for dev
 resource "azurerm_dns_ns_record" "dev_portalefatturazione_pagopa_it_ns" {
   count               = var.env_short == "p" ? 1 : 0
   name                = "dev"
@@ -20,6 +20,22 @@ resource "azurerm_dns_ns_record" "dev_portalefatturazione_pagopa_it_ns" {
     "ns2-33.azure-dns.net.",
     "ns3-33.azure-dns.org.",
     "ns4-33.azure-dns.info.",
+  ]
+  ttl  = var.dns_default_ttl_sec
+  tags = var.tags
+}
+
+# prod-only record to "previous" env dns delegation for uat
+resource "azurerm_dns_ns_record" "uat_portalefatturazione_pagopa_it_ns" {
+  count               = var.env_short == "p" ? 1 : 0
+  name                = "uat"
+  zone_name           = azurerm_dns_zone.portalefatturazione[0].name
+  resource_group_name = azurerm_resource_group.networking.name
+  records = [
+    "ns1-05.azure-dns.com.",
+    "ns2-05.azure-dns.net.",
+    "ns3-05.azure-dns.org.",
+    "ns4-05.azure-dns.info.",
   ]
   ttl  = var.dns_default_ttl_sec
   tags = var.tags
