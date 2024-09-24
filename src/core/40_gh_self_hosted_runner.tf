@@ -92,4 +92,9 @@ module "container_app_job_runner" {
   job = each.value
 
   tags = var.tags
+
+  depends_on = [
+    azurerm_resource_group.runner_rg,
+    azurerm_container_app_environment.runner_cae,
+  ]
 }
