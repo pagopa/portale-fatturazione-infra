@@ -14,18 +14,18 @@ variable "repos_to_sync" {
       branch_name  = "refs/heads/main"
       yml_path     = ".devops/sync-github.yml"
     },
-    {
-      organization = "pagopa"
-      name         = "portale-fatturazione-fe"
-      branch_name  = "refs/heads/main"
-      yml_path     = ".devops/sync-github.yml"
-    },
-    {
-      organization = "pagopa"
-      name         = "portale-fatturazione-synapse"
-      branch_name  = "refs/heads/main"
-      yml_path     = ".devops/sync-github.yml"
-    },
+    # {
+    #   organization = "pagopa"
+    #   name         = "portale-fatturazione-fe"
+    #   branch_name  = "refs/heads/main"
+    #   yml_path     = ".devops/sync-github.yml"
+    # },
+    # {
+    #   organization = "pagopa"
+    #   name         = "portale-fatturazione-synapse"
+    #   branch_name  = "refs/heads/main"
+    #   yml_path     = ".devops/sync-github.yml"
+    # },
   ]
 }
 
@@ -65,5 +65,9 @@ resource "azuredevops_build_definition" "sync_repo_to_github" {
 
   ci_trigger {
     use_yaml = true
+  }
+
+  lifecycle {
+    ignore_changes = [variable]
   }
 }

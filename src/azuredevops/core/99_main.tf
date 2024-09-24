@@ -50,6 +50,22 @@ provider "azurerm" {
   subscription_id = data.azurerm_subscriptions.dev.subscriptions[0].subscription_id
 }
 
+# Uat
+
+data "azurerm_subscriptions" "uat" {
+  display_name_prefix = var.uat_subscription_name
+}
+
+provider "azurerm" {
+  alias = "uat"
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = false
+    }
+  }
+  subscription_id = data.azurerm_subscriptions.uat.subscriptions[0].subscription_id
+}
+
 # Prod
 
 data "azurerm_subscriptions" "prod" {
@@ -65,4 +81,3 @@ provider "azurerm" {
   }
   subscription_id = data.azurerm_subscriptions.prod.subscriptions[0].subscription_id
 }
-
