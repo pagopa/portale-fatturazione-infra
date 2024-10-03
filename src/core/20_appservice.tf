@@ -188,6 +188,12 @@ resource "azurerm_synapse_role_assignment" "api_synapse_user" {
   principal_id         = azurerm_linux_web_app.app_api.identity[0].principal_id
 }
 
+resource "azurerm_synapse_role_assignment" "api_synapse_credential_user" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Credential User"
+  principal_id         = azurerm_linux_web_app.app_api.identity[0].principal_id
+}
+
 # vnet integration
 resource "azurerm_app_service_virtual_network_swift_connection" "app_api" {
   app_service_id = azurerm_linux_web_app.app_api.id
