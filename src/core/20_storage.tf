@@ -248,3 +248,28 @@ resource "azurerm_private_endpoint" "rel_storage_blob" {
 
   tags = var.tags
 }
+
+# public access storage with SAS token
+module "public_storage" {
+  source                               = "./.terraform/modules/__v3__/storage_account/"
+  name                                 = replace(format("%s-%s", local.project, "public"), "-", "")
+  resource_group_name                  = azurerm_resource_group.analytics.name
+  location                             = var.secondary_location
+  account_kind                         = "StorageV2"
+  account_tier                         = "Standard"
+  access_tier                          = "Hot"
+  account_replication_type             = "ZRS"
+  blob_versioning_enabled              = true
+  blob_container_delete_retention_days = var.storage_delete_retention_days
+  allow_nested_items_to_be_public      = false
+  public_network_access_enabled        = true
+  tags                                 = var.tags
+}
+
+#tfsec:ignore:azure-keyvault-content-type-for-secret
+#tfsec:ignore:azure-keyvault-ensure-secret-expiry
+resource "azurerm_key_vault_secret" "public_storage_key" {
+  name         = "PublicStorageKey"
+  value        = module.public_storage.primary_access_key
+  key_vault_id = module.key_vault_app.id
+}
