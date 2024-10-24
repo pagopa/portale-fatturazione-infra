@@ -133,6 +133,10 @@ resource "azurerm_linux_web_app" "app_api" {
     PIPELINE_NAME_SAP                  = "SendJsonToSap",
     SYNAPSE_SUBSCRIPTIONID             = data.azurerm_client_config.current.subscription_id
     SYNAPSE_RESOURCEGROUPNAME          = azurerm_synapse_workspace.this.resource_group_name
+
+    STORAGE_FINANCIAL_ACCOUNTNAME   = module.public_storage.name
+    STORAGE_FINANCIAL_ACCOUNTKEY    = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+    STORAGE_FINANCIAL_CONTAINERNAME = "invoices"
   }
 
   site_config {
