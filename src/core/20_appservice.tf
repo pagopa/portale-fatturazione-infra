@@ -118,8 +118,26 @@ resource "azurerm_linux_web_app" "app_api" {
     SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
-    CORS_ORIGINS             = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
-    APPLICATION_INSIGHTS     = azurerm_application_insights.application_insights.connection_string
+    CORS_ORIGINS = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+
+    # appinsights
+    APPLICATION_INSIGHTS                            = azurerm_application_insights.application_insights.connection_string
+    APPINSIGHTS_INSTRUMENTATIONKEY                  = azurerm_application_insights.application_insights.instrumentation_key
+    APPINSIGHTS_PROFILERFEATURE_VERSION             = "1.0.0"
+    APPINSIGHTS_SNAPSHOTFEATURE_VERSION             = "1.0.0"
+    APPLICATIONINSIGHTS_CONNECTION_STRING           = azurerm_application_insights.application_insights.connection_string
+    APPLICATIONINSIGHTS_ENABLESQLQUERYCOLLECTION    = "disabled"
+    DISABLE_APPINSIGHTS_SDK                         = "disabled"
+    IGNORE_APPINSIGHTS_SDK                          = "disabled"
+    ApplicationInsightsAgent_EXTENSION_VERSION      = "~2"
+    DiagnosticServices_EXTENSION_VERSION            = "~3"
+    InstrumentationEngine_EXTENSION_VERSION         = "disabled"
+    SnapshotDebugger_EXTENSION_VERSION              = "disabled"
+    XDT_MicrosoftApplicationInsights_BaseExtensions = "disabled"
+    XDT_MicrosoftApplicationInsights_Mode           = "recommended"
+    XDT_MicrosoftApplicationInsights_PreemptSdk     = "disabled"
+
+    # application
     AZUREAD_INSTANCE         = "https://login.microsoftonline.com/"
     AZUREAD_TENANTID         = data.azurerm_client_config.current.tenant_id
     AZUREAD_CLIENTID         = data.azuread_application.portalefatturazione.application_id
@@ -180,7 +198,11 @@ resource "azurerm_linux_web_app" "app_api" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack[0].dotnet_version
+      site_config[0].application_stack[0].dotnet_version,
+      tags["hidden-link: /app-insights-conn-string"],
+      tags["hidden-link: /app-insights-instrumentation-key"],
+      tags["hidden-link: /app-insights-resource-id"],
+      logs[0].http_logs[0].file_system[0].retention_in_days, # keeps getting change, tired of it
     ]
   }
   tags = var.tags

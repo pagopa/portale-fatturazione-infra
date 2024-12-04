@@ -6,7 +6,9 @@ resource "azurerm_mssql_server" "this" {
   version             = var.sql_version
   # admin auth
   azuread_administrator {
-    azuread_authentication_only = true
+    # this SHOULD be true, but cannot be done right away.
+    # there are some clients that need a brutal SQL Server authentication, like PowerBI.
+    azuread_authentication_only = false
     login_username              = data.azuread_group.adgroup_admins.display_name
     object_id                   = data.azuread_group.adgroup_admins.object_id
     tenant_id                   = data.azurerm_client_config.current.tenant_id
