@@ -132,11 +132,6 @@ variable "cidr_dns_fwd_snet" {
   description = "cidr of the dns forwarder subnet"
 }
 
-variable "cidr_github_runner_snet" {
-  type        = list(string)
-  description = "cidr of the github runner subnet"
-}
-
 #
 # secondary networking
 #
