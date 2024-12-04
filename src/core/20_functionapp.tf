@@ -45,9 +45,10 @@ resource "azurerm_linux_function_app" "send_email" {
   }
 
   app_settings = {
-    APPINSIGHTS_SAMPLING_PERCENTAGE = 5               # would have been inherited from module
-    WEBSITE_DNS_SERVER              = "168.63.129.16" # would have been inherited from module
-    APPLICATION_INSIGHTS            = azurerm_application_insights.application_insights.connection_string
+    APPINSIGHTS_SAMPLING_PERCENTAGE        = 5               # would have been inherited from module
+    WEBSITE_DNS_SERVER                     = "168.63.129.16" # would have been inherited from module
+    WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
+    APPLICATION_INSIGHTS                   = azurerm_application_insights.application_insights.connection_string
 
     CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
     SMTP              = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=Smtp)"
