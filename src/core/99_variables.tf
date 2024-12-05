@@ -146,10 +146,31 @@ variable "secondary_cidr_pvt_endp_snet" {
   description = "cidr of the private endpoints subnet on secondary"
 }
 
+#
+# ddos protection
+#
+variable "ddos_protection_plan" {
+  type = object({
+    id     = string
+    enable = bool
+  })
+  description = "ddos protection plan assigned to managed vnets"
+}
 
 #
 # appgateway
 #
+
+variable "agw_sku" {
+  type        = string
+  description = "sku of the app gateway"
+}
+
+variable "agw_waf_enabled" {
+  type        = bool
+  description = "whether to enable WAF on the app gateway"
+}
+
 variable "agw_api_app_certificate_name" {
   type        = string
   description = "the certificate name on the kv for the api endpoint"

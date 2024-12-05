@@ -38,8 +38,18 @@ secondary_cidr_vnet          = ["10.1.0.0/18"]
 secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
 
 #
+# ddos protection
+#
+ddos_protection_plan = {
+  id     = "/subscriptions/0da48c97-355f-4050-a520-f11a18b8be90/resourceGroups/sec-p-ddos/providers/Microsoft.Network/ddosProtectionPlans/sec-p-ddos-protection"
+  enable = true
+}
+
+#
 # appgateway
 #
+agw_sku                       = "WAF_v2"
+agw_waf_enabled               = true
 agw_apex_app_certificate_name = "portalefatturazione-pagopa-it"
 agw_api_app_certificate_name  = "api-portalefatturazione-pagopa-it"
 
