@@ -273,3 +273,25 @@ resource "azurerm_key_vault_secret" "public_storage_key" {
   value        = module.public_storage.primary_access_key
   key_vault_id = module.key_vault_app.id
 }
+
+# the public storage is indeed public, but we need to bind a private endpoint for access from whithin the VNET
+resource "azurerm_private_endpoint" "public_storage_blob" {
+  name                = format("%s-blob-endpoint", module.public_storage.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+
+  private_service_connection {
+    name                           = format("%s-blob-endpoint", module.public_storage.name)
+    private_connection_resource_id = module.public_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+  }
+
+  tags = var.tags
+}
