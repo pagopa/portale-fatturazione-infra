@@ -38,20 +38,30 @@ secondary_cidr_vnet          = ["10.1.0.0/18"]
 secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
 
 #
+# ddos protection
+#
+ddos_protection_plan = {
+  id     = "/subscriptions/0da48c97-355f-4050-a520-f11a18b8be90/resourceGroups/sec-p-ddos/providers/Microsoft.Network/ddosProtectionPlans/sec-p-ddos-protection"
+  enable = true
+}
+
+#
 # appgateway
 #
+agw_sku                       = "Standard_v2"
+agw_waf_enabled               = false
 agw_apex_app_certificate_name = "uat-portalefatturazione-pagopa-it"
 agw_api_app_certificate_name  = "api-uat-portalefatturazione-pagopa-it"
 
 #
 # appservice
 #
-app_plan_sku_name = "P1v3"
+app_plan_sku_name = "P0v3"
 
 #
 # azure sql
 #
-sql_database_sku_name = "S6"
+sql_database_sku_name = "S3"
 
 #
 # storage

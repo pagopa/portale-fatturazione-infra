@@ -19,7 +19,8 @@ resource "azurerm_mssql_server" "this" {
 }
 
 resource "azurerm_mssql_database" "this" {
-  name                 = format("%s-%s", local.project, "db")
+  # the weird UAT name is due to historical reasons
+  name                 = format("%s-%s%s", local.project, "db", var.env_short == "u" ? "-20241108" : "")
   server_id            = azurerm_mssql_server.this.id
   collation            = "SQL_Latin1_General_CP1_CI_AS"
   max_size_gb          = var.sql_database_max_size_gb

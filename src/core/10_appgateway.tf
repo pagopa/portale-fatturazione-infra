@@ -43,9 +43,9 @@ module "agw" {
   resource_group_name = azurerm_resource_group.networking.name
   location            = azurerm_resource_group.networking.location
   # sku
-  sku_name    = "WAF_v2"
-  sku_tier    = "WAF_v2"
-  waf_enabled = true # module quirk, cannot be false, up in Detection mode
+  sku_name    = var.agw_sku
+  sku_tier    = var.agw_sku
+  waf_enabled = var.agw_waf_enabled
   # networking
   subnet_id    = module.agw_snet.id
   public_ip_id = azurerm_public_ip.agw.id
