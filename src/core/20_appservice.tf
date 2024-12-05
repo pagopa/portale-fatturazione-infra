@@ -91,6 +91,10 @@ resource "azurerm_linux_web_app" "app_fe" {
   tags = var.tags
 }
 
+locals {
+  selfcare_url = format("https://api.%sselfcare.pagopa.it", var.env_short == "p" ? "" : "${var.env}.")
+}
+
 # api
 resource "azurerm_linux_web_app" "app_api" {
   name                       = format("%s-%s", local.project, "app-api")
@@ -155,6 +159,13 @@ resource "azurerm_linux_web_app" "app_api" {
     STORAGE_FINANCIAL_ACCOUNTNAME   = module.public_storage.name
     STORAGE_FINANCIAL_ACCOUNTKEY    = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
     STORAGE_FINANCIAL_CONTAINERNAME = "invoices"
+
+    SELFCAREONBOARDING_ENDPOINT  = local.selfcare_url
+    SELFCAREONBOARDING_URI       = "/external/billing-portal/v1/institutions/onboarding/recipientCode/verification"
+    SELFCAREONBOARDING_AUTHTOKEN = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SelfCareAuthToken)"
+    SUPPORTAPISERVICE_ENDPOINT   = local.selfcare_url
+    SUPPORTAPISERVICE_URI        = "/external/billing-portal/v1/onboarding/{onboardingId}/recipient-code"
+    SUPPORTAPISERVICE_AUTHTOKEN  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SupportApiServiceAuthToken)"
   }
 
   site_config {
