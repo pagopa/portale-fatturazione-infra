@@ -69,6 +69,12 @@ resource "azurerm_role_assignment" "synw_sap_storage_blob_data_contributor" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
+resource "azurerm_role_assignment" "synw_public_storage_blob_data_contributor" {
+  scope                = module.public_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+}
+
 # integration runtime
 resource "azurerm_synapse_integration_runtime_azure" "this" {
   name                 = format("%s-%s", local.project, "synw-integration-runtime")
@@ -317,4 +323,12 @@ resource "azurerm_synapse_managed_private_endpoint" "sendemail" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = azurerm_linux_function_app.send_email.id
   subresource_name     = "sites"
+}
+
+# managed_private_endpoint must be manual approved on target resource
+resource "azurerm_synapse_managed_private_endpoint" "public_storage" {
+  name                 = format("%s-public-storage-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = module.public_storage.id
+  subresource_name     = "blob"
 }
