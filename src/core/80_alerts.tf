@@ -27,7 +27,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "detect_sdi_code_modifica
 
   action {
     action_group  = [azurerm_monitor_action_group.notify_sdi_code_modification.id]
-    email_subject = "Alert: Modifica Codice SDI triggered"
+    email_subject = "Portale Fatturazione [${upper(var.env)}]: Modifica Codice SDI"
   }
 
   tags = var.tags
