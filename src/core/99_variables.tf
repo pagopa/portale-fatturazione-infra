@@ -286,3 +286,18 @@ variable "law_daily_quota_gb" {
   description = "daily quota in gb of the log analytics workspace (default: -1, unlimited)"
   default     = -1
 }
+
+#
+# alerts
+#
+variable "alert_sdi_code_frequency_mins" {
+  type        = number
+  description = "the frequency of evaluation of the query for the SDI code modification alert"
+  default     = 10
+}
+
+variable "alert_sdi_code_time_window_mins" {
+  type        = number
+  description = "the time window of the query for the SDI code modification alert"
+  default     = 11
+}
