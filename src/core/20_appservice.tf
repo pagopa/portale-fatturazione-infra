@@ -118,7 +118,7 @@ resource "azurerm_linux_web_app" "app_api" {
     KEY_VAULT_NAME                      = module.key_vault_app.name
     SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
     SELF_CARE_URI                       = var.app_api_config_selfcare_url
-    SELF_CARE_TIMEOUT                   = false
+    SELF_CARE_TIMEOUT                   = true
     SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
     # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
     # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
