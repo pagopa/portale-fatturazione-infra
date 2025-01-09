@@ -55,6 +55,12 @@ resource "azurerm_linux_function_app" "send_email" {
     SMTP_PORT         = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SmtpPort)"
     SMTP_AUTH         = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SmtpAuth)"
     SMTP_PASSWORD     = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SmtpPassword)"
+    ACCESSTOKEN       = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ACCESSTOKEN)"
+    CLIENTID          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=CLIENTID)"
+    CLIENTSECRET      = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=CLIENTSECRET)"
+    FROM              = "no-reply_fatturazione@pagopa.it"
+    FROMNAME          = "pagoPA"
+    REFRESHTOKEN      = "@Microsoft.KeyVault(VaultName=fat-p-kv-app;SecretName=REFRESHTOKEN)"
   }
 
   identity {
@@ -64,7 +70,10 @@ resource "azurerm_linux_function_app" "send_email" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack[0].dotnet_version
+      site_config[0].application_stack[0].dotnet_version,
+      # temporary values, ignore for the moment
+      app_settings["TO"],
+      app_settings["TONAME"],
     ]
   }
 }
