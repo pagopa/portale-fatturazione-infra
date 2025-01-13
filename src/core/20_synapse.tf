@@ -11,15 +11,9 @@ resource "azurerm_synapse_workspace" "this" {
   managed_virtual_network_enabled      = true
   data_exfiltration_protection_enabled = true
   public_network_access_enabled        = false
-  # admin auth
-  # azuread_authentication_only = true
-  # FIXME https://github.com/hashicorp/terraform-provider-azurerm/pull/23659
-  sql_administrator_login = "sqladminuser"
-  aad_admin {
-    login     = data.azuread_group.adgroup_admins.display_name
-    object_id = data.azuread_group.adgroup_admins.object_id
-    tenant_id = data.azurerm_client_config.current.tenant_id
-  }
+  azuread_authentication_only          = true
+  sql_administrator_login              = "sqladminuser"
+
   identity {
     type = "SystemAssigned"
   }
@@ -31,6 +25,13 @@ resource "azurerm_synapse_workspace" "this" {
       azure_devops_repo, # manual configuration
     ]
   }
+}
+
+resource "azurerm_synapse_workspace_aad_admin" "this" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  login                = data.azuread_group.adgroup_admins.display_name
+  object_id            = data.azuread_group.adgroup_admins.object_id
+  tenant_id            = data.azurerm_client_config.current.tenant_id
 }
 
 resource "azurerm_synapse_spark_pool" "sparkcls01" {
@@ -269,12 +270,14 @@ resource "azurerm_synapse_role_assignment" "admins" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Administrator"
   principal_id         = data.azuread_group.adgroup_admins.object_id
+  principal_type       = "Group"
 }
 
 resource "azurerm_synapse_role_assignment" "developers" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Contributor"
   principal_id         = data.azuread_group.adgroup_developers.object_id
+  principal_type       = "Group"
 }
 
 # managed_private_endpoint must be manual approved on target resource
