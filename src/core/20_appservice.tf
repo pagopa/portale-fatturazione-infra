@@ -123,15 +123,17 @@ resource "azurerm_linux_web_app" "app_fe" {
   }
 
   site_config {
-    always_on               = true
-    use_32_bit_worker       = false
-    ftps_state              = "Disabled"
-    http2_enabled           = true
-    app_command_line        = "pm2 serve /home/site/wwwroot --no-daemon --spa"
-    minimum_tls_version     = "1.2"
-    scm_minimum_tls_version = "1.2"
-    vnet_route_all_enabled  = true
-    health_check_path       = "/health"
+    always_on                         = true
+    use_32_bit_worker                 = false
+    ftps_state                        = "Disabled"
+    http2_enabled                     = true
+    app_command_line                  = "pm2 serve /home/site/wwwroot --no-daemon --spa"
+    minimum_tls_version               = "1.2"
+    scm_minimum_tls_version           = "1.2"
+    vnet_route_all_enabled            = true
+    health_check_path                 = "/health"
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Allow"
 
     application_stack {
       node_version = "18-lts"
