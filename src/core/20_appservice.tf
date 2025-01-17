@@ -9,8 +9,8 @@ locals {
       CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
       JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=JwtSecret)"
       ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=AdminKey)"
-      JWT_VALID_AUDIENCE                  = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
-      JWT_VALID_ISSUER                    = "${format("%s-%s", local.project, "app-api")}.azurewebsites.net"
+      JWT_VALID_AUDIENCE                  = local.fqdn_api
+      JWT_VALID_ISSUER                    = local.fqdn_api
       KEY_VAULT_NAME                      = module.key_vault_app.name
       SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
       SELF_CARE_URI                       = var.app_api_config_selfcare_url
@@ -166,13 +166,14 @@ locals {
 
 # api
 resource "azurerm_linux_web_app" "app_api" {
-  name                       = format("%s-%s", local.project, "app-api")
-  location                   = azurerm_resource_group.app.location
-  resource_group_name        = azurerm_resource_group.app.name
-  service_plan_id            = azurerm_service_plan.app.id
-  client_certificate_enabled = false
-  https_only                 = true
-  client_affinity_enabled    = false
+  name                          = format("%s-%s", local.project, "app-api")
+  location                      = azurerm_resource_group.app.location
+  resource_group_name           = azurerm_resource_group.app.name
+  service_plan_id               = azurerm_service_plan.app.id
+  client_certificate_enabled    = false
+  https_only                    = true
+  client_affinity_enabled       = false
+  public_network_access_enabled = false
 
   app_settings = local.app_api.app_settings
 
@@ -274,7 +275,7 @@ resource "azurerm_linux_web_app_slot" "app_api_staging" {
   client_certificate_enabled    = false
   https_only                    = true
   client_affinity_enabled       = false
-  public_network_access_enabled = true
+  public_network_access_enabled = false
 
   app_settings = local.app_api.app_settings
 

@@ -96,7 +96,7 @@ module "agw" {
   listeners = {
     api = {
       protocol           = "Https"
-      host               = join(".", [var.dns_api_prefix, var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
+      host               = local.fqdn_api
       port               = 443
       ssl_profile_name   = null
       firewall_policy_id = null
@@ -111,7 +111,7 @@ module "agw" {
     }
     apex = {
       protocol           = "Https"
-      host               = join(".", [var.dns_zone_portalefatturazione_prefix, var.dns_external_domain])
+      host               = local.fqdn_fe
       port               = 443
       ssl_profile_name   = null
       firewall_policy_id = null
