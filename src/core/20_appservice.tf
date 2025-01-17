@@ -5,6 +5,7 @@ locals {
       WEBSITE_DNS_SERVER                  = "168.63.129.16" # would have been inherited from module
       WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
       WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
+      ASPNETCORE_ENVIRONMENT              = "Production"
       CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
       JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=JwtSecret)"
       ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=AdminKey)"
