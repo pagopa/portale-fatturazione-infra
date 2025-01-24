@@ -335,3 +335,14 @@ resource "azurerm_synapse_managed_private_endpoint" "public_storage" {
   target_resource_id   = module.public_storage.id
   subresource_name     = "blob"
 }
+
+# private endpoint for a CRM data lake EXTERNAL to this subscription,
+# we reference it directly by its id
+resource "azurerm_synapse_managed_private_endpoint" "crm_storage_dfs" {
+  count = var.crm_storage_id != null ? 1 : 0
+
+  name                 = format("%s-crm-storage-dfs-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = var.crm_storage_id
+  subresource_name     = "dfs"
+}
