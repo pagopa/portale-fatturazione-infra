@@ -237,6 +237,13 @@ variable "storage_sap_rule_ips" {
   default     = []
 }
 
+# this storage is in another subscription, we reference it directly by id
+variable "crm_storage_id" {
+  type        = string
+  description = "id of the CRM storage, that lies in another subscription"
+  default     = null
+}
+
 #
 # azure sql
 #
