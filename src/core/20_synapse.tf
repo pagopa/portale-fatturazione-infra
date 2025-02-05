@@ -346,3 +346,12 @@ resource "azurerm_synapse_managed_private_endpoint" "crm_storage_dfs" {
   target_resource_id   = var.crm_storage_id
   subresource_name     = "dfs"
 }
+
+resource "azurerm_synapse_managed_private_endpoint" "crm_storage_blob" {
+  count = var.crm_storage_id != null ? 1 : 0
+
+  name                 = format("%s-crm-storage-blob-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = var.crm_storage_id
+  subresource_name     = "blob"
+}
