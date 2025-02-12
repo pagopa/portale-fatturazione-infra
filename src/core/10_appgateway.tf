@@ -77,7 +77,7 @@ module "agw" {
       fqdns                       = [format("%s-%s.%s", local.project, "app-api", "azurewebsites.net")]
       probe                       = "/health"
       probe_name                  = "probe-app_api"
-      request_timeout             = 60
+      request_timeout             = 300
       pick_host_name_from_backend = false # module quirk
     },
     app_fe = {
