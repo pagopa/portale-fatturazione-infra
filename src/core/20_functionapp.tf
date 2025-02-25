@@ -61,7 +61,12 @@ resource "azurerm_linux_function_app" "send_email" {
     CLIENTSECRET      = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=CLIENTSECRET)"
     FROM              = "no-reply_fatturazione@pagopa.it"
     FROMNAME          = "pagoPA"
-    REFRESHTOKEN      = "@Microsoft.KeyVault(VaultName=fat-p-kv-app;SecretName=REFRESHTOKEN)"
+    REFRESHTOKEN      = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=REFRESHTOKEN)"
+
+    StorageRELAccountName       = module.public_storage.name
+    StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
+    StorageRELBlobContainerName = "relrighe"
+
   }
 
   identity {
