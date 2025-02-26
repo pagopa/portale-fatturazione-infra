@@ -64,6 +64,16 @@ resource "azurerm_dns_a_record" "agw_api" {
   tags                = var.tags
 }
 
+# provide a custom hostname for the public storage account by passing through the agw
+resource "azurerm_dns_a_record" "agw_storage" {
+  name                = "storage"
+  zone_name           = azurerm_dns_zone.portalefatturazione[0].name
+  resource_group_name = azurerm_resource_group.networking.name
+  records             = [azurerm_public_ip.agw.ip_address]
+  ttl                 = var.dns_default_ttl_sec
+  tags                = var.tags
+}
+
 #
 # dns private zone name list:
 # https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration

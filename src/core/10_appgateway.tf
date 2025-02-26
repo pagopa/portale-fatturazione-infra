@@ -37,6 +37,11 @@ data "azurerm_key_vault_certificate" "agw_apex_app" {
   key_vault_id = module.key_vault.id
 }
 
+data "azurerm_key_vault_certificate" "agw_storage" {
+  name         = var.agw_storage_certificate_name
+  key_vault_id = module.key_vault.id
+}
+
 module "agw" {
   source              = "./.terraform/modules/__v3__/app_gateway/"
   name                = format("%s-%s", local.project, "agw")
@@ -91,6 +96,19 @@ module "agw" {
       request_timeout             = 60
       pick_host_name_from_backend = false # module quirk
     },
+    # backend for the public storage account
+    storage = {
+      protocol     = "Https"
+      host         = module.public_storage.primary_blob_host
+      port         = 443
+      ip_addresses = null # with null value use fqdns
+      fqdns        = [module.public_storage.primary_blob_host]
+      # probe targeting an ad-hoc health check blob in the public storage
+      probe                       = local.public_health_blob_url
+      probe_name                  = "probe-storage"
+      request_timeout             = 60
+      pick_host_name_from_backend = false # module quirk
+    }
   }
   # listeners
   listeners = {
@@ -102,11 +120,7 @@ module "agw" {
       firewall_policy_id = null
       certificate = {
         name = var.agw_api_app_certificate_name
-        id = replace(
-          data.azurerm_key_vault_certificate.agw_api_app.secret_id,
-          "/${data.azurerm_key_vault_certificate.agw_api_app.version}",
-          ""
-        )
+        id   = data.azurerm_key_vault_certificate.agw_api_app.versionless_secret_id
       }
     }
     apex = {
@@ -117,11 +131,19 @@ module "agw" {
       firewall_policy_id = null
       certificate = {
         name = var.agw_apex_app_certificate_name
-        id = replace(
-          data.azurerm_key_vault_certificate.agw_apex_app.secret_id,
-          "/${data.azurerm_key_vault_certificate.agw_apex_app.version}",
-          ""
-        )
+        id   = data.azurerm_key_vault_certificate.agw_apex_app.secret_id,
+      }
+    }
+    # public storage listener to provide a custom hostname to that storage
+    storage = {
+      protocol           = "Https"
+      host               = local.fqdn_storage
+      port               = 443
+      ssl_profile_name   = null
+      firewall_policy_id = null
+      certificate = {
+        name = var.agw_storage_certificate_name
+        id   = data.azurerm_key_vault_certificate.agw_storage.versionless_secret_id
       }
     }
   }
@@ -137,6 +159,12 @@ module "agw" {
       backend               = "app_fe"
       rewrite_rule_set_name = null
       priority              = 20
+    }
+    storage = {
+      listener              = "storage"
+      backend               = "storage"
+      rewrite_rule_set_name = null
+      priority              = 90
     }
   }
   # identity

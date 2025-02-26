@@ -181,6 +181,10 @@ variable "agw_apex_app_certificate_name" {
   description = "the certificate name on the kv for the api endpoint"
 }
 
+variable "agw_storage_certificate_name" {
+  type        = string
+  description = "the certificate name on the kv for the storage endpoint behind agw"
+}
 
 #
 # appservice
