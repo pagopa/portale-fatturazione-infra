@@ -23,6 +23,7 @@ fi
 source "./env/$env/backend.ini"
 
 az account set -s "${subscription}"
+export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 
 echo "SUBSCRIPTION: ${subscription}"
 

@@ -1,11 +1,11 @@
 module "agw_snet" {
-  source                                    = "./.terraform/modules/__v3__/subnet/"
-  name                                      = format("%s-%s-snet", local.project, "agw")
-  address_prefixes                          = var.cidr_agw_snet
-  resource_group_name                       = azurerm_resource_group.networking.name
-  virtual_network_name                      = module.vnet.name
-  private_endpoint_network_policies_enabled = true
-  service_endpoints                         = ["Microsoft.Web"]
+  source                            = "./.terraform/modules/__v4__/subnet/"
+  name                              = format("%s-%s-snet", local.project, "agw")
+  address_prefixes                  = var.cidr_agw_snet
+  resource_group_name               = azurerm_resource_group.networking.name
+  virtual_network_name              = module.vnet.name
+  private_endpoint_network_policies = "Enabled"
+  service_endpoints                 = ["Microsoft.Web"]
 }
 
 resource "azurerm_public_ip" "agw" {
@@ -43,7 +43,7 @@ data "azurerm_key_vault_certificate" "agw_storage" {
 }
 
 module "agw" {
-  source              = "./.terraform/modules/__v3__/app_gateway/"
+  source              = "./.terraform/modules/__v4__/app_gateway/"
   name                = format("%s-%s", local.project, "agw")
   resource_group_name = azurerm_resource_group.networking.name
   location            = azurerm_resource_group.networking.location

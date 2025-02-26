@@ -1,11 +1,11 @@
 module "vpn_snet" {
-  source                                    = "./.terraform/modules/__v3__/subnet/"
-  name                                      = "GatewaySubnet" # vpn_gateway quirk, this is expected
-  address_prefixes                          = var.cidr_vpn_snet
-  resource_group_name                       = azurerm_resource_group.networking.name
-  virtual_network_name                      = module.vnet.name
-  private_endpoint_network_policies_enabled = true
-  service_endpoints                         = []
+  source                            = "./.terraform/modules/__v4__/subnet/"
+  name                              = "GatewaySubnet" # vpn_gateway quirk, this is expected
+  address_prefixes                  = var.cidr_vpn_snet
+  resource_group_name               = azurerm_resource_group.networking.name
+  virtual_network_name              = module.vnet.name
+  private_endpoint_network_policies = "Enabled"
+  service_endpoints                 = []
 }
 
 data "azuread_application" "vpn_app" {
@@ -13,7 +13,7 @@ data "azuread_application" "vpn_app" {
 }
 
 module "vpn" {
-  source              = "./.terraform/modules/__v3__/vpn_gateway/"
+  source              = "./.terraform/modules/__v4__/vpn_gateway/"
   name                = format("%s-%s", local.project, "vpn")
   resource_group_name = azurerm_resource_group.networking.name
   sku                 = "VpnGw1"
@@ -41,12 +41,12 @@ module "vpn" {
 
 ## dns forwarder
 module "dns_fwd_snet" {
-  source                                    = "./.terraform/modules/__v3__/subnet/"
-  name                                      = format("%s-%s-snet", local.project, "dns-fwd")
-  address_prefixes                          = var.cidr_dns_fwd_snet
-  resource_group_name                       = azurerm_resource_group.networking.name
-  virtual_network_name                      = module.vnet.name
-  private_endpoint_network_policies_enabled = true
+  source                            = "./.terraform/modules/__v4__/subnet/"
+  name                              = format("%s-%s-snet", local.project, "dns-fwd")
+  address_prefixes                  = var.cidr_dns_fwd_snet
+  resource_group_name               = azurerm_resource_group.networking.name
+  virtual_network_name              = module.vnet.name
+  private_endpoint_network_policies = "Enabled"
   # use subnet delegation
   # https://learn.microsoft.com/en-us/azure/container-instances/container-instances-custom-dns
   delegation = {
@@ -59,7 +59,7 @@ module "dns_fwd_snet" {
 }
 
 module "dns_fwd" {
-  source              = "./.terraform/modules/__v3__/dns_forwarder/"
+  source              = "./.terraform/modules/__v4__/dns_forwarder/"
   name                = format("%s-%s", local.project, "dns-fwd")
   location            = azurerm_resource_group.networking.location
   resource_group_name = azurerm_resource_group.networking.name
