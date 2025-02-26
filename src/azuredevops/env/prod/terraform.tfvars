@@ -22,6 +22,10 @@ domains = [
     dns_zone_name   = "portalefatturazione.pagopa.it"
     dns_record_name = "api"
   },
+  {
+    dns_zone_name   = "portalefatturazione.pagopa.it"
+    dns_record_name = "storage"
+  },
 ]
 
 # pipeline for syncing azdo repo to github 
