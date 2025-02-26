@@ -2,64 +2,65 @@
 
 set -e
 
-#
-# HOW TO USE IT:
-# $ sh terraform.sh apply iac -> to apply terraform file inside iac-projects
-# $ sh terraform.sh apply app -> to apply terraform file inside app-projects
-#
-
-SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-CURRENT_DIRECTORY="$(basename "$SCRIPT_PATH")"
-ACTION=$1
-PROJECT=$2
+action=$1
+env=$2
 shift 2
-other="$*"
-BACKEND_CONFIG_PATH="../.env/${PROJECT}_state.tfvars"
-BACKEND_INI_PATH="../.env/backend.ini"
-TF_VAR_FILE_PATH="../.env/terraform.tfvars"
+other=$@
 
-echo "[INFO] This is the current directory: ${CURRENT_DIRECTORY}"
+subscription="MOCK_VALUE"
 
-if [ -z "$ACTION" ]; then
-  echo "[ERROR] Missed ACTION: init, apply, plan"
+if [ -z "$action" ]; then
+  echo "Missed action: init, apply, plan"
   exit 0
 fi
 
-if [ -z "$PROJECT" ]; then
-  echo "[ERROR] PROJECT should be: app or iac."
+if [ -z "$env" ]; then
+  echo "env should be: dev, uat or prod."
   exit 0
 fi
 
-pushd "${PROJECT}"
-
-# LOAD SUBSCRIPTION
-## must be subscription in lower case
-subscription=""
 # shellcheck source=/dev/null
-source "${BACKEND_INI_PATH}"
+source "./env/$env/backend.ini"
 
-echo "[INFO] Set account on subscription ${subscription}"
 az account set -s "${subscription}"
 
-if echo "init plan apply refresh import output state taint destroy" | grep -w "$ACTION" > /dev/null; then
-  if [ "$ACTION" = "init" ]; then
-    echo "[INFO] init tf"
-    terraform "$ACTION" -backend-config="${BACKEND_CONFIG_PATH}" $other
-  elif [ "$ACTION" = "output" ] || [ "$ACTION" = "state" ] || [ "$ACTION" = "taint" ]; then
+echo "SUBSCRIPTION: ${subscription}"
+
+if [ "$action" = "force-unlock" ]; then
+  echo "🧭 terraform INIT in env: ${env}"
+  terraform init -reconfigure -backend-config="./env/$env/backend.tfvars" $other
+  warn_message="You are about to unlock Terraform's remote state. 
+  This is a dangerous task you want to be aware of before going on.
+  This operation won't affect your infrastructure directly.
+  However, please note that you may lose pieces of information about partially-applied configurations.
+
+  Please refer to the official Terraform documentation about the command:
+  https://developer.hashicorp.com/terraform/cli/commands/force-unlock"
+  printf "\n\e[33m%s\e[0m\n\n" "$warn_message"
+
+  read -r -p "Please enter the LOCK ID: " lock_id
+  terraform force-unlock "$lock_id"
+  
+  exit 0 # this line prevents the script to go on
+fi
+
+if echo "init plan apply refresh import output state taint destroy" | grep -w "$action" > /dev/null; then
+  if [ "$action" = "init" ]; then
+    echo "🧭 terraform INIT in env: ${env}"
+    terraform "$action" -reconfigure -backend-config="./env/$env/backend.tfvars" $other
+  elif [ "$action" = "output" ] || [ "$action" = "state" ] || [ "$action" = "taint" ]; then
     # init terraform backend
-    echo "[INFO] init tf"
-    terraform init -reconfigure -backend-config="${BACKEND_CONFIG_PATH}"
-    
-    terraform "$ACTION" $other
+    echo "🧭 terraform (output|state|taint) launched with action: ${action} in env: ${env}"
+    terraform init -reconfigure -backend-config="./env/$env/backend.tfvars"
+    terraform "$action" $other
   else
     # init terraform backend
-    echo "[INFO] init tf"
-    terraform init -reconfigure -backend-config="${BACKEND_CONFIG_PATH}"
+    echo "🧭 terraform launched with action: ${action} in env: ${env}"
 
-    echo "[INFO] run tf with: ${ACTION} and other: >${other}<"
-    terraform "${ACTION}" -var-file="${TF_VAR_FILE_PATH}" $other
+    terraform init -reconfigure -backend-config="./env/$env/backend.tfvars"
+    terraform "$action" -var-file="./env/$env/terraform.tfvars" $other
   fi
 else
-    echo "[ERROR] ACTION not allowed."
+    echo "Action not allowed."
     exit 1
 fi

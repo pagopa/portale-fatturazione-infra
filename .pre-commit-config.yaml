@@ -3,7 +3,7 @@ repos:
     rev: 89f45610a846f56273a6c4290b3c42534175949e # v1.96.1
     hooks:
       - id: terraform_fmt
-      # - id: terraform_docs
+      - id: terraform_docs
       - id: terraform_trivy
         args:
           - --args=--skip-dirs="**/.terraform"

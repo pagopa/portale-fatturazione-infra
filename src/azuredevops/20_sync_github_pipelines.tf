@@ -1,34 +1,4 @@
 
-variable "repos_to_sync" {
-  description = "Repositories to sync to GitHub"
-  type = list(object({
-    organization = string
-    name         = string
-    branch_name  = string
-    yml_path     = string
-  }))
-  default = [
-    {
-      organization = "pagopa"
-      name         = "portale-fatturazione-be"
-      branch_name  = "refs/heads/main"
-      yml_path     = ".devops/sync-github.yml"
-    },
-    # {
-    #   organization = "pagopa"
-    #   name         = "portale-fatturazione-fe"
-    #   branch_name  = "refs/heads/main"
-    #   yml_path     = ".devops/sync-github.yml"
-    # },
-    # {
-    #   organization = "pagopa"
-    #   name         = "portale-fatturazione-synapse"
-    #   branch_name  = "refs/heads/main"
-    #   yml_path     = ".devops/sync-github.yml"
-    # },
-  ]
-}
-
 data "azuredevops_git_repository" "repo" {
   for_each = { for repo in var.repos_to_sync : repo.name => repo }
 
