@@ -1,5 +1,5 @@
 module "key_vault" {
-  source                     = "./.terraform/modules/__v3__/key_vault/"
+  source                     = "./.terraform/modules/__v4__/key_vault/"
   name                       = format("%s-%s", local.project, "kv")
   location                   = azurerm_resource_group.kv.location
   resource_group_name        = azurerm_resource_group.kv.name
@@ -82,7 +82,7 @@ resource "azurerm_key_vault_access_policy" "agw_policy" {
 # additional kv for app secrets
 #
 module "key_vault_app" {
-  source                     = "./.terraform/modules/__v3__/key_vault/"
+  source                     = "./.terraform/modules/__v4__/key_vault/"
   name                       = format("%s-%s", local.project, "kv-app")
   location                   = azurerm_resource_group.kv.location
   resource_group_name        = azurerm_resource_group.kv.name

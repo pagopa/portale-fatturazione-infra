@@ -2,7 +2,7 @@
 # dls storage
 #
 module "dls_storage" {
-  source                               = "./.terraform/modules/__v3__/storage_account/"
+  source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "dls"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
@@ -21,13 +21,13 @@ module "dls_storage" {
 
 resource "azurerm_storage_container" "dls_raw" {
   name                  = "raw"
-  storage_account_name  = module.dls_storage.name
+  storage_account_id    = module.dls_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "dls_synapse" {
   name                  = "synapse"
-  storage_account_name  = module.dls_storage.name
+  storage_account_id    = module.dls_storage.id
   container_access_type = "private"
 }
 
@@ -44,7 +44,7 @@ resource "azurerm_key_vault_secret" "dls_storage_connection_string" {
 #
 #tfsec:ignore:azure-storage-default-action-deny Reason: DataLake needs to upload blob to this storage, we applied ip restrictions
 module "sa_storage" {
-  source                               = "./.terraform/modules/__v3__/storage_account/"
+  source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sa"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
@@ -68,7 +68,7 @@ module "sa_storage" {
 
 resource "azurerm_storage_container" "sa_stage" {
   name                  = "pfstage"
-  storage_account_name  = module.sa_storage.name
+  storage_account_id    = module.sa_storage.id
   container_access_type = "private"
 }
 
@@ -144,7 +144,7 @@ resource "azurerm_private_endpoint" "sa_storage_blob" {
 #
 #tfsec:ignore:azure-storage-default-action-deny Reason: SAP needs to read blob from this storage, we applied ip restrictions
 module "sap_storage" {
-  source                               = "./.terraform/modules/__v3__/storage_account/"
+  source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sap"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
@@ -167,7 +167,7 @@ module "sap_storage" {
 
 resource "azurerm_storage_container" "sap_sap" {
   name                  = "sap"
-  storage_account_name  = module.sap_storage.name
+  storage_account_id    = module.sap_storage.id
   container_access_type = "private"
 }
 
@@ -199,7 +199,7 @@ resource "azurerm_private_endpoint" "sap_storage_blob" {
 #
 #no public access, used by fatturazione API-BE
 module "rel_storage" {
-  source                               = "./.terraform/modules/__v3__/storage_account/"
+  source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "rel"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
@@ -224,7 +224,7 @@ resource "azurerm_key_vault_secret" "rel_storage_connection_string" {
 
 resource "azurerm_storage_container" "rel_rel" {
   name                  = "rel"
-  storage_account_name  = module.rel_storage.name
+  storage_account_id    = module.rel_storage.id
   container_access_type = "private"
 }
 
@@ -253,7 +253,7 @@ resource "azurerm_private_endpoint" "rel_storage_blob" {
 # accessible and also mapped as virtual host in the app gateway with a
 # custom hostname
 module "public_storage" {
-  source                               = "./.terraform/modules/__v3__/storage_account/"
+  source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "public"), "-", "")
   resource_group_name                  = azurerm_resource_group.analytics.name
   location                             = var.secondary_location
@@ -276,7 +276,7 @@ module "public_storage" {
 
 # internal container for health probe
 resource "azurerm_storage_container" "internal" {
-  storage_account_name  = module.public_storage.name
+  storage_account_id    = module.public_storage.id
   name                  = "internal"
   container_access_type = "private"
 }

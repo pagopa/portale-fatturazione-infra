@@ -1,6 +1,6 @@
 
 module "nat_gateway" {
-  source = "./.terraform/modules/__v3__/nat_gateway/"
+  source = "./.terraform/modules/__v4__/nat_gateway/"
 
   name                = "${local.project}-natgw"
   location            = azurerm_resource_group.networking.location

@@ -1,11 +1,9 @@
 terraform {
-  required_version = ">=1.3.0"
+  required_version = ">= 1.10.0"
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
-      # last available version of azurerm v3
-      # upgrade to v4 will break all modules
-      version = "= 3.117.0"
+      source  = "hashicorp/azurerm"
+      version = "~> 4.20"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -19,7 +17,6 @@ terraform {
 }
 
 provider "azurerm" {
-  skip_provider_registration = true
   features {
     key_vault {
       purge_soft_delete_on_destroy = false
@@ -27,9 +24,9 @@ provider "azurerm" {
   }
 }
 
-module "__v3__" {
-  # https://github.com/pagopa/terraform-azurerm-v3/releases/tag/v8.71.0
-  source = "github.com/pagopa/terraform-azurerm-v3?ref=8e1de5c01dfb551c2a99998ed65efc2d34102a78"
+module "__v4__" {
+  # github.com/pagopa/terraform-azurerm-v4/releases/tag/v1.9.0
+  source = "github.com/pagopa/terraform-azurerm-v4?ref=d9aee53bcf1d1e01594cc3276447afe0635d1789"
 }
 
 data "azurerm_subscription" "current" {}

@@ -70,13 +70,13 @@ data "azuread_application" "portalefatturazione" {
 }
 
 module "app_snet" {
-  source                                    = "./.terraform/modules/__v3__/subnet/"
-  name                                      = format("%s-%s-snet", local.project, "app")
-  address_prefixes                          = var.cidr_app_snet
-  resource_group_name                       = azurerm_resource_group.networking.name
-  virtual_network_name                      = module.vnet.name
-  private_endpoint_network_policies_enabled = true
-  service_endpoints                         = []
+  source                            = "./.terraform/modules/__v4__/subnet/"
+  name                              = format("%s-%s-snet", local.project, "app")
+  address_prefixes                  = var.cidr_app_snet
+  resource_group_name               = azurerm_resource_group.networking.name
+  virtual_network_name              = module.vnet.name
+  private_endpoint_network_policies = "Enabled"
+  service_endpoints                 = []
   delegation = {
     name = "default"
     service_delegation = {
@@ -133,6 +133,7 @@ resource "azurerm_linux_web_app" "app_fe" {
     scm_minimum_tls_version           = "1.2"
     vnet_route_all_enabled            = true
     health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 2
     ip_restriction_default_action     = "Deny"
     scm_ip_restriction_default_action = "Allow"
 
@@ -178,14 +179,15 @@ resource "azurerm_linux_web_app" "app_api" {
   app_settings = local.app_api.app_settings
 
   site_config {
-    always_on               = true
-    use_32_bit_worker       = false
-    ftps_state              = "Disabled"
-    http2_enabled           = true
-    minimum_tls_version     = "1.2"
-    scm_minimum_tls_version = "1.2"
-    vnet_route_all_enabled  = true
-    health_check_path       = "/health"
+    always_on                         = true
+    use_32_bit_worker                 = false
+    ftps_state                        = "Disabled"
+    http2_enabled                     = true
+    minimum_tls_version               = "1.2"
+    scm_minimum_tls_version           = "1.2"
+    vnet_route_all_enabled            = true
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 2
 
     application_stack {
       docker_image_name   = "pagopa/portale-fatturazione-be:latest" // ignored, will be managed from ci/cd pipeline
@@ -280,14 +282,15 @@ resource "azurerm_linux_web_app_slot" "app_api_staging" {
   app_settings = local.app_api.app_settings
 
   site_config {
-    always_on               = true
-    use_32_bit_worker       = false
-    ftps_state              = "Disabled"
-    http2_enabled           = true
-    minimum_tls_version     = "1.2"
-    scm_minimum_tls_version = "1.2"
-    vnet_route_all_enabled  = true
-    health_check_path       = "/health"
+    always_on                         = true
+    use_32_bit_worker                 = false
+    ftps_state                        = "Disabled"
+    http2_enabled                     = true
+    minimum_tls_version               = "1.2"
+    scm_minimum_tls_version           = "1.2"
+    vnet_route_all_enabled            = true
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 2
 
     application_stack {
       docker_image_name   = "pagopa/portale-fatturazione-be:latest" // ignored, will be managed from ci/cd pipeline
