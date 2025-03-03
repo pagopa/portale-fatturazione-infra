@@ -6,6 +6,7 @@ resource "azurerm_storage_account" "function_send_email" {
   account_tier             = "Standard"
   account_replication_type = "ZRS"
   min_tls_version          = "TLS1_2"
+  tags                     = var.tags
 }
 
 resource "azurerm_linux_function_app" "send_email" {
@@ -72,6 +73,8 @@ resource "azurerm_linux_function_app" "send_email" {
   identity {
     type = "SystemAssigned"
   }
+
+  tags = var.tags
 
   lifecycle {
     ignore_changes = [

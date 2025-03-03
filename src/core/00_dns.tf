@@ -83,6 +83,7 @@ resource "azurerm_dns_a_record" "agw_storage" {
 resource "azurerm_private_dns_zone" "privatelink_azurewebsites_net" {
   name                = "privatelink.azurewebsites.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsites_net_vnet" {
@@ -90,6 +91,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsi
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_azurewebsites_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsites_net_secondary_vnet" {
@@ -97,12 +99,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azurewebsi
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_azurewebsites_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 # azure sql
 resource "azurerm_private_dns_zone" "privatelink_database_windows_net" {
   name                = "privatelink.database.windows.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_windows_net_vnet" {
@@ -110,6 +114,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_w
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_database_windows_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_windows_net_secondary_vnet" {
@@ -117,17 +122,20 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_database_w
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_database_windows_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 # storage
 resource "azurerm_private_dns_zone" "privatelink_blob_core_windows_net" {
   name                = "privatelink.blob.core.windows.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone" "privatelink_dfs_core_windows_net" {
   name                = "privatelink.dfs.core.windows.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_windows_net_vnet" {
@@ -135,6 +143,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_blob_core_windows_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dfs_core_windows_net_vnet" {
@@ -142,6 +151,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dfs_core_w
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_dfs_core_windows_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_windows_net_secondary_vnet" {
@@ -149,6 +159,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_blob_core_windows_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dfs_core_windows_net_secondary_vnet" {
@@ -156,12 +167,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dfs_core_w
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_dfs_core_windows_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 # synapse
 resource "azurerm_private_dns_zone" "privatelink_sql_azuresynapse_net" {
   name                = "privatelink.sql.azuresynapse.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_sql_azuresynapse_net_vnet" {
@@ -169,6 +182,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_sql_azures
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_sql_azuresynapse_net_secondary_vnet" {
@@ -176,11 +190,13 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_sql_azures
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone" "privatelink_dev_azuresynapse_net" {
   name                = "privatelink.dev.azuresynapse.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dev_azuresynapse_net_vnet" {
@@ -188,6 +204,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dev_azures
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_dev_azuresynapse_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dev_azuresynapse_net_secondary_vnet" {
@@ -195,11 +212,13 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dev_azures
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_dev_azuresynapse_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone" "privatelink_azuresynapse_net" {
   name                = "privatelink.azuresynapse.net"
   resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azuresynapse_net_vnet" {
@@ -207,6 +226,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azuresynap
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_azuresynapse_net.name
   virtual_network_id    = module.vnet.id
+  tags                  = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azuresynapse_net_secondary_vnet" {
@@ -214,6 +234,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_azuresynap
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_azuresynapse_net.name
   virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
 }
 
 #
@@ -244,4 +265,6 @@ resource "azurerm_dns_caa_record" "this" {
     tag   = "iodef"
     value = "mailto:security+caa@pagopa.it"
   }
+
+  tags = var.tags
 }
