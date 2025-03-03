@@ -131,7 +131,7 @@ module "agw" {
       firewall_policy_id = null
       certificate = {
         name = var.agw_apex_app_certificate_name
-        id   = data.azurerm_key_vault_certificate.agw_apex_app.secret_id,
+        id   = data.azurerm_key_vault_certificate.agw_apex_app.versionless_secret_id,
       }
     }
     # public storage listener to provide a custom hostname to that storage
