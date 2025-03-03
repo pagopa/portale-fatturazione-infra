@@ -62,6 +62,11 @@ locals {
       SUPPORTAPISERVICE_ENDPOINT   = local.selfcare_url
       SUPPORTAPISERVICE_URI        = "/external/billing-portal/v1/onboarding/{onboardingId}/recipient-code"
       SUPPORTAPISERVICE_AUTHTOKEN  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SupportApiServiceAuthToken)"
+
+      StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageRELAccountName       = module.public_storage.name
+      StorageRELBlobContainerName = "relrighe"
+      StorageRELCustomDns         = "https://${azurerm_dns_a_record.agw_storage.name}.${azurerm_dns_zone.portalefatturazione[0].name}"
     }
   }
 }
