@@ -26,8 +26,8 @@ resource "azurerm_linux_function_app" "send_email" {
     use_32_bit_worker       = false
     ftps_state              = "Disabled"
     http2_enabled           = true
-    minimum_tls_version     = "1.2"
-    scm_minimum_tls_version = "1.2"
+    minimum_tls_version     = "1.3"
+    scm_minimum_tls_version = "1.3"
     vnet_route_all_enabled  = true
     # health_check_path       = "/health" TODO
 
