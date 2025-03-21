@@ -241,6 +241,12 @@ variable "storage_sap_rule_ips" {
   default     = []
 }
 
+variable "storage_dls_rule_ips" {
+  type        = list(string)
+  description = "ips used in the dls storage account network rules"
+  default     = []
+}
+
 # this storage is in another subscription, we reference it directly by id
 variable "crm_storage_id" {
   type        = string
