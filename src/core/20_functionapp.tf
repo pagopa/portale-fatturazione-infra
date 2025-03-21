@@ -124,3 +124,51 @@ resource "azurerm_private_endpoint" "send_email_function" {
   }
   tags = var.tags
 }
+
+module "func_api" {
+  source = "./.terraform/modules/__v4__/function_app/"
+
+  name                                     = "${local.project}-api-func"
+  resource_group_name                      = azurerm_resource_group.app.name
+  location                                 = azurerm_resource_group.app.location
+  always_on                                = true
+  enable_healthcheck                       = false
+  application_insights_instrumentation_key = azurerm_application_insights.application_insights.instrumentation_key
+  runtime_version                          = "~4"
+  dotnet_version                           = "8.0"
+  use_dotnet_isolated_runtime              = true
+
+  app_settings = {}
+
+  internal_storage = {
+    enable                     = true,
+    private_endpoint_subnet_id = module.private_endpoint_snet.id,
+    private_dns_zone_blob_ids  = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id],
+    private_dns_zone_queue_ids = [azurerm_private_dns_zone.privatelink_queue_core_windows_net.id],
+    private_dns_zone_table_ids = [azurerm_private_dns_zone.privatelink_table_core_windows_net.id],
+    queues                     = [],
+    containers                 = [],
+    blobs_retention_days       = 7
+  }
+
+  internal_storage_account_info = {
+    account_kind                      = "StorageV2"
+    account_tier                      = "Standard"
+    account_replication_type          = "ZRS"
+    access_tier                       = "Hot"
+    advanced_threat_protection_enable = false
+    use_legacy_defender_version       = false
+    public_network_access_enabled     = false
+  }
+
+  subnet_id               = module.app_snet.id
+  allowed_subnets         = [module.app_snet.id]
+  app_service_plan_id     = azurerm_service_plan.app.id
+  system_identity_enabled = true
+
+  cors = {
+    allowed_origins = ["https://portal.azure.com"]
+  }
+
+  tags = var.tags
+}
