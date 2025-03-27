@@ -355,3 +355,37 @@ resource "azurerm_synapse_managed_private_endpoint" "crm_storage_blob" {
   target_resource_id   = var.crm_storage_id
   subresource_name     = "blob"
 }
+
+# access to api func
+
+data "azurerm_function_app_host_keys" "api_func" {
+  name                = azurerm_linux_function_app.api.name
+  resource_group_name = azurerm_linux_function_app.api.resource_group_name
+}
+
+resource "azurerm_synapse_linked_service" "api_func" {
+  name                 = "${var.prefix}_api_func"
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  type                 = "AzureFunction"
+  type_properties_json = <<JSON
+  {
+    "functionAppUrl": "https://${azurerm_linux_function_app.api.default_hostname}/api/",
+    "functionKey":
+      {
+        "type": "SecureString",
+        "value": "${data.azurerm_function_app_host_keys.api_func.primary_key}"
+      }
+  }
+  JSON
+  integration_runtime {
+    name = "AutoResolveIntegrationRuntime"
+  }
+}
+
+# managed_private_endpoint must be manual approved on target resource
+resource "azurerm_synapse_managed_private_endpoint" "api_func" {
+  name                 = format("%s-api-func-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = azurerm_linux_function_app.api.id
+  subresource_name     = "sites"
+}
