@@ -96,3 +96,8 @@ storage_dls_rule_ips = [
 ]
 
 crm_storage_id = "/subscriptions/59f48fac-dfdb-4063-bcc6-9322c9e5ebd0/resourceGroups/crm-p-data-rg/providers/Microsoft.Storage/storageAccounts/crmpdatast"
+
+#
+# synapse
+#
+syn_spark_version = "3.4"
