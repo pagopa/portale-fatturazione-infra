@@ -134,8 +134,8 @@ resource "azurerm_linux_web_app" "app_fe" {
     ftps_state                        = "Disabled"
     http2_enabled                     = true
     app_command_line                  = "pm2 serve /home/site/wwwroot --no-daemon --spa"
-    minimum_tls_version               = "1.2"
-    scm_minimum_tls_version           = "1.2"
+    minimum_tls_version               = "1.3"
+    scm_minimum_tls_version           = "1.3"
     vnet_route_all_enabled            = true
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 2
@@ -188,8 +188,8 @@ resource "azurerm_linux_web_app" "app_api" {
     use_32_bit_worker                 = false
     ftps_state                        = "Disabled"
     http2_enabled                     = true
-    minimum_tls_version               = "1.2"
-    scm_minimum_tls_version           = "1.2"
+    minimum_tls_version               = "1.3"
+    scm_minimum_tls_version           = "1.3"
     vnet_route_all_enabled            = true
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 2
@@ -291,8 +291,8 @@ resource "azurerm_linux_web_app_slot" "app_api_staging" {
     use_32_bit_worker                 = false
     ftps_state                        = "Disabled"
     http2_enabled                     = true
-    minimum_tls_version               = "1.2"
-    scm_minimum_tls_version           = "1.2"
+    minimum_tls_version               = "1.3"
+    scm_minimum_tls_version           = "1.3"
     vnet_route_all_enabled            = true
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 2
