@@ -89,3 +89,8 @@ storage_sap_rule_ips = [
 ]
 
 crm_storage_id = "/subscriptions/57cfa745-48f4-4ad8-91ab-fb63aebc57ec/resourceGroups/crm-u-data-rg/providers/Microsoft.Storage/storageAccounts/crmudatast"
+
+#
+# synapse
+#
+syn_spark_version = "3.4"
