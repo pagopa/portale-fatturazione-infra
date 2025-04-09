@@ -138,6 +138,18 @@ resource "azurerm_private_dns_zone" "privatelink_dfs_core_windows_net" {
   tags                = var.tags
 }
 
+resource "azurerm_private_dns_zone" "privatelink_queue_core_windows_net" {
+  name                = "privatelink.queue.core.windows.net"
+  resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
+}
+
+resource "azurerm_private_dns_zone" "privatelink_table_core_windows_net" {
+  name                = "privatelink.table.core.windows.net"
+  resource_group_name = azurerm_resource_group.networking.name
+  tags                = var.tags
+}
+
 resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_blob_core_windows_net_vnet" {
   name                  = module.vnet.name
   resource_group_name   = azurerm_resource_group.networking.name
@@ -166,6 +178,38 @@ resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_dfs_core_w
   name                  = module.secondary_vnet.name
   resource_group_name   = azurerm_resource_group.networking.name
   private_dns_zone_name = azurerm_private_dns_zone.privatelink_dfs_core_windows_net.name
+  virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_queue_core_windows_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_queue_core_windows_net.name
+  virtual_network_id    = module.vnet.id
+  tags                  = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_table_core_windows_net_vnet" {
+  name                  = module.vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_table_core_windows_net.name
+  virtual_network_id    = module.vnet.id
+  tags                  = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_queue_core_windows_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_queue_core_windows_net.name
+  virtual_network_id    = module.secondary_vnet.id
+  tags                  = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "privatelink_table_core_windows_net_secondary_vnet" {
+  name                  = module.secondary_vnet.name
+  resource_group_name   = azurerm_resource_group.networking.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatelink_table_core_windows_net.name
   virtual_network_id    = module.secondary_vnet.id
   tags                  = var.tags
 }
