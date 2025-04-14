@@ -139,9 +139,9 @@ resource "azurerm_linux_function_app" "api" {
     StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
     StorageRELBlobContainerName = "relrighe"
 
-    "StorageNotifiche:AccountName"       = module.public_storage.name
-    "StorageNotifiche:AccountKey"        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
-    "StorageNotifiche:BlobContainerName" = "notifiche"
+    "StorageNotifiche.AccountName"       = module.public_storage.name
+    "StorageNotifiche.AccountKey"        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
+    "StorageNotifiche.BlobContainerName" = "notifiche"
   }
 
   identity {
