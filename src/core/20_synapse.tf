@@ -161,6 +161,8 @@ resource "azurerm_synapse_linked_service" "delta" {
 }
 
 # TODO use https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/function_app_host_keys
+# TODO rename, not used only in synapse
+# TODO use managed identity, drop this key
 data "azurerm_key_vault_secret" "synapse_sendemail_fnkey" {
   name         = "synapse-sendemail-fnkey"
   key_vault_id = module.key_vault_app.id
@@ -369,7 +371,7 @@ resource "azurerm_synapse_linked_service" "api_func" {
   type                 = "AzureFunction"
   type_properties_json = <<JSON
   {
-    "functionAppUrl": "https://${azurerm_linux_function_app.api.default_hostname}/api/",
+    "functionAppUrl": "https://${azurerm_linux_function_app.api.default_hostname}",
     "functionKey":
       {
         "type": "SecureString",
