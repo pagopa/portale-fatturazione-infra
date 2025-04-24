@@ -186,6 +186,11 @@ variable "agw_storage_certificate_name" {
   description = "the certificate name on the kv for the storage endpoint behind agw"
 }
 
+variable "agw_integration_certificate_name" {
+  type        = string
+  description = "the certificate name on the kv for the integration endpoint"
+}
+
 #
 # appservice
 #

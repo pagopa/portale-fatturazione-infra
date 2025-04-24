@@ -42,6 +42,11 @@ data "azurerm_key_vault_certificate" "agw_storage" {
   key_vault_id = module.key_vault.id
 }
 
+data "azurerm_key_vault_certificate" "agw_integration" {
+  name         = var.agw_integration_certificate_name
+  key_vault_id = module.key_vault.id
+}
+
 module "agw" {
   source              = "./.terraform/modules/__v4__/app_gateway/"
   name                = format("%s-%s", local.project, "agw")
@@ -109,6 +114,19 @@ module "agw" {
       request_timeout             = 60
       pick_host_name_from_backend = false # module quirk
     }
+    # backend for the integration function app
+    integration = {
+      protocol     = "Https"
+      host         = azurerm_linux_function_app.integration.default_hostname
+      port         = 443
+      ip_addresses = null # with null value use fqdns
+      fqdns        = [azurerm_linux_function_app.integration.default_hostname]
+      # probe targeting an ad-hoc health check blob in the public storage
+      probe                       = "/"
+      probe_name                  = "probe-integration"
+      request_timeout             = 60
+      pick_host_name_from_backend = false # module quirk
+    }
   }
   # listeners
   listeners = {
@@ -146,7 +164,34 @@ module "agw" {
         id   = data.azurerm_key_vault_certificate.agw_storage.versionless_secret_id
       }
     }
+    integration = {
+      protocol           = "Https"
+      host               = local.fqdn_integration
+      port               = 443
+      ssl_profile_name   = null
+      firewall_policy_id = null
+      certificate = {
+        name = var.agw_integration_certificate_name
+        id   = data.azurerm_key_vault_certificate.agw_integration.versionless_secret_id
+      }
+    }
   }
+  rewrite_rule_sets = [{
+    name = "integration"
+    rewrite_rules = [{
+      # this is because the normal X-Forwarded-For header is somehow
+      # killed by the function app runtime, let's just use another header
+      name          = "custom-forwarded-for"
+      rule_sequence = 100
+      conditions    = []
+      request_header_configurations = [{
+        header_name  = "Custom-Forwarded-For"
+        header_value = "{var_add_x_forwarded_for_proxy}"
+      }]
+      response_header_configurations = []
+      url                            = null
+    }]
+  }]
   routes = {
     api = {
       listener              = "api"
@@ -165,6 +210,12 @@ module "agw" {
       backend               = "storage"
       rewrite_rule_set_name = null
       priority              = 90
+    }
+    integration = {
+      listener              = "integration"
+      backend               = "integration"
+      rewrite_rule_set_name = "integration"
+      priority              = 30
     }
   }
   # identity
