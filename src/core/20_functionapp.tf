@@ -1,25 +1,98 @@
 
-resource "azurerm_storage_account" "function_send_email" {
-  name                     = replace("${local.project}sendemailsa", "-", "")
-  location                 = azurerm_resource_group.app.location
-  resource_group_name      = azurerm_resource_group.app.name
-  account_tier             = "Standard"
-  account_replication_type = "ZRS"
-  min_tls_version          = "TLS1_2"
-  tags                     = var.tags
+module "api_func_storage" {
+  source = "./.terraform/modules/__v4__/storage_account/"
+
+  name                                 = replace("${local.project}apifuncsa", "-", "")
+  resource_group_name                  = azurerm_resource_group.analytics.name
+  location                             = var.secondary_location
+  account_kind                         = "StorageV2"
+  account_tier                         = "Standard"
+  access_tier                          = "Hot"
+  account_replication_type             = "ZRS"
+  is_hns_enabled                       = true
+  blob_versioning_enabled              = false
+  blob_delete_retention_days           = var.storage_delete_retention_days
+  blob_container_delete_retention_days = var.storage_delete_retention_days
+  allow_nested_items_to_be_public      = false
+  public_network_access_enabled        = false
+  tags                                 = var.tags
 }
 
-resource "azurerm_linux_function_app" "send_email" {
-  name                = "${local.project}-send-email"
+resource "azurerm_private_endpoint" "api_func_storage_blob" {
+  name                = format("%s-blob-endpoint", module.api_func_storage.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+
+  private_service_connection {
+    name                           = format("%s-blob-endpoint", module.api_func_storage.name)
+    private_connection_resource_id = module.api_func_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+  }
+
+  tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "api_func_storage_queue" {
+  name                = format("%s-queue-endpoint", module.api_func_storage.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+
+  private_service_connection {
+    name                           = format("%s-queue-endpoint", module.api_func_storage.name)
+    private_connection_resource_id = module.api_func_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["queue"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_queue_core_windows_net.id]
+  }
+
+  tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "api_func_storage_table" {
+  name                = format("%s-table-endpoint", module.api_func_storage.name)
+  location            = var.secondary_location
+  resource_group_name = azurerm_resource_group.analytics.name
+  subnet_id           = module.private_endpoint_secondary_snet.id
+
+  private_service_connection {
+    name                           = format("%s-table-endpoint", module.api_func_storage.name)
+    private_connection_resource_id = module.api_func_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["table"]
+  }
+
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_table_core_windows_net.id]
+  }
+
+  tags = var.tags
+}
+
+resource "azurerm_linux_function_app" "api" {
+  name                = "${local.project}-api-func"
   resource_group_name = azurerm_resource_group.app.name
   location            = azurerm_resource_group.app.location
 
-  storage_account_name          = azurerm_storage_account.function_send_email.name
+  storage_account_name          = module.api_func_storage.name
   storage_uses_managed_identity = true
   service_plan_id               = azurerm_service_plan.app.id
-
-  client_certificate_enabled = false
-  https_only                 = true
+  client_certificate_enabled    = false
+  https_only                    = true
+  functions_extension_version   = "~4"
+  public_network_access_enabled = false
 
   site_config {
     always_on               = true
@@ -32,9 +105,7 @@ resource "azurerm_linux_function_app" "send_email" {
     # health_check_path       = "/health" TODO
 
     application_stack {
-      dotnet_version = "7.0" # FIXME
-      # dotnet_version is ignored
-      # wait https://github.com/hashicorp/terraform-provider-azurerm/commit/73832251e80c390a139688097ffdad3f2f2022e8
+      dotnet_version              = "8.0"
       use_dotnet_isolated_runtime = true
     }
     cors {
@@ -46,8 +117,8 @@ resource "azurerm_linux_function_app" "send_email" {
   }
 
   app_settings = {
-    APPINSIGHTS_SAMPLING_PERCENTAGE        = 5               # would have been inherited from module
-    WEBSITE_DNS_SERVER                     = "168.63.129.16" # would have been inherited from module
+    APPINSIGHTS_SAMPLING_PERCENTAGE        = 5
+    WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
     WEBSITE_RUN_FROM_PACKAGE               = "1"
     APPLICATION_INSIGHTS                   = azurerm_application_insights.application_insights.connection_string
@@ -68,6 +139,9 @@ resource "azurerm_linux_function_app" "send_email" {
     StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
     StorageRELBlobContainerName = "relrighe"
 
+    "StorageNotifiche.AccountName"       = module.public_storage.name
+    "StorageNotifiche.AccountKey"        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
+    "StorageNotifiche.BlobContainerName" = "notifiche"
   }
 
   identity {
@@ -79,7 +153,6 @@ resource "azurerm_linux_function_app" "send_email" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack[0].dotnet_version,
       # temporary values, ignore for the moment
       app_settings["TO"],
       app_settings["TONAME"],
@@ -87,34 +160,46 @@ resource "azurerm_linux_function_app" "send_email" {
   }
 }
 
-resource "azurerm_role_assignment" "function_send_email_storage_contributor" {
-  scope                = azurerm_storage_account.function_send_email.id
+resource "azurerm_role_assignment" "api_func_storage_blob_contributor" {
+  scope                = module.api_func_storage.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_linux_function_app.send_email.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app.api.identity[0].principal_id
 }
 
-resource "azurerm_key_vault_access_policy" "function_send_email_get_secrets" {
+resource "azurerm_role_assignment" "api_func_storage_queue_contributor" {
+  scope                = module.api_func_storage.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_linux_function_app.api.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "api_func_storage_table_contributor" {
+  scope                = module.api_func_storage.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_linux_function_app.api.identity[0].principal_id
+}
+
+resource "azurerm_key_vault_access_policy" "api_func_get_secrets" {
   key_vault_id       = module.key_vault_app.id
   tenant_id          = data.azurerm_client_config.current.tenant_id
-  object_id          = azurerm_linux_function_app.send_email.identity[0].principal_id
+  object_id          = azurerm_linux_function_app.api.identity[0].principal_id
   secret_permissions = ["Get"]
 }
 
 # vnet integration
-resource "azurerm_app_service_virtual_network_swift_connection" "send_email_function" {
-  app_service_id = azurerm_linux_function_app.send_email.id
+resource "azurerm_app_service_virtual_network_swift_connection" "api_func" {
+  app_service_id = azurerm_linux_function_app.api.id
   subnet_id      = module.app_snet.id
 }
 
 # private endpoint
-resource "azurerm_private_endpoint" "send_email_function" {
-  name                = format("%s-endpoint", azurerm_linux_function_app.send_email.name)
+resource "azurerm_private_endpoint" "api_func" {
+  name                = format("%s-endpoint", azurerm_linux_function_app.api.name)
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   subnet_id           = module.private_endpoint_snet.id
   private_service_connection {
-    name                           = format("%s-endpoint", azurerm_linux_function_app.send_email.name)
-    private_connection_resource_id = azurerm_linux_function_app.send_email.id
+    name                           = format("%s-endpoint", azurerm_linux_function_app.api.name)
+    private_connection_resource_id = azurerm_linux_function_app.api.id
     is_manual_connection           = false
     subresource_names              = ["sites"]
   }

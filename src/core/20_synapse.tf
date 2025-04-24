@@ -160,33 +160,6 @@ resource "azurerm_synapse_linked_service" "delta" {
   }
 }
 
-# TODO use https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/function_app_host_keys
-# TODO rename, not used only in synapse
-# TODO use managed identity, drop this key
-data "azurerm_key_vault_secret" "synapse_sendemail_fnkey" {
-  name         = "synapse-sendemail-fnkey"
-  key_vault_id = module.key_vault_app.id
-}
-
-resource "azurerm_synapse_linked_service" "sendemail" {
-  name                 = format("%s_%s", var.prefix, "sendemail")
-  synapse_workspace_id = azurerm_synapse_workspace.this.id
-  type                 = "AzureFunction"
-  type_properties_json = <<JSON
-  {
-    "functionAppUrl": "https://${azurerm_linux_function_app.send_email.name}.azurewebsites.net/api/",
-    "functionKey": 
-      {
-        "type": "SecureString",
-        "value": "${data.azurerm_key_vault_secret.synapse_sendemail_fnkey.value}"
-      }
-  }
-  JSON
-  integration_runtime {
-    name = "AutoResolveIntegrationRuntime"
-  }
-}
-
 # private endpoints
 resource "azurerm_private_endpoint" "web_azuresynapse" {
   name                = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
@@ -320,14 +293,6 @@ resource "azurerm_synapse_managed_private_endpoint" "dls_storage_dfs" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.dls_storage.id
   subresource_name     = "blob"
-}
-
-# managed_private_endpoint must be manual approved on target resource
-resource "azurerm_synapse_managed_private_endpoint" "sendemail" {
-  name                 = format("%s-sendemail-endpoint", azurerm_synapse_workspace.this.name)
-  synapse_workspace_id = azurerm_synapse_workspace.this.id
-  target_resource_id   = azurerm_linux_function_app.send_email.id
-  subresource_name     = "sites"
 }
 
 # managed_private_endpoint must be manual approved on target resource
