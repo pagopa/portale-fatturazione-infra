@@ -331,6 +331,7 @@ resource "azurerm_linux_function_app" "integration" {
     cors {
       allowed_origins = [
         "https://portal.azure.com",
+        "https://${local.fqdn_integration}",
       ]
       support_credentials = true
     }
@@ -348,6 +349,11 @@ resource "azurerm_linux_function_app" "integration" {
     STORAGE_NOTIFICHE     = "notifiche"
     STORAGE_REL           = "relrighe"
     STORAGE_CONTESTAZIONI = "contestazioni"
+
+    OpenApi__DocDescription = "API documentation Portale Fatturazione."
+    OpenApi__DocTitle       = "Portale Fatturazione API"
+    OpenApi__DocVersion     = "v1"
+    OpenApi__HostNames      = "https://${local.fqdn_integration}/api"
   }
 
   identity {
