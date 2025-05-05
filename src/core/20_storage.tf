@@ -15,13 +15,13 @@ module "dls_storage" {
   blob_delete_retention_days           = var.storage_delete_retention_days
   blob_container_delete_retention_days = var.storage_delete_retention_days
   allow_nested_items_to_be_public      = false
-  public_network_access_enabled        = true
-  network_rules = {
-    default_action             = length(var.storage_dls_rule_ips) < 1 ? "Allow" : "Deny"
+  public_network_access_enabled        = length(var.storage_dls_rule_ips) > 0
+  network_rules = length(var.storage_dls_rule_ips) > 0 ? {
+    default_action             = "Deny"
     bypass                     = ["AzureServices"]
     ip_rules                   = var.storage_dls_rule_ips
     virtual_network_subnet_ids = []
-  }
+  } : null
   tags = var.tags
 }
 
