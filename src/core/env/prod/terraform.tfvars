@@ -48,11 +48,12 @@ ddos_protection_plan = {
 #
 # appgateway
 #
-agw_sku                       = "WAF_v2"
-agw_waf_enabled               = true
-agw_apex_app_certificate_name = "portalefatturazione-pagopa-it"
-agw_api_app_certificate_name  = "api-portalefatturazione-pagopa-it"
-agw_storage_certificate_name  = "storage-portalefatturazione-pagopa-it"
+agw_sku                          = "WAF_v2"
+agw_waf_enabled                  = true
+agw_apex_app_certificate_name    = "portalefatturazione-pagopa-it"
+agw_api_app_certificate_name     = "api-portalefatturazione-pagopa-it"
+agw_storage_certificate_name     = "storage-portalefatturazione-pagopa-it"
+agw_integration_certificate_name = "integration-portalefatturazione-pagopa-it"
 
 #
 # appservice
