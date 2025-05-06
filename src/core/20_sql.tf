@@ -16,6 +16,10 @@ resource "azurerm_mssql_server" "this" {
   public_network_access_enabled = false
   minimum_tls_version           = "1.2"
   tags                          = var.tags
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_mssql_database" "this" {
@@ -25,10 +29,15 @@ resource "azurerm_mssql_database" "this" {
   collation            = "SQL_Latin1_General_CP1_CI_AS"
   max_size_gb          = var.sql_database_max_size_gb
   sku_name             = var.sql_database_sku_name
-  read_scale           = false # FIXME do we need a read-only replica? needs capacity planning
-  zone_redundant       = false # FIXME not supported on S0, needs capacity planning
+  read_scale           = false
+  zone_redundant       = false
   storage_account_type = "Zone"
   tags                 = var.tags
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = all # TODO: this is TEMPORARY, we are experimenting in UAT
+  }
 }
 
 resource "azurerm_private_endpoint" "sql" {
