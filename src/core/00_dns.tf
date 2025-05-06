@@ -74,6 +74,16 @@ resource "azurerm_dns_a_record" "agw_storage" {
   tags                = var.tags
 }
 
+# to integration-func
+resource "azurerm_dns_a_record" "agw_integration" {
+  name                = "integration"
+  zone_name           = azurerm_dns_zone.portalefatturazione[0].name
+  resource_group_name = azurerm_resource_group.networking.name
+  records             = [azurerm_public_ip.agw.ip_address]
+  ttl                 = var.dns_default_ttl_sec
+  tags                = var.tags
+}
+
 #
 # dns private zone name list:
 # https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration

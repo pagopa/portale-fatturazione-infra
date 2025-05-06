@@ -26,4 +26,8 @@ domains = [
     dns_zone_name   = "uat.portalefatturazione.pagopa.it"
     dns_record_name = "storage"
   },
+  {
+    dns_zone_name   = "uat.portalefatturazione.pagopa.it"
+    dns_record_name = "integration"
+  },
 ]
