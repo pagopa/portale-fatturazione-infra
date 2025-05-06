@@ -151,7 +151,7 @@ resource "azurerm_linux_web_app" "app_fe" {
     scm_ip_restriction_default_action = "Allow"
 
     application_stack {
-      node_version = "18-lts"
+      node_version = "22-lts"
     }
     ip_restriction {
       virtual_network_subnet_id = module.agw_snet.id
