@@ -65,8 +65,14 @@ EXEC CreateUser @user
 EXEC AddRoleToUser @user, 'db_datareader'
 EXEC AddRoleToUser @user, 'db_datawriter'
 
--- fat-p-send-email --
-SET @user = 'fat-p-send-email'
+-- fat-p-api-func --
+SET @user = 'fat-p-api-func'
+EXEC CreateUser @user
+EXEC AddRoleToUser @user, 'db_datareader'
+EXEC AddRoleToUser @user, 'db_datawriter'
+
+-- fat-p-integration-func --
+SET @user = 'fat-p-integration-func'
 EXEC CreateUser @user
 EXEC AddRoleToUser @user, 'db_datareader'
 EXEC AddRoleToUser @user, 'db_datawriter'
