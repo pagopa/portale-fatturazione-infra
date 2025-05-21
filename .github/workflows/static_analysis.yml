@@ -14,9 +14,9 @@ jobs:
       - name: init_terraform_folders
         env:
           FOLDERS: >
-            .identity
             src/core
             src/github
+            src/azuredevops
         run: |
           pids=()
 
