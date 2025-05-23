@@ -343,15 +343,17 @@ resource "azurerm_linux_function_app" "integration" {
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
     WEBSITE_RUN_FROM_PACKAGE               = "1"
 
-    CONNECTION_STRING       = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
-    AES_KEY                 = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=EncryptionAesKey)"
-    STORAGE_ACCOUNT_KEY     = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
-    STORAGE_ACCOUNT_NAME    = module.public_storage.name
-    STORAGE_NOTIFICHE       = "notifiche"
-    STORAGE_REL             = "relrighe"
-    STORAGE_REL_DOWNLOAD    = "reldownload"
-    STORAGE_CONTESTAZIONI   = "contestazioni"
-    STORAGE_CUSTOM_HOSTNAME = "https://${local.fqdn_storage}"
+    CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
+    AES_KEY                            = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=EncryptionAesKey)"
+    STORAGE_ACCOUNT_KEY                = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+    STORAGE_ACCOUNT_NAME               = module.public_storage.name
+    STORAGE_NOTIFICHE                  = "notifiche"
+    STORAGE_REL                        = "relrighe"
+    STORAGE_REL_DOWNLOAD               = "reldownload"
+    STORAGE_CONTESTAZIONI              = "contestazioni"
+    STORAGE_CUSTOM_HOSTNAME            = "https://${local.fqdn_storage}"
+    StorageDocumenti__ConnectionString = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
+    StorageDocumenti__DocumentiFolder  = "documenti"
 
     OpenApi__DocDescription = "API documentation Portale Fatturazione."
     OpenApi__DocTitle       = "Portale Fatturazione API"
