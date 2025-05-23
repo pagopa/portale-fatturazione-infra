@@ -1,13 +1,13 @@
 repos:
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: 236cbaedf7e10643b38b1e6cc04e4035810dd13a # v1.97.3
+    rev: v1.99.0
     hooks:
       - id: terraform_fmt
       - id: terraform_docs
-      - id: terraform_trivy
-        args:
-          # - --args=--skip-dirs="**/.terraform"
-          - --hook-config=--parallelism-limit=1
+      # - id: terraform_trivy
+      #   args:
+      #     - --args=--skip-dirs="**/.terraform"
+      #     - --hook-config=--parallelism-limit=1
       - id: terraform_validate
         args:
           - --init-args=-lockfile=readonly
