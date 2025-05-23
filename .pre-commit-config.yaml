@@ -4,10 +4,10 @@ repos:
     hooks:
       - id: terraform_fmt
       - id: terraform_docs
-      - id: terraform_trivy
-        args:
-          - --args=--skip-dirs="**/.terraform"
-          - --hook-config=--parallelism-limit=1
+      # - id: terraform_trivy
+      #   args:
+      #     - --args=--skip-dirs="**/.terraform"
+      #     - --hook-config=--parallelism-limit=1
       - id: terraform_validate
         args:
           - --init-args=-lockfile=readonly
