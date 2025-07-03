@@ -359,6 +359,11 @@ resource "azurerm_linux_function_app" "integration" {
     OpenApi__DocTitle       = "Portale Fatturazione API"
     OpenApi__DocVersion     = "v1"
     OpenApi__HostNames      = "https://${local.fqdn_integration}/api"
+
+    StorageContestazioni__AccountName       = module.public_storage.name
+    StorageContestazioni__AccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+    StorageContestazioni__BlobContainerName = "contestazioni",
+    StorageContestazioni__CustomDns         = "https://${local.fqdn_storage}"
   }
 
   identity {
