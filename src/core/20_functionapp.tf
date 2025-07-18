@@ -100,13 +100,14 @@ resource "azurerm_linux_function_app" "api" {
   public_network_access_enabled = false
 
   site_config {
-    always_on               = true
-    use_32_bit_worker       = false
-    ftps_state              = "Disabled"
-    http2_enabled           = true
-    minimum_tls_version     = "1.2"
-    scm_minimum_tls_version = "1.2"
-    vnet_route_all_enabled  = true
+    always_on                = true
+    use_32_bit_worker        = false
+    ftps_state               = "Disabled"
+    http2_enabled            = true
+    minimum_tls_version      = "1.2"
+    scm_minimum_tls_version  = "1.2"
+    vnet_route_all_enabled   = true
+    application_insights_key = azurerm_application_insights.application_insights.instrumentation_key
     # health_check_path       = "/health" TODO
 
     application_stack {
@@ -126,7 +127,6 @@ resource "azurerm_linux_function_app" "api" {
     WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
     WEBSITE_RUN_FROM_PACKAGE               = "1"
-    APPLICATION_INSIGHTS                   = azurerm_application_insights.application_insights.connection_string
 
     CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
     SMTP              = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=Smtp)"
@@ -144,9 +144,9 @@ resource "azurerm_linux_function_app" "api" {
     StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
     StorageRELBlobContainerName = "relrighe"
 
-    "StorageNotifiche.AccountName"       = module.public_storage.name
-    "StorageNotifiche.AccountKey"        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
-    "StorageNotifiche.BlobContainerName" = "notifiche"
+    StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
+    StorageNotificheAccountName       = module.public_storage.name
+    StorageNotificheBlobContainerName = "notifiche"
   }
 
   identity {
@@ -300,6 +300,43 @@ resource "azurerm_private_endpoint" "integration_func_storage_table" {
   tags = var.tags
 }
 
+locals {
+  integration_func = {
+    app_settings = {
+      APPINSIGHTS_SAMPLING_PERCENTAGE        = 5
+      WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
+      WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
+      WEBSITE_RUN_FROM_PACKAGE               = "1"
+
+      CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
+      AES_KEY                            = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=EncryptionAesKey)"
+      STORAGE_ACCOUNT_KEY                = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      STORAGE_ACCOUNT_NAME               = module.public_storage.name
+      STORAGE_NOTIFICHE                  = "notifiche"
+      STORAGE_REL                        = "relrighe"
+      STORAGE_REL_DOWNLOAD               = "reldownload"
+      STORAGE_CONTESTAZIONI              = "contestazioni"
+      STORAGE_CUSTOM_HOSTNAME            = "https://${local.fqdn_storage}"
+      StorageDocumenti__ConnectionString = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
+      StorageDocumenti__DocumentiFolder  = "documenti"
+
+      OpenApi__DocDescription = "API documentation Portale Fatturazione."
+      OpenApi__DocTitle       = "Portale Fatturazione API"
+      OpenApi__DocVersion     = "v1"
+      OpenApi__HostNames      = "https://${local.fqdn_integration}/api"
+
+      StorageContestazioni__AccountName       = module.public_storage.name
+      StorageContestazioni__AccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageContestazioni__BlobContainerName = "contestazioni",
+      StorageContestazioni__CustomDns         = "https://${local.fqdn_storage}"
+
+      WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+
+      // TODO temporary
+      DOCKER_ENABLE_CI = var.env_short != "p" ? "true" : "false"
+    }
+  }
+}
 resource "azurerm_linux_function_app" "integration" {
   name                = "${local.project}-integration-func"
   resource_group_name = azurerm_resource_group.app.name
@@ -337,33 +374,16 @@ resource "azurerm_linux_function_app" "integration" {
     }
   }
 
-  app_settings = {
-    APPINSIGHTS_SAMPLING_PERCENTAGE        = 5
-    WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
-    WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
-    WEBSITE_RUN_FROM_PACKAGE               = "1"
+  app_settings = merge(
+    local.integration_func.app_settings, {
+      TaskHubName = "TaskHub"
+  })
 
-    CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
-    AES_KEY                            = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=EncryptionAesKey)"
-    STORAGE_ACCOUNT_KEY                = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
-    STORAGE_ACCOUNT_NAME               = module.public_storage.name
-    STORAGE_NOTIFICHE                  = "notifiche"
-    STORAGE_REL                        = "relrighe"
-    STORAGE_REL_DOWNLOAD               = "reldownload"
-    STORAGE_CONTESTAZIONI              = "contestazioni"
-    STORAGE_CUSTOM_HOSTNAME            = "https://${local.fqdn_storage}"
-    StorageDocumenti__ConnectionString = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
-    StorageDocumenti__DocumentiFolder  = "documenti"
-
-    OpenApi__DocDescription = "API documentation Portale Fatturazione."
-    OpenApi__DocTitle       = "Portale Fatturazione API"
-    OpenApi__DocVersion     = "v1"
-    OpenApi__HostNames      = "https://${local.fqdn_integration}/api"
-
-    StorageContestazioni__AccountName       = module.public_storage.name
-    StorageContestazioni__AccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
-    StorageContestazioni__BlobContainerName = "contestazioni",
-    StorageContestazioni__CustomDns         = "https://${local.fqdn_storage}"
+  sticky_settings {
+    app_setting_names = [
+      "TaskHubName",
+      "OpenApi__HostNames",
+    ]
   }
 
   identity {
@@ -470,30 +490,11 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
     }
   }
 
-  app_settings = {
-    APPINSIGHTS_SAMPLING_PERCENTAGE        = 5
-    WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
-    WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
-    WEBSITE_RUN_FROM_PACKAGE               = "1"
-    DOCKER_ENABLE_CI                       = "true"
-
-    CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
-    AES_KEY                            = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=EncryptionAesKey)"
-    STORAGE_ACCOUNT_KEY                = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
-    STORAGE_ACCOUNT_NAME               = module.public_storage.name
-    STORAGE_NOTIFICHE                  = "notifiche"
-    STORAGE_REL                        = "relrighe"
-    STORAGE_REL_DOWNLOAD               = "reldownload"
-    STORAGE_CONTESTAZIONI              = "contestazioni"
-    STORAGE_CUSTOM_HOSTNAME            = "https://${local.fqdn_storage}"
-    StorageDocumenti__ConnectionString = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
-    StorageDocumenti__DocumentiFolder  = "documenti"
-
-    OpenApi__DocDescription = "API documentation Portale Fatturazione."
-    OpenApi__DocTitle       = "Portale Fatturazione API"
-    OpenApi__DocVersion     = "v1"
-    OpenApi__HostNames      = "https://${local.fqdn_integration}/api"
-  }
+  app_settings = merge(
+    local.integration_func.app_settings, {
+      OpenApi__HostNames = "https://${local.project}-integration-func-staging.azurewebsites.net/api"
+      TaskHubName        = "TaskHubStaging"
+  })
 
   identity {
     type = "SystemAssigned"
@@ -504,6 +505,7 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
+      site_config[0].application_stack[0].docker[0].image_tag,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
