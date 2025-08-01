@@ -362,8 +362,11 @@ resource "azurerm_linux_function_app" "integration" {
     # health_check_path       = "/health" TODO
 
     application_stack {
-      dotnet_version              = "8.0"
-      use_dotnet_isolated_runtime = true
+      docker {
+        image_name   = "pagopa/portale-fatturazione-integration"
+        image_tag    = "latest" // ignored, will be mangaed from ci/cd pipeline
+        registry_url = "https://ghcr.io"
+      }
     }
     cors {
       allowed_origins = [
@@ -395,6 +398,7 @@ resource "azurerm_linux_function_app" "integration" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
+      site_config[0].application_stack[0].docker[0].image_tag,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
