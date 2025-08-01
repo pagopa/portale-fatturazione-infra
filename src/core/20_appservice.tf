@@ -68,13 +68,13 @@ locals {
       StorageRELBlobContainerName = "relrighe"
       StorageRELCustomDns         = "https://${azurerm_dns_a_record.agw_storage.name}.${azurerm_dns_zone.portalefatturazione[0].name}"
 
-      "StorageNotifiche.AccountName"       = module.public_storage.name
-      "StorageNotifiche.AccountKey"        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
-      "StorageNotifiche.BlobContainerName" = "notifiche",
-      "StorageNotifiche.CustomDNS"         = "https://${local.fqdn_storage}",
-      "AzureFunction.NotificheUri"         = "https://${azurerm_linux_function_app.api.default_hostname}/api/RichiestaNotificheHandler",
+      StorageNotificheAccountName       = module.public_storage.name
+      StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageNotificheBlobContainerName = "notifiche"
+      StorageNotificheCustomDNS         = "https://${local.fqdn_storage}",
+      AzureFunctionNotificheUri         = "https://${azurerm_linux_function_app.api.default_hostname}/api/RichiestaNotificheHandler"
       # TODO use managed identity
-      "AzureFunction.AppKey" = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=synapse-sendemail-fnkey)"
+      AzureFunctionAppKey = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=synapse-sendemail-fnkey)"
     }
   }
 }
