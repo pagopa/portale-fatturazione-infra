@@ -349,6 +349,7 @@ resource "azurerm_linux_function_app" "integration" {
   https_only                    = true
   functions_extension_version   = "~4"
   public_network_access_enabled = false
+  enabled                       = var.function_app_integration_enabled
 
   site_config {
     always_on                = true
@@ -466,6 +467,7 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
   client_certificate_enabled    = false
   https_only                    = true
   public_network_access_enabled = false
+  enabled                       = var.function_app_integration_enabled
 
   site_config {
     always_on                = true

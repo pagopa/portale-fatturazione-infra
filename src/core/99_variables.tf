@@ -323,3 +323,12 @@ variable "alert_sdi_code_time_window_mins" {
   description = "the time window of the query for the SDI code modification alert"
   default     = 11
 }
+
+#
+# feature flags
+#
+variable "function_app_integration_enabled" {
+  type        = bool
+  description = "Feature flag for integration function app"
+  default     = false
+}
