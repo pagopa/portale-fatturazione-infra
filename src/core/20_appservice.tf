@@ -358,3 +358,22 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "app_api_st
 
   depends_on = [azurerm_linux_web_app_slot.app_api_staging]
 }
+
+resource "azurerm_private_endpoint" "app_api_staging" {
+  name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
+  location            = azurerm_resource_group.app.location
+  resource_group_name = azurerm_resource_group.app.name
+  subnet_id           = module.private_endpoint_snet.id
+  private_service_connection {
+    name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
+    private_connection_resource_id = azurerm_linux_web_app.app_api.id
+    is_manual_connection           = false
+    # https://learn.microsoft.com/en-us/azure/app-service/overview-private-endpoint#conceptual-overview
+    subresource_names = ["sites-${azurerm_linux_web_app_slot.app_api_staging.name}"]
+  }
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+  }
+  tags = var.tags
+}
