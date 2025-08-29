@@ -36,6 +36,7 @@ cidr_vpn_snet      = ["10.0.63.0/24"]
 #
 secondary_cidr_vnet          = ["10.1.0.0/18"]
 secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
+vpn_gw_sku                   = "VpnGw1"
 
 #
 # ddos protection

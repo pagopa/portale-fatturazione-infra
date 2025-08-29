@@ -13,14 +13,12 @@ data "azuread_application" "vpn_app" {
 }
 
 module "vpn" {
-  source              = "./.terraform/modules/__v4__/vpn_gateway/"
-  name                = format("%s-%s", local.project, "vpn")
-  resource_group_name = azurerm_resource_group.networking.name
-  sku                 = "VpnGw1"
-  # TODO the following is because we can't anymore configure a VPN gateway with Basic sku pip.
-  #  Migrate the production config too!
-  pip_sku               = var.env_short == "p" ? "Basic" : "Standard"
-  pip_allocation_method = var.env_short == "p" ? "Dynamic" : "Static"
+  source                = "./.terraform/modules/__v4__/vpn_gateway/"
+  name                  = format("%s-%s", local.project, "vpn")
+  resource_group_name   = azurerm_resource_group.networking.name
+  sku                   = var.vpn_gw_sku
+  pip_sku               = "Standard"
+  pip_allocation_method = "Static"
   location              = azurerm_resource_group.networking.location
   subnet_id             = module.vpn_snet.id
   vpn_client_configuration = [
