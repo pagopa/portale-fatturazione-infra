@@ -146,6 +146,11 @@ variable "secondary_cidr_pvt_endp_snet" {
   description = "cidr of the private endpoints subnet on secondary"
 }
 
+variable "vpn_gw_sku" {
+  type        = string
+  description = "sku of the vpn gateway"
+}
+
 #
 # ddos protection
 #
