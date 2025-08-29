@@ -14,7 +14,7 @@ locals {
       KEY_VAULT_NAME                      = module.key_vault_app.name
       SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
       SELF_CARE_URI                       = var.app_api_config_selfcare_url
-      SELF_CARE_TIMEOUT                   = true
+      SELF_CARE_TIMEOUT                   = var.env_short == "p"
       SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
       # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
       # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
@@ -68,13 +68,13 @@ locals {
       StorageRELBlobContainerName = "relrighe"
       StorageRELCustomDns         = "https://${azurerm_dns_a_record.agw_storage.name}.${azurerm_dns_zone.portalefatturazione[0].name}"
 
-      "StorageNotifiche.AccountName"       = module.public_storage.name
-      "StorageNotifiche.AccountKey"        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
-      "StorageNotifiche.BlobContainerName" = "notifiche",
-      "StorageNotifiche.CustomDNS"         = "https://${local.fqdn_storage}",
-      "AzureFunction.NotificheUri"         = "https://${azurerm_linux_function_app.api.default_hostname}/api/RichiestaNotificheHandler",
+      StorageNotificheAccountName       = module.public_storage.name
+      StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageNotificheBlobContainerName = "notifiche"
+      StorageNotificheCustomDNS         = "https://${local.fqdn_storage}",
+      AzureFunctionNotificheUri         = "https://${azurerm_linux_function_app.api.default_hostname}/api/RichiestaNotificheHandler"
       # TODO use managed identity
-      "AzureFunction.AppKey" = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=synapse-sendemail-fnkey)"
+      AzureFunctionAppKey = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=synapse-sendemail-fnkey)"
     }
   }
 }
@@ -151,7 +151,7 @@ resource "azurerm_linux_web_app" "app_fe" {
     scm_ip_restriction_default_action = "Allow"
 
     application_stack {
-      node_version = "18-lts"
+      node_version = "22-lts"
     }
     ip_restriction {
       virtual_network_subnet_id = module.agw_snet.id
@@ -357,4 +357,23 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "app_api_st
   subnet_id      = module.app_snet.id
 
   depends_on = [azurerm_linux_web_app_slot.app_api_staging]
+}
+
+resource "azurerm_private_endpoint" "app_api_staging" {
+  name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
+  location            = azurerm_resource_group.app.location
+  resource_group_name = azurerm_resource_group.app.name
+  subnet_id           = module.private_endpoint_snet.id
+  private_service_connection {
+    name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
+    private_connection_resource_id = azurerm_linux_web_app.app_api.id
+    is_manual_connection           = false
+    # https://learn.microsoft.com/en-us/azure/app-service/overview-private-endpoint#conceptual-overview
+    subresource_names = ["sites-${azurerm_linux_web_app_slot.app_api_staging.name}"]
+  }
+  private_dns_zone_group {
+    name                 = "private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+  }
+  tags = var.tags
 }

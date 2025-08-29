@@ -38,6 +38,11 @@ resource "azurerm_monitor_diagnostic_setting" "agw" {
     category = "AllMetrics"
     enabled  = false
   }
+
+  lifecycle {
+    # it keeps getting changed
+    ignore_changes = [log_analytics_destination_type]
+  }
 }
 
 # Send API App Service logs to LAW in non-prod (in prod a policy will take care of it)

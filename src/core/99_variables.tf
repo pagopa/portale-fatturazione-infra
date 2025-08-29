@@ -146,6 +146,11 @@ variable "secondary_cidr_pvt_endp_snet" {
   description = "cidr of the private endpoints subnet on secondary"
 }
 
+variable "vpn_gw_sku" {
+  type        = string
+  description = "sku of the vpn gateway"
+}
+
 #
 # ddos protection
 #
@@ -322,4 +327,13 @@ variable "alert_sdi_code_time_window_mins" {
   type        = number
   description = "the time window of the query for the SDI code modification alert"
   default     = 11
+}
+
+#
+# feature flags
+#
+variable "function_app_integration_enabled" {
+  type        = bool
+  description = "Feature flag for integration function app"
+  default     = false
 }

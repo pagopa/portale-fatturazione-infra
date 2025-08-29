@@ -36,6 +36,7 @@ cidr_vpn_snet      = ["10.0.63.0/24"]
 #
 secondary_cidr_vnet          = ["10.1.0.0/18"]
 secondary_cidr_pvt_endp_snet = ["10.1.60.0/23"]
+vpn_gw_sku                   = "VpnGw1"
 
 #
 # ddos protection
@@ -95,3 +96,8 @@ crm_storage_id = "/subscriptions/57cfa745-48f4-4ad8-91ab-fb63aebc57ec/resourceGr
 # synapse
 #
 syn_spark_version = "3.4"
+
+#
+# feature flags
+#
+function_app_integration_enabled = true
