@@ -147,6 +147,10 @@ resource "azurerm_linux_function_app" "api" {
     StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
     StorageNotificheAccountName       = module.public_storage.name
     StorageNotificheBlobContainerName = "notifiche"
+
+    ModuloCommessaSEND            = "${var.send_api_url}/pn-portfat-in/file-ready-event",
+    ModuloCommessaSENDAccountKey  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SENDAccountKey)",
+    ModuloCommessaSENDFileVersion = "1.0.0"
   }
 
   identity {

@@ -101,3 +101,8 @@ syn_spark_version = "3.4"
 # feature flags
 #
 function_app_integration_enabled = true
+
+#
+# integration
+#
+send_api_url = "https://api.uat.notifichedigitali.it"

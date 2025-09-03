@@ -103,3 +103,8 @@ crm_storage_id = "/subscriptions/59f48fac-dfdb-4063-bcc6-9322c9e5ebd0/resourceGr
 # synapse
 #
 syn_spark_version = "3.4"
+
+#
+# integration
+#
+send_api_url = "https://api.notifichedigitali.it"

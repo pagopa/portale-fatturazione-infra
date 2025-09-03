@@ -337,3 +337,11 @@ variable "function_app_integration_enabled" {
   description = "Feature flag for integration function app"
   default     = false
 }
+
+#
+# integrations
+#
+variable "send_api_url" {
+  type        = string
+  description = "Base URL of the SEND API"
+}
