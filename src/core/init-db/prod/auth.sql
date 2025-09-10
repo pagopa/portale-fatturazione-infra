@@ -64,6 +64,12 @@ SET @user = 'fat-p-app-api'
 EXEC CreateUser @user
 EXEC AddRoleToUser @user, 'db_datareader'
 EXEC AddRoleToUser @user, 'db_datawriter'
+GRANT EXECUTE ON [pfd].[RipristinaFattura] TO @user
+GO
+GRANT EXECUTE ON [pfd].[SospendiFattura] TO @user
+GO
+GRANT EXECUTE ON TYPE::[pfd].[RipristinoFatture] TO @user
+GO
 
 -- fat-p-api-func --
 SET @user = 'fat-p-api-func'
