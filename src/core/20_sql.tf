@@ -29,14 +29,13 @@ resource "azurerm_mssql_database" "this" {
   collation            = "SQL_Latin1_General_CP1_CI_AS"
   max_size_gb          = var.sql_database_max_size_gb
   sku_name             = var.sql_database_sku_name
-  read_scale           = false
+  read_scale           = var.sql_database_read_scale
   zone_redundant       = false
   storage_account_type = "Zone"
   tags                 = var.tags
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = all # TODO: this is TEMPORARY, we are experimenting in UAT
   }
 }
 

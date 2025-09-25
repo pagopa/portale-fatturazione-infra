@@ -64,7 +64,8 @@ app_plan_sku_name = "P0v3"
 #
 # azure sql
 #
-sql_database_sku_name = "S3"
+sql_database_sku_name    = "HS_S_Gen5_4"
+sql_database_max_size_gb = null # hyperscale
 
 #
 # storage

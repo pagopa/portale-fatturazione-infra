@@ -284,6 +284,12 @@ variable "sql_database_sku_name" {
   description = "the name of the database sku"
 }
 
+variable "sql_database_read_scale" {
+  type        = bool
+  description = "enable sql database read only ha replica"
+  default     = false
+}
+
 #
 # synapse
 #
