@@ -162,6 +162,7 @@ resource "azurerm_linux_function_app" "api" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
+      tags["hidden-link: /app-insights-resource-id"],
     ]
   }
 }
