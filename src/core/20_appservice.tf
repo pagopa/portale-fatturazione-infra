@@ -87,7 +87,7 @@ module "app_snet" {
   name                              = format("%s-%s-snet", local.project, "app")
   address_prefixes                  = var.cidr_app_snet
   resource_group_name               = azurerm_resource_group.networking.name
-  virtual_network_name              = module.vnet.name
+  virtual_network_name              = azurerm_virtual_network.primary.name
   private_endpoint_network_policies = "Enabled"
   service_endpoints                 = []
   delegation = {
@@ -154,7 +154,7 @@ resource "azurerm_linux_web_app" "app_fe" {
       node_version = "22-lts"
     }
     ip_restriction {
-      virtual_network_subnet_id = module.agw_snet.id
+      virtual_network_subnet_id = azurerm_subnet.agw.id
       name                      = "rule"
     }
   }
@@ -270,7 +270,7 @@ resource "azurerm_private_endpoint" "app_api" {
   name                = format("%s-endpoint", azurerm_linux_web_app.app_api.name)
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_linux_web_app.app_api.name)
     private_connection_resource_id = azurerm_linux_web_app.app_api.id
@@ -363,7 +363,7 @@ resource "azurerm_private_endpoint" "app_api_staging" {
   name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
     private_connection_resource_id = azurerm_linux_web_app.app_api.id

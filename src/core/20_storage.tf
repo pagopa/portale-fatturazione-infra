@@ -86,7 +86,7 @@ resource "azurerm_private_endpoint" "dls_storage_blob" {
   name                = format("%s-blob-endpoint", module.dls_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.dls_storage.name)
@@ -107,7 +107,7 @@ resource "azurerm_private_endpoint" "dls_storage_dfs" {
   name                = format("%s-dfs-endpoint", module.dls_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-dfs-endpoint", module.dls_storage.name)
@@ -128,7 +128,7 @@ resource "azurerm_private_endpoint" "sa_storage_blob" {
   name                = format("%s-blob-endpoint", module.sa_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.sa_storage.name)
@@ -181,7 +181,7 @@ resource "azurerm_private_endpoint" "sap_storage_blob" {
   name                = format("%s-blob-endpoint", module.sap_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.sap_storage.name)
@@ -238,7 +238,7 @@ resource "azurerm_private_endpoint" "rel_storage_blob" {
   name                = format("%s-blob-endpoint", module.rel_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.rel_storage.name)
@@ -339,7 +339,7 @@ resource "azurerm_private_endpoint" "public_storage_blob" {
   name                = format("%s-blob-endpoint", module.public_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.public_storage.name)

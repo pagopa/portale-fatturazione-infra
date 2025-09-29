@@ -1,9 +1,8 @@
-module "agw_snet" {
-  source                            = "./.terraform/modules/__v4__/subnet/"
-  name                              = format("%s-%s-snet", local.project, "agw")
+resource "azurerm_subnet" "agw" {
+  name                              = "${local.project}-agw-snet"
   address_prefixes                  = var.cidr_agw_snet
-  resource_group_name               = azurerm_resource_group.networking.name
-  virtual_network_name              = module.vnet.name
+  resource_group_name               = azurerm_virtual_network.primary.resource_group_name
+  virtual_network_name              = azurerm_virtual_network.primary.name
   private_endpoint_network_policies = "Enabled"
   service_endpoints                 = ["Microsoft.Web"]
 }
@@ -57,7 +56,7 @@ module "agw" {
   sku_tier    = var.agw_sku
   waf_enabled = var.agw_waf_enabled
   # networking
-  subnet_id    = module.agw_snet.id
+  subnet_id    = azurerm_subnet.agw.id
   public_ip_id = azurerm_public_ip.agw.id
   # tls config
   ssl_profiles = [{

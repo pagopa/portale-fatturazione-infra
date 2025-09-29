@@ -165,7 +165,7 @@ resource "azurerm_private_endpoint" "web_azuresynapse" {
   name                = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_private_link_hub.this.id
@@ -183,7 +183,7 @@ resource "azurerm_private_endpoint" "dev_azuresynapse" {
   name                = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
@@ -201,7 +201,7 @@ resource "azurerm_private_endpoint" "sql_azuresynapse" {
   name                = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
@@ -219,7 +219,7 @@ resource "azurerm_private_endpoint" "sql_ondemand_azuresynapse" {
   name                = format("%s-sql-ondemand-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-sql-ondemand-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id

@@ -151,16 +151,6 @@ variable "vpn_gw_sku" {
   description = "sku of the vpn gateway"
 }
 
-#
-# ddos protection
-#
-variable "ddos_protection_plan" {
-  type = object({
-    id     = string
-    enable = bool
-  })
-  description = "ddos protection plan assigned to managed vnets"
-}
 
 #
 # appgateway
