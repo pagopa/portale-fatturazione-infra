@@ -27,7 +27,7 @@ resource "azurerm_private_endpoint" "api_func_storage_blob" {
   name                = format("%s-blob-endpoint", module.api_func_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.api_func_storage.name)
@@ -48,7 +48,7 @@ resource "azurerm_private_endpoint" "api_func_storage_queue" {
   name                = format("%s-queue-endpoint", module.api_func_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-queue-endpoint", module.api_func_storage.name)
@@ -69,7 +69,7 @@ resource "azurerm_private_endpoint" "api_func_storage_table" {
   name                = format("%s-table-endpoint", module.api_func_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-table-endpoint", module.api_func_storage.name)
@@ -203,7 +203,7 @@ resource "azurerm_private_endpoint" "api_func" {
   name                = format("%s-endpoint", azurerm_linux_function_app.api.name)
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_linux_function_app.api.name)
     private_connection_resource_id = azurerm_linux_function_app.api.id
@@ -246,7 +246,7 @@ resource "azurerm_private_endpoint" "integration_func_storage_blob" {
   name                = format("%s-blob-endpoint", module.integration_func_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.integration_func_storage.name)
@@ -267,7 +267,7 @@ resource "azurerm_private_endpoint" "integration_func_storage_queue" {
   name                = format("%s-queue-endpoint", module.integration_func_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-queue-endpoint", module.integration_func_storage.name)
@@ -288,7 +288,7 @@ resource "azurerm_private_endpoint" "integration_func_storage_table" {
   name                = format("%s-table-endpoint", module.integration_func_storage.name)
   location            = var.secondary_location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_secondary_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-table-endpoint", module.integration_func_storage.name)
@@ -448,7 +448,7 @@ resource "azurerm_private_endpoint" "integration_func" {
   name                = format("%s-endpoint", azurerm_linux_function_app.integration.name)
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_linux_function_app.integration.name)
     private_connection_resource_id = azurerm_linux_function_app.integration.id
@@ -563,7 +563,7 @@ resource "azurerm_private_endpoint" "integration_staging_func" {
   name                = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging.name}-endpoint"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging.name}-endpoint"
     private_connection_resource_id = azurerm_linux_function_app.integration.id

@@ -43,7 +43,7 @@ resource "azurerm_private_endpoint" "sql" {
   name                = format("%s-endpoint", azurerm_mssql_server.this.name)
   location            = azurerm_resource_group.analytics.location
   resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = module.private_endpoint_snet.id
+  subnet_id           = azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_mssql_server.this.name)
     private_connection_resource_id = azurerm_mssql_server.this.id

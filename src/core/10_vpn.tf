@@ -1,11 +1,10 @@
-module "vpn_snet" {
-  source                            = "./.terraform/modules/__v4__/subnet/"
+
+resource "azurerm_subnet" "vpn" {
   name                              = "GatewaySubnet" # vpn_gateway quirk, this is expected
   address_prefixes                  = var.cidr_vpn_snet
-  resource_group_name               = azurerm_resource_group.networking.name
-  virtual_network_name              = module.vnet.name
+  resource_group_name               = azurerm_virtual_network.primary.resource_group_name
+  virtual_network_name              = azurerm_virtual_network.primary.name
   private_endpoint_network_policies = "Enabled"
-  service_endpoints                 = []
 }
 
 data "azuread_application" "vpn_app" {
@@ -20,7 +19,7 @@ module "vpn" {
   pip_sku               = "Standard"
   pip_allocation_method = "Static"
   location              = azurerm_resource_group.networking.location
-  subnet_id             = module.vpn_snet.id
+  subnet_id             = azurerm_subnet.vpn.id
   vpn_client_configuration = [
     {
       address_space         = ["172.16.1.0/24"],
@@ -38,18 +37,17 @@ module "vpn" {
 }
 
 ## dns forwarder
-module "dns_fwd_snet" {
-  source                            = "./.terraform/modules/__v4__/subnet/"
-  name                              = format("%s-%s-snet", local.project, "dns-fwd")
+resource "azurerm_subnet" "dns_fwd" {
+  name                              = "${local.project}-dns-fwd-snet"
   address_prefixes                  = var.cidr_dns_fwd_snet
-  resource_group_name               = azurerm_resource_group.networking.name
-  virtual_network_name              = module.vnet.name
+  resource_group_name               = azurerm_virtual_network.primary.resource_group_name
+  virtual_network_name              = azurerm_virtual_network.primary.name
   private_endpoint_network_policies = "Enabled"
   # use subnet delegation
   # https://learn.microsoft.com/en-us/azure/container-instances/container-instances-custom-dns
-  delegation = {
+  delegation {
     name = "delegation"
-    service_delegation = {
+    service_delegation {
       name    = "Microsoft.ContainerInstance/containerGroups" # delegate to this service
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
     }
@@ -61,6 +59,6 @@ module "dns_fwd" {
   name                = format("%s-%s", local.project, "dns-fwd")
   location            = azurerm_resource_group.networking.location
   resource_group_name = azurerm_resource_group.networking.name
-  subnet_id           = module.dns_fwd_snet.id
+  subnet_id           = azurerm_subnet.dns_fwd.id
   tags                = var.tags
 }
