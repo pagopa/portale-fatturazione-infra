@@ -41,12 +41,8 @@ vpn_gw_sku                   = "VpnGw1"
 #
 # appgateway
 #
-agw_sku                          = "Standard_v2"
-agw_waf_enabled                  = false
-agw_apex_app_certificate_name    = "uat-portalefatturazione-pagopa-it"
-agw_api_app_certificate_name     = "api-uat-portalefatturazione-pagopa-it"
-agw_storage_certificate_name     = "storage-uat-portalefatturazione-pagopa-it"
-agw_integration_certificate_name = "integration-uat-portalefatturazione-pagopa-it"
+agw_sku         = "Standard_v2"
+agw_waf_enabled = false
 
 #
 # appservice

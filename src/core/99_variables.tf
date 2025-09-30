@@ -166,25 +166,6 @@ variable "agw_waf_enabled" {
   description = "whether to enable WAF on the app gateway"
 }
 
-variable "agw_api_app_certificate_name" {
-  type        = string
-  description = "the certificate name on the kv for the api endpoint"
-}
-
-variable "agw_apex_app_certificate_name" {
-  type        = string
-  description = "the certificate name on the kv for the api endpoint"
-}
-
-variable "agw_storage_certificate_name" {
-  type        = string
-  description = "the certificate name on the kv for the storage endpoint behind agw"
-}
-
-variable "agw_integration_certificate_name" {
-  type        = string
-  description = "the certificate name on the kv for the integration endpoint"
-}
 
 #
 # appservice

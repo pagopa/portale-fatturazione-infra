@@ -27,22 +27,22 @@ resource "azurerm_user_assigned_identity" "agw" {
 
 # read the certificate before provisioning the appgateway
 data "azurerm_key_vault_certificate" "agw_api_app" {
-  name         = var.agw_api_app_certificate_name
+  name         = local.cert_name_api
   key_vault_id = module.key_vault.id
 }
 
 data "azurerm_key_vault_certificate" "agw_apex_app" {
-  name         = var.agw_apex_app_certificate_name
+  name         = local.cert_name_apex
   key_vault_id = module.key_vault.id
 }
 
 data "azurerm_key_vault_certificate" "agw_storage" {
-  name         = var.agw_storage_certificate_name
+  name         = local.cert_name_storage
   key_vault_id = module.key_vault.id
 }
 
 data "azurerm_key_vault_certificate" "agw_integration" {
-  name         = var.agw_integration_certificate_name
+  name         = local.cert_name_integration
   key_vault_id = module.key_vault.id
 }
 
@@ -136,7 +136,7 @@ module "agw" {
       ssl_profile_name   = null
       firewall_policy_id = null
       certificate = {
-        name = var.agw_api_app_certificate_name
+        name = local.cert_name_api
         id   = data.azurerm_key_vault_certificate.agw_api_app.versionless_secret_id
       }
     }
@@ -147,7 +147,7 @@ module "agw" {
       ssl_profile_name   = null
       firewall_policy_id = null
       certificate = {
-        name = var.agw_apex_app_certificate_name
+        name = local.cert_name_apex
         id   = data.azurerm_key_vault_certificate.agw_apex_app.versionless_secret_id,
       }
     }
@@ -159,7 +159,7 @@ module "agw" {
       ssl_profile_name   = null
       firewall_policy_id = null
       certificate = {
-        name = var.agw_storage_certificate_name
+        name = local.cert_name_storage
         id   = data.azurerm_key_vault_certificate.agw_storage.versionless_secret_id
       }
     }
@@ -170,7 +170,7 @@ module "agw" {
       ssl_profile_name   = null
       firewall_policy_id = null
       certificate = {
-        name = var.agw_integration_certificate_name
+        name = local.cert_name_integration
         id   = data.azurerm_key_vault_certificate.agw_integration.versionless_secret_id
       }
     }
