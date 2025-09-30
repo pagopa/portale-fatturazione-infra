@@ -1,8 +1,8 @@
 #tfsec:ignore:azure-database-enable-audit
 resource "azurerm_mssql_server" "this" {
   name                = format("%s-%s", local.project, "sqls")
-  resource_group_name = azurerm_resource_group.analytics.name
-  location            = azurerm_resource_group.analytics.location
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  location            = data.azurerm_resource_group.analytics.location
   version             = var.sql_version
   # admin auth
   azuread_administrator {
@@ -41,9 +41,9 @@ resource "azurerm_mssql_database" "this" {
 
 resource "azurerm_private_endpoint" "sql" {
   name                = format("%s-endpoint", azurerm_mssql_server.this.name)
-  location            = azurerm_resource_group.analytics.location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint.id
+  location            = data.azurerm_resource_group.analytics.location
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_mssql_server.this.name)
     private_connection_resource_id = azurerm_mssql_server.this.id
@@ -52,7 +52,7 @@ resource "azurerm_private_endpoint" "sql" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_database_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.sqldatabase]
   }
   tags = var.tags
 }

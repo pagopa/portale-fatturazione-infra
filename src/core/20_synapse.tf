@@ -5,7 +5,7 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "this" {
 
 resource "azurerm_synapse_workspace" "this" {
   name                                 = format("%s-%s", local.project, "synw")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location # not available in italynorth
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.this.id
   managed_virtual_network_enabled      = true
@@ -164,8 +164,8 @@ resource "azurerm_synapse_linked_service" "delta" {
 resource "azurerm_private_endpoint" "web_azuresynapse" {
   name                = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-web-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_private_link_hub.this.id
@@ -174,7 +174,7 @@ resource "azurerm_private_endpoint" "web_azuresynapse" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azuresynapse_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.synapse]
   }
   tags = var.tags
 }
@@ -182,8 +182,8 @@ resource "azurerm_private_endpoint" "web_azuresynapse" {
 resource "azurerm_private_endpoint" "dev_azuresynapse" {
   name                = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-dev-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
@@ -192,7 +192,7 @@ resource "azurerm_private_endpoint" "dev_azuresynapse" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_dev_azuresynapse_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.synapse_dev]
   }
   tags = var.tags
 }
@@ -200,8 +200,8 @@ resource "azurerm_private_endpoint" "dev_azuresynapse" {
 resource "azurerm_private_endpoint" "sql_azuresynapse" {
   name                = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
@@ -210,7 +210,7 @@ resource "azurerm_private_endpoint" "sql_azuresynapse" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.synapse_sql]
   }
   tags = var.tags
 }
@@ -218,8 +218,8 @@ resource "azurerm_private_endpoint" "sql_azuresynapse" {
 resource "azurerm_private_endpoint" "sql_ondemand_azuresynapse" {
   name                = format("%s-sql-ondemand-endpoint", azurerm_synapse_workspace.this.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
   private_service_connection {
     name                           = format("%s-sql-ondemand-endpoint", azurerm_synapse_workspace.this.name)
     private_connection_resource_id = azurerm_synapse_workspace.this.id
@@ -228,7 +228,7 @@ resource "azurerm_private_endpoint" "sql_ondemand_azuresynapse" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_sql_azuresynapse_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.synapse_sql]
   }
   tags = var.tags
 }
@@ -236,7 +236,7 @@ resource "azurerm_private_endpoint" "sql_ondemand_azuresynapse" {
 # private link hub
 resource "azurerm_synapse_private_link_hub" "this" {
   name                = replace(format("%s-link-hub", azurerm_synapse_workspace.this.name), "-", "")
-  resource_group_name = azurerm_resource_group.analytics.name
+  resource_group_name = data.azurerm_resource_group.analytics.name
   location            = var.secondary_location
 }
 

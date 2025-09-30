@@ -4,7 +4,7 @@
 module "dls_storage" {
   source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "dls"), "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -42,7 +42,7 @@ resource "azurerm_storage_container" "dls_synapse" {
 resource "azurerm_key_vault_secret" "dls_storage_connection_string" {
   name         = "DlsStorageConnectionString"
   value        = module.dls_storage.primary_connection_string
-  key_vault_id = module.key_vault_app.id
+  key_vault_id = data.azurerm_key_vault.app.id
 }
 
 #
@@ -52,7 +52,7 @@ resource "azurerm_key_vault_secret" "dls_storage_connection_string" {
 module "sa_storage" {
   source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sa"), "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -85,8 +85,8 @@ resource "azurerm_storage_container" "sa_stage" {
 resource "azurerm_private_endpoint" "dls_storage_blob" {
   name                = format("%s-blob-endpoint", module.dls_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.dls_storage.name)
@@ -97,7 +97,7 @@ resource "azurerm_private_endpoint" "dls_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags
@@ -106,8 +106,8 @@ resource "azurerm_private_endpoint" "dls_storage_blob" {
 resource "azurerm_private_endpoint" "dls_storage_dfs" {
   name                = format("%s-dfs-endpoint", module.dls_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-dfs-endpoint", module.dls_storage.name)
@@ -118,7 +118,7 @@ resource "azurerm_private_endpoint" "dls_storage_dfs" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_dfs_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_dfs]
   }
 
   tags = var.tags
@@ -127,8 +127,8 @@ resource "azurerm_private_endpoint" "dls_storage_dfs" {
 resource "azurerm_private_endpoint" "sa_storage_blob" {
   name                = format("%s-blob-endpoint", module.sa_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.sa_storage.name)
@@ -139,7 +139,7 @@ resource "azurerm_private_endpoint" "sa_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags
@@ -152,7 +152,7 @@ resource "azurerm_private_endpoint" "sa_storage_blob" {
 module "sap_storage" {
   source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "sap"), "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -180,8 +180,8 @@ resource "azurerm_storage_container" "sap_sap" {
 resource "azurerm_private_endpoint" "sap_storage_blob" {
   name                = format("%s-blob-endpoint", module.sap_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.sap_storage.name)
@@ -192,7 +192,7 @@ resource "azurerm_private_endpoint" "sap_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags
@@ -207,7 +207,7 @@ resource "azurerm_private_endpoint" "sap_storage_blob" {
 module "rel_storage" {
   source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "rel"), "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -225,7 +225,7 @@ module "rel_storage" {
 resource "azurerm_key_vault_secret" "rel_storage_connection_string" {
   name         = "RelStorageConnectionString"
   value        = module.rel_storage.primary_connection_string
-  key_vault_id = module.key_vault_app.id
+  key_vault_id = data.azurerm_key_vault.app.id
 }
 
 resource "azurerm_storage_container" "rel_rel" {
@@ -237,8 +237,8 @@ resource "azurerm_storage_container" "rel_rel" {
 resource "azurerm_private_endpoint" "rel_storage_blob" {
   name                = format("%s-blob-endpoint", module.rel_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.rel_storage.name)
@@ -249,7 +249,7 @@ resource "azurerm_private_endpoint" "rel_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags
@@ -261,7 +261,7 @@ resource "azurerm_private_endpoint" "rel_storage_blob" {
 module "public_storage" {
   source                               = "./.terraform/modules/__v4__/storage_account/"
   name                                 = replace(format("%s-%s", local.project, "public"), "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -331,15 +331,15 @@ locals {
 resource "azurerm_key_vault_secret" "public_storage_key" {
   name         = "PublicStorageKey"
   value        = module.public_storage.primary_access_key
-  key_vault_id = module.key_vault_app.id
+  key_vault_id = data.azurerm_key_vault.app.id
 }
 
 # the public storage is indeed public, but we need to bind a private endpoint for access from whithin the VNET
 resource "azurerm_private_endpoint" "public_storage_blob" {
   name                = format("%s-blob-endpoint", module.public_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.public_storage.name)
@@ -350,7 +350,7 @@ resource "azurerm_private_endpoint" "public_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags

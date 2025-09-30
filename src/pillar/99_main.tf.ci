@@ -14,12 +14,9 @@ terraform {
       version = "<= 3.2.1"
     }
   }
-
-  backend "azurerm" {}
 }
 
 provider "azurerm" {
-  storage_use_azuread = false
   features {
     key_vault {
       purge_soft_delete_on_destroy = false

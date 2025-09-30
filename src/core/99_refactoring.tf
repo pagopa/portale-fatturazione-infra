@@ -34,3 +34,8 @@ moved {
   from = module.agw_snet.azurerm_subnet.this
   to   = azurerm_subnet.agw
 }
+
+moved {
+  from = azurerm_resource_group.grafana_dashboard_rg
+  to   = azurerm_resource_group.grafana_dashboard
+}

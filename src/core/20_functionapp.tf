@@ -8,7 +8,7 @@ module "api_func_storage" {
   source = "./.terraform/modules/__v4__/storage_account/"
 
   name                                 = replace("${local.project}apifuncsa", "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -26,8 +26,8 @@ module "api_func_storage" {
 resource "azurerm_private_endpoint" "api_func_storage_blob" {
   name                = format("%s-blob-endpoint", module.api_func_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.api_func_storage.name)
@@ -38,7 +38,7 @@ resource "azurerm_private_endpoint" "api_func_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags
@@ -47,8 +47,8 @@ resource "azurerm_private_endpoint" "api_func_storage_blob" {
 resource "azurerm_private_endpoint" "api_func_storage_queue" {
   name                = format("%s-queue-endpoint", module.api_func_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-queue-endpoint", module.api_func_storage.name)
@@ -59,7 +59,7 @@ resource "azurerm_private_endpoint" "api_func_storage_queue" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_queue_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_queue]
   }
 
   tags = var.tags
@@ -68,8 +68,8 @@ resource "azurerm_private_endpoint" "api_func_storage_queue" {
 resource "azurerm_private_endpoint" "api_func_storage_table" {
   name                = format("%s-table-endpoint", module.api_func_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-table-endpoint", module.api_func_storage.name)
@@ -80,7 +80,7 @@ resource "azurerm_private_endpoint" "api_func_storage_table" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_table_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_table]
   }
 
   tags = var.tags
@@ -88,8 +88,8 @@ resource "azurerm_private_endpoint" "api_func_storage_table" {
 
 resource "azurerm_linux_function_app" "api" {
   name                = "${local.project}-api-func"
-  resource_group_name = azurerm_resource_group.app.name
-  location            = azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  location            = data.azurerm_resource_group.app.location
 
   storage_account_name          = module.api_func_storage.name
   storage_uses_managed_identity = true
@@ -128,28 +128,28 @@ resource "azurerm_linux_function_app" "api" {
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
     WEBSITE_RUN_FROM_PACKAGE               = "1"
 
-    CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
-    SMTP              = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=Smtp)"
-    SMTP_PORT         = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SmtpPort)"
-    SMTP_AUTH         = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SmtpAuth)"
-    SMTP_PASSWORD     = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SmtpPassword)"
-    ACCESSTOKEN       = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ACCESSTOKEN)"
-    CLIENTID          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=CLIENTID)"
-    CLIENTSECRET      = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=CLIENTSECRET)"
+    CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
+    SMTP              = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=Smtp)"
+    SMTP_PORT         = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SmtpPort)"
+    SMTP_AUTH         = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SmtpAuth)"
+    SMTP_PASSWORD     = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SmtpPassword)"
+    ACCESSTOKEN       = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ACCESSTOKEN)"
+    CLIENTID          = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=CLIENTID)"
+    CLIENTSECRET      = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=CLIENTSECRET)"
     FROM              = "no-reply_fatturazione@pagopa.it"
     FROMNAME          = "pagoPA"
-    REFRESHTOKEN      = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=REFRESHTOKEN)"
+    REFRESHTOKEN      = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=REFRESHTOKEN)"
 
     StorageRELAccountName       = module.public_storage.name
-    StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
+    StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
     StorageRELBlobContainerName = "relrighe"
 
-    StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
+    StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=${azurerm_key_vault_secret.public_storage_key.name})"
     StorageNotificheAccountName       = module.public_storage.name
     StorageNotificheBlobContainerName = "notifiche"
 
     ModuloCommessaSEND            = "${var.send_api_url}/pn-portfat-in/file-ready-event",
-    ModuloCommessaSENDAccountKey  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SENDAccountKey)",
+    ModuloCommessaSENDAccountKey  = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SENDAccountKey)",
     ModuloCommessaSENDFileVersion = "1.0.0"
   }
 
@@ -186,7 +186,7 @@ resource "azurerm_role_assignment" "api_func_storage_table_contributor" {
 }
 
 resource "azurerm_key_vault_access_policy" "api_func_get_secrets" {
-  key_vault_id       = module.key_vault_app.id
+  key_vault_id       = data.azurerm_key_vault.app.id
   tenant_id          = data.azurerm_client_config.current.tenant_id
   object_id          = azurerm_linux_function_app.api.identity[0].principal_id
   secret_permissions = ["Get"]
@@ -195,15 +195,15 @@ resource "azurerm_key_vault_access_policy" "api_func_get_secrets" {
 # vnet integration
 resource "azurerm_app_service_virtual_network_swift_connection" "api_func" {
   app_service_id = azurerm_linux_function_app.api.id
-  subnet_id      = module.app_snet.id
+  subnet_id      = data.azurerm_subnet.app.id
 }
 
 # private endpoint
 resource "azurerm_private_endpoint" "api_func" {
   name                = format("%s-endpoint", azurerm_linux_function_app.api.name)
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = azurerm_subnet.private_endpoint.id
+  location            = data.azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_linux_function_app.api.name)
     private_connection_resource_id = azurerm_linux_function_app.api.id
@@ -212,7 +212,7 @@ resource "azurerm_private_endpoint" "api_func" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
   }
   tags = var.tags
 }
@@ -227,7 +227,7 @@ module "integration_func_storage" {
   source = "./.terraform/modules/__v4__/storage_account/"
 
   name                                 = replace("${local.project}integrationfuncsa", "-", "")
-  resource_group_name                  = azurerm_resource_group.analytics.name
+  resource_group_name                  = data.azurerm_resource_group.analytics.name
   location                             = var.secondary_location
   account_kind                         = "StorageV2"
   account_tier                         = "Standard"
@@ -245,8 +245,8 @@ module "integration_func_storage" {
 resource "azurerm_private_endpoint" "integration_func_storage_blob" {
   name                = format("%s-blob-endpoint", module.integration_func_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-blob-endpoint", module.integration_func_storage.name)
@@ -257,7 +257,7 @@ resource "azurerm_private_endpoint" "integration_func_storage_blob" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_blob_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_blob]
   }
 
   tags = var.tags
@@ -266,8 +266,8 @@ resource "azurerm_private_endpoint" "integration_func_storage_blob" {
 resource "azurerm_private_endpoint" "integration_func_storage_queue" {
   name                = format("%s-queue-endpoint", module.integration_func_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-queue-endpoint", module.integration_func_storage.name)
@@ -278,7 +278,7 @@ resource "azurerm_private_endpoint" "integration_func_storage_queue" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_queue_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_queue]
   }
 
   tags = var.tags
@@ -287,8 +287,8 @@ resource "azurerm_private_endpoint" "integration_func_storage_queue" {
 resource "azurerm_private_endpoint" "integration_func_storage_table" {
   name                = format("%s-table-endpoint", module.integration_func_storage.name)
   location            = var.secondary_location
-  resource_group_name = azurerm_resource_group.analytics.name
-  subnet_id           = azurerm_subnet.private_endpoint_secondary.id
+  resource_group_name = data.azurerm_resource_group.analytics.name
+  subnet_id           = data.azurerm_subnet.private_endpoint_secondary.id
 
   private_service_connection {
     name                           = format("%s-table-endpoint", module.integration_func_storage.name)
@@ -299,7 +299,7 @@ resource "azurerm_private_endpoint" "integration_func_storage_table" {
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_table_core_windows_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.storage_table]
   }
 
   tags = var.tags
@@ -313,16 +313,16 @@ locals {
       WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
       WEBSITE_RUN_FROM_PACKAGE               = "1"
 
-      CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
-      AES_KEY                            = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=EncryptionAesKey)"
-      STORAGE_ACCOUNT_KEY                = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
+      AES_KEY                            = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=EncryptionAesKey)"
+      STORAGE_ACCOUNT_KEY                = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=PublicStorageKey)"
       STORAGE_ACCOUNT_NAME               = module.public_storage.name
       STORAGE_NOTIFICHE                  = "notifiche"
       STORAGE_REL                        = "relrighe"
       STORAGE_REL_DOWNLOAD               = "reldownload"
       STORAGE_CONTESTAZIONI              = "contestazioni"
       STORAGE_CUSTOM_HOSTNAME            = "https://${local.fqdn_storage}"
-      StorageDocumenti__ConnectionString = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
+      StorageDocumenti__ConnectionString = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=RelStorageConnectionString)"
       StorageDocumenti__DocumentiFolder  = "documenti"
 
       OpenApi__DocDescription = "API documentation Portale Fatturazione."
@@ -331,7 +331,7 @@ locals {
       OpenApi__HostNames      = "https://${local.fqdn_integration}/api"
 
       StorageContestazioni__AccountName       = module.public_storage.name
-      StorageContestazioni__AccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageContestazioni__AccountKey        = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=PublicStorageKey)"
       StorageContestazioni__BlobContainerName = "contestazioni",
       StorageContestazioni__CustomDns         = "https://${local.fqdn_storage}"
 
@@ -344,8 +344,8 @@ locals {
 }
 resource "azurerm_linux_function_app" "integration" {
   name                = "${local.project}-integration-func"
-  resource_group_name = azurerm_resource_group.app.name
-  location            = azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  location            = data.azurerm_resource_group.app.location
 
   storage_account_name          = module.integration_func_storage.name
   storage_uses_managed_identity = true
@@ -431,7 +431,7 @@ resource "azurerm_role_assignment" "integration_func_storage_table_contributor" 
 }
 
 resource "azurerm_key_vault_access_policy" "integration_func_get_secrets" {
-  key_vault_id       = module.key_vault_app.id
+  key_vault_id       = data.azurerm_key_vault.app.id
   tenant_id          = data.azurerm_client_config.current.tenant_id
   object_id          = azurerm_linux_function_app.integration.identity[0].principal_id
   secret_permissions = ["Get"]
@@ -440,15 +440,15 @@ resource "azurerm_key_vault_access_policy" "integration_func_get_secrets" {
 # vnet integration
 resource "azurerm_app_service_virtual_network_swift_connection" "integration_func" {
   app_service_id = azurerm_linux_function_app.integration.id
-  subnet_id      = module.app_snet.id
+  subnet_id      = data.azurerm_subnet.app.id
 }
 
 # private endpoint
 resource "azurerm_private_endpoint" "integration_func" {
   name                = format("%s-endpoint", azurerm_linux_function_app.integration.name)
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = azurerm_subnet.private_endpoint.id
+  location            = data.azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_linux_function_app.integration.name)
     private_connection_resource_id = azurerm_linux_function_app.integration.id
@@ -457,7 +457,7 @@ resource "azurerm_private_endpoint" "integration_func" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
   }
   tags = var.tags
 }
@@ -543,7 +543,7 @@ resource "azurerm_role_assignment" "integration_staging_func_storage_table_contr
 }
 
 resource "azurerm_key_vault_access_policy" "integration_staging_func_get_secrets" {
-  key_vault_id       = module.key_vault_app.id
+  key_vault_id       = data.azurerm_key_vault.app.id
   tenant_id          = data.azurerm_client_config.current.tenant_id
   object_id          = azurerm_linux_function_app_slot.integration_staging.identity[0].principal_id
   secret_permissions = ["Get"]
@@ -553,7 +553,7 @@ resource "azurerm_key_vault_access_policy" "integration_staging_func_get_secrets
 resource "azurerm_app_service_slot_virtual_network_swift_connection" "integration_func_staging" {
   slot_name      = azurerm_linux_function_app_slot.integration_staging.name
   app_service_id = azurerm_linux_function_app.integration.id
-  subnet_id      = module.app_snet.id
+  subnet_id      = data.azurerm_subnet.app.id
 
   depends_on = [azurerm_linux_function_app_slot.integration_staging]
 }
@@ -561,9 +561,9 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "integratio
 # private endpoint
 resource "azurerm_private_endpoint" "integration_staging_func" {
   name                = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging.name}-endpoint"
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = azurerm_subnet.private_endpoint.id
+  location            = data.azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging.name}-endpoint"
     private_connection_resource_id = azurerm_linux_function_app.integration.id
@@ -573,7 +573,7 @@ resource "azurerm_private_endpoint" "integration_staging_func" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
   }
   tags = var.tags
 }

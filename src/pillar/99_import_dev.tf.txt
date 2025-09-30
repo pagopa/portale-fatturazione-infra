@@ -1,0 +1,4 @@
+# import {
+#   id = "/subscriptions/5c587d75-fb91-4559-bda2-8612949a2b7d/resourceGroups/fat-d-networking-rg/providers/Microsoft.Network/dnsZones/dev.portalefatturazione.pagopa.it"
+#   to = azurerm_dns_zone.portalefatturazione
+# }

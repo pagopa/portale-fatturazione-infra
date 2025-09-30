@@ -3,8 +3,8 @@
 resource "azurerm_monitor_scheduled_query_rules_alert" "detect_sdi_code_modification" {
   name                = "[${azurerm_application_insights.application_insights.name}] SDI code modification"
   description         = "Triggered when SDI code modification is detected in application logs"
-  location            = azurerm_resource_group.monitoring.location
-  resource_group_name = azurerm_resource_group.monitoring.name
+  location            = data.azurerm_resource_group.monitoring.location
+  resource_group_name = data.azurerm_resource_group.monitoring.name
   data_source_id      = azurerm_application_insights.application_insights.id
   enabled             = true
   severity            = 3 // informational
@@ -36,7 +36,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "detect_sdi_code_modifica
 # take the destination email address from key vault
 data "azurerm_key_vault_secret" "alert_sdi_code_email_address" {
   name         = "AlertSDICodeNotifyEmailAddress"
-  key_vault_id = module.key_vault.id
+  key_vault_id = data.azurerm_key_vault.main.id
 }
 
 # action group for notifying SDI code modification
@@ -44,7 +44,7 @@ resource "azurerm_monitor_action_group" "notify_sdi_code_modification" {
   name                = "notify-sdi-code-modification"
   short_name          = "sdi-code"
   location            = "global"
-  resource_group_name = azurerm_resource_group.monitoring.name
+  resource_group_name = data.azurerm_resource_group.monitoring.name
   enabled             = true
 
   email_receiver {
