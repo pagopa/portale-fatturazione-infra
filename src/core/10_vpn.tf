@@ -55,7 +55,7 @@ resource "azurerm_subnet" "dns_fwd" {
 }
 
 module "dns_fwd" {
-  source              = "./.terraform/modules/__v4__/dns_forwarder/"
+  source              = "./.terraform/modules/__v4__/dns_forwarder_deprecated/"
   name                = format("%s-%s", local.project, "dns-fwd")
   location            = azurerm_resource_group.networking.location
   resource_group_name = azurerm_resource_group.networking.name
