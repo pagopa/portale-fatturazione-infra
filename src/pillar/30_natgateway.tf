@@ -12,3 +12,8 @@ module "nat_gateway" {
 
   tags = var.tags
 }
+
+resource "azurerm_subnet_nat_gateway_association" "app_snet" {
+  nat_gateway_id = module.nat_gateway.id
+  subnet_id      = azurerm_subnet.app.id
+}

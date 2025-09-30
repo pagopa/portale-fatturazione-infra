@@ -1,16 +1,8 @@
-resource "azurerm_subnet" "agw" {
-  name                              = "${local.project}-agw-snet"
-  address_prefixes                  = var.cidr_agw_snet
-  resource_group_name               = azurerm_virtual_network.primary.resource_group_name
-  virtual_network_name              = azurerm_virtual_network.primary.name
-  private_endpoint_network_policies = "Enabled"
-  service_endpoints                 = ["Microsoft.Web"]
-}
 
 resource "azurerm_public_ip" "agw" {
   name                = format("%s-%s-pip", local.project, "agw")
-  resource_group_name = azurerm_resource_group.networking.name
-  location            = azurerm_resource_group.networking.location
+  resource_group_name = data.azurerm_resource_group.networking.name
+  location            = data.azurerm_resource_group.networking.location
   sku                 = "Standard"
   allocation_method   = "Static"
   zones               = [1, 2, 3]
@@ -18,8 +10,8 @@ resource "azurerm_public_ip" "agw" {
 }
 
 resource "azurerm_user_assigned_identity" "agw" {
-  resource_group_name = azurerm_resource_group.networking.name
-  location            = azurerm_resource_group.networking.location
+  resource_group_name = data.azurerm_resource_group.networking.name
+  location            = data.azurerm_resource_group.networking.location
   name                = format("%s-%s", local.project, "agw-id")
   tags                = var.tags
 }
@@ -28,35 +20,35 @@ resource "azurerm_user_assigned_identity" "agw" {
 # read the certificate before provisioning the appgateway
 data "azurerm_key_vault_certificate" "agw_api_app" {
   name         = local.cert_name_api
-  key_vault_id = module.key_vault.id
+  key_vault_id = data.azurerm_key_vault.main.id
 }
 
 data "azurerm_key_vault_certificate" "agw_apex_app" {
   name         = local.cert_name_apex
-  key_vault_id = module.key_vault.id
+  key_vault_id = data.azurerm_key_vault.main.id
 }
 
 data "azurerm_key_vault_certificate" "agw_storage" {
   name         = local.cert_name_storage
-  key_vault_id = module.key_vault.id
+  key_vault_id = data.azurerm_key_vault.main.id
 }
 
 data "azurerm_key_vault_certificate" "agw_integration" {
   name         = local.cert_name_integration
-  key_vault_id = module.key_vault.id
+  key_vault_id = data.azurerm_key_vault.main.id
 }
 
 module "agw" {
   source              = "./.terraform/modules/__v4__/app_gateway/"
   name                = format("%s-%s", local.project, "agw")
-  resource_group_name = azurerm_resource_group.networking.name
-  location            = azurerm_resource_group.networking.location
+  resource_group_name = data.azurerm_resource_group.networking.name
+  location            = data.azurerm_resource_group.networking.location
   # sku
   sku_name    = var.agw_sku
   sku_tier    = var.agw_sku
   waf_enabled = var.agw_waf_enabled
   # networking
-  subnet_id    = azurerm_subnet.agw.id
+  subnet_id    = data.azurerm_subnet.agw.id
   public_ip_id = azurerm_public_ip.agw.id
   # tls config
   ssl_profiles = [{
@@ -225,4 +217,15 @@ module "agw" {
   # multi-az
   zones = [1, 2, 3]
   tags  = var.tags
+}
+
+# allow agw to pull certs
+resource "azurerm_key_vault_access_policy" "agw_policy" {
+  key_vault_id            = data.azurerm_key_vault.main.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = azurerm_user_assigned_identity.agw.principal_id
+  key_permissions         = []
+  secret_permissions      = ["Get", "List"]
+  storage_permissions     = []
+  certificate_permissions = ["Get", "List"]
 }

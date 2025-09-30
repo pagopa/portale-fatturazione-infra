@@ -1,0 +1,304 @@
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/dnsZones/portalefatturazione.pagopa.it/CAA/@"
+  to = azurerm_dns_caa_record.portalefatturazione_apex
+}
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/dnsZones/portalefatturazione.pagopa.it/NS/dev"
+  to = azurerm_dns_ns_record.dev_portalefatturazione_pagopa_it_ns[0]
+}
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/dnsZones/portalefatturazione.pagopa.it/NS/uat"
+  to = azurerm_dns_ns_record.uat_portalefatturazione_pagopa_it_ns[0]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/dnsZones/portalefatturazione.pagopa.it"
+  to = azurerm_dns_zone.portalefatturazione
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg/providers/Microsoft.KeyVault/vaults/fat-p-kv/objectId/eeb5bfe2-d8f6-498c-bfc1-efe26b0db599"
+  to = azurerm_key_vault_access_policy.adgroup_admins_policy
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg/providers/Microsoft.KeyVault/vaults/fat-p-kv-app/objectId/eeb5bfe2-d8f6-498c-bfc1-efe26b0db599"
+  to = azurerm_key_vault_access_policy.adgroup_admins_policy_app
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg/providers/Microsoft.KeyVault/vaults/fat-p-kv/objectId/fefacf65-63c4-40b8-b75a-aa21b5abc76a"
+  to = azurerm_key_vault_access_policy.adgroup_developers_policy
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg/providers/Microsoft.KeyVault/vaults/fat-p-kv-app/objectId/fefacf65-63c4-40b8-b75a-aa21b5abc76a"
+  to = azurerm_key_vault_access_policy.adgroup_developers_policy_app
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azuresynapse.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azurewebsites.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.azurewebsites.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.blob.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.database.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.dev.azuresynapse.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.dev.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.dfs.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.queue.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.sql.azuresynapse.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.sql.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net"
+  to = azurerm_private_dns_zone.privatelink["privatelink.table.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azuresynapse.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azuresynapse.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azurewebsites.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.azurewebsites.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.azurewebsites.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.azurewebsites.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.blob.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.blob.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.database.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.database.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.dev.azuresynapse.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.dev.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.dev.azuresynapse.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.dev.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.dfs.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.dfs.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.queue.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.queue.core.windows.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.queue.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.sql.azuresynapse.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.sql.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.sql.azuresynapse.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.sql.azuresynapse.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/fat-p-secondary-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink_secondary["privatelink.table.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/privateDnsZones/privatelink.table.core.windows.net/virtualNetworkLinks/fat-p-vnet"
+  to = azurerm_private_dns_zone_virtual_network_link.privatelink["privatelink.table.core.windows.net"]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-analytics-rg"
+  to = azurerm_resource_group.analytics
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-app-rg"
+  to = azurerm_resource_group.app
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-identity-rg"
+  to = azurerm_resource_group.identity
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg"
+  to = azurerm_resource_group.kv
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-monitoring-rg"
+  to = azurerm_resource_group.monitoring
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg"
+  to = azurerm_resource_group.networking
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/subnets/fat-p-app-snet"
+  to = azurerm_subnet.app
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/subnets/fat-p-agw-snet"
+  to = azurerm_subnet.agw
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/subnets/fat-p-dns-fwd-snet"
+  to = azurerm_subnet.dns_fwd[0]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/subnets/fat-p-private_endpoint-snet"
+  to = azurerm_subnet.private_endpoint
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-secondary-vnet/subnets/fat-p-private_endpoint-snet"
+  to = azurerm_subnet.private_endpoint_secondary
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/subnets/GatewaySubnet"
+  to = azurerm_subnet.vpn[0]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/subnets/fat-p-app-snet"
+  to = azurerm_subnet_nat_gateway_association.app_snet
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet"
+  to = azurerm_virtual_network.primary
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-secondary-vnet"
+  to = azurerm_virtual_network.secondary
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.ContainerInstance/containerGroups/fat-p-dns-fwd"
+  to = module.dns_fwd[0].azurerm_container_group.this
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg/providers/Microsoft.KeyVault/vaults/fat-p-kv"
+  to = module.key_vault.azurerm_key_vault.this
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-kv-rg/providers/Microsoft.KeyVault/vaults/fat-p-kv-app"
+  to = module.key_vault_app.azurerm_key_vault.this
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/natGateways/fat-p-natgw"
+  to = module.nat_gateway.azurerm_nat_gateway.this
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/natGateways/fat-p-natgw|/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/publicIPAddresses/fat-p-natgw-pip-01"
+  to = module.nat_gateway.azurerm_nat_gateway_public_ip_association.this[0]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/publicIPAddresses/fat-p-natgw-pip-01"
+  to = module.nat_gateway.azurerm_public_ip.this[0]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-vnet/virtualNetworkPeerings/fat-p-vnet-to-fat-p-secondary-vnet"
+  to = module.vnet_peering_between_primary_secondary.azurerm_virtual_network_peering.source
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworks/fat-p-secondary-vnet/virtualNetworkPeerings/fat-p-secondary-vnet-to-fat-p-vnet"
+  to = module.vnet_peering_between_primary_secondary.azurerm_virtual_network_peering.target
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/publicIPAddresses/fat-p-vpn-gw-pip"
+  to = module.vpn[0].azurerm_public_ip.gw[0]
+}
+
+import {
+  id = "/subscriptions/794146a8-9ae6-4002-b37c-f51d91ecc399/resourceGroups/fat-p-networking-rg/providers/Microsoft.Network/virtualNetworkGateways/fat-p-vpn-gw"
+  to = module.vpn[0].azurerm_virtual_network_gateway.gw
+}
+
+import {
+  id = "u7qzyx"
+  to = module.vpn[0].random_string.dns
+}
+

@@ -1,13 +1,17 @@
-resource "azurerm_resource_group" "grafana_dashboard_rg" {
+resource "azurerm_resource_group" "grafana_dashboard" {
   name     = "${local.project}-grafana-dashboard-rg"
-  location = "northeurope"
+  location = "northeurope" # why?
 
   tags = var.tags
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_dashboard_grafana" "grafana_dashboard" {
   name                              = "${local.project}-grafana"
-  resource_group_name               = azurerm_resource_group.grafana_dashboard_rg.name
+  resource_group_name               = azurerm_resource_group.grafana_dashboard.name
   location                          = "northeurope"
   api_key_enabled                   = true
   deterministic_outbound_ip_enabled = true

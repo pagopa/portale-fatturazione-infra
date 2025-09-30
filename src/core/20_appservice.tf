@@ -6,12 +6,12 @@ locals {
       WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
       WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
       ASPNETCORE_ENVIRONMENT              = "Production"
-      CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=ConnectionString)"
-      JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=JwtSecret)"
-      ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=AdminKey)"
+      CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
+      JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=JwtSecret)"
+      ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=AdminKey)"
       JWT_VALID_AUDIENCE                  = local.fqdn_api
       JWT_VALID_ISSUER                    = local.fqdn_api
-      KEY_VAULT_NAME                      = module.key_vault_app.name
+      KEY_VAULT_NAME                      = data.azurerm_key_vault.app.name
       SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
       SELF_CARE_URI                       = var.app_api_config_selfcare_url
       SELF_CARE_TIMEOUT                   = var.env_short == "p"
@@ -42,10 +42,10 @@ locals {
       AZUREAD_TENANTID         = data.azurerm_client_config.current.tenant_id
       AZUREAD_CLIENTID         = data.azuread_application.portalefatturazione.application_id
       AZUREAD_ADGROUP          = "fat-${var.env_short}-adgroup-"
-      STORAGE_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=RelStorageConnectionString)"
+      STORAGE_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=RelStorageConnectionString)"
       STORAGE_REL_FOLDER       = "rel"
 
-      STORAGE_DOCUMENTI_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=DlsStorageConnectionString)"
+      STORAGE_DOCUMENTI_CONNECTIONSTRING = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=DlsStorageConnectionString)"
       STORAGE_DOCUMENTI_FOLDER           = "reportaccertamenti"
       SYNAPSE_WORKSPACE_NAME             = azurerm_synapse_workspace.this.name
       PIPELINE_NAME_SAP                  = "SendJsonToSap",
@@ -53,62 +53,37 @@ locals {
       SYNAPSE_RESOURCEGROUPNAME          = azurerm_synapse_workspace.this.resource_group_name
 
       STORAGE_FINANCIAL_ACCOUNTNAME   = module.public_storage.name
-      STORAGE_FINANCIAL_ACCOUNTKEY    = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      STORAGE_FINANCIAL_ACCOUNTKEY    = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=PublicStorageKey)"
       STORAGE_FINANCIAL_CONTAINERNAME = "invoices"
 
       SELFCAREONBOARDING_ENDPOINT  = local.selfcare_url
       SELFCAREONBOARDING_URI       = "/external/billing-portal/v1/institutions/onboarding/recipientCode/verification"
-      SELFCAREONBOARDING_AUTHTOKEN = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SelfCareAuthToken)"
+      SELFCAREONBOARDING_AUTHTOKEN = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SelfCareAuthToken)"
       SUPPORTAPISERVICE_ENDPOINT   = local.selfcare_url
       SUPPORTAPISERVICE_URI        = "/external/billing-portal/v1/onboarding/{onboardingId}/recipient-code"
-      SUPPORTAPISERVICE_AUTHTOKEN  = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=SupportApiServiceAuthToken)"
+      SUPPORTAPISERVICE_AUTHTOKEN  = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SupportApiServiceAuthToken)"
 
-      StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageRELAccountKey        = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=PublicStorageKey)"
       StorageRELAccountName       = module.public_storage.name
       StorageRELBlobContainerName = "relrighe"
-      StorageRELCustomDns         = "https://${azurerm_dns_a_record.agw_storage.name}.${azurerm_dns_zone.portalefatturazione[0].name}"
+      StorageRELCustomDns         = "https://${local.fqdn_storage}"
 
       StorageNotificheAccountName       = module.public_storage.name
-      StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=PublicStorageKey)"
+      StorageNotificheAccountKey        = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=PublicStorageKey)"
       StorageNotificheBlobContainerName = "notifiche"
       StorageNotificheCustomDNS         = "https://${local.fqdn_storage}",
       AzureFunctionNotificheUri         = "https://${azurerm_linux_function_app.api.default_hostname}/api/RichiestaNotificheHandler"
       # TODO use managed identity
-      AzureFunctionAppKey = "@Microsoft.KeyVault(VaultName=${module.key_vault_app.name};SecretName=synapse-sendemail-fnkey)"
+      AzureFunctionAppKey = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=synapse-sendemail-fnkey)"
     }
   }
-}
-data "azuread_application" "portalefatturazione" {
-  display_name = format("%s-%s", local.project, "portalefatturazione") # hardcoded, created in eng-azure-authorization
-}
-
-module "app_snet" {
-  source                            = "./.terraform/modules/__v4__/subnet/"
-  name                              = format("%s-%s-snet", local.project, "app")
-  address_prefixes                  = var.cidr_app_snet
-  resource_group_name               = azurerm_resource_group.networking.name
-  virtual_network_name              = azurerm_virtual_network.primary.name
-  private_endpoint_network_policies = "Enabled"
-  service_endpoints                 = []
-  delegation = {
-    name = "default"
-    service_delegation = {
-      name    = "Microsoft.Web/serverFarms"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-    }
-  }
-}
-
-resource "azurerm_subnet_nat_gateway_association" "app_snet" {
-  nat_gateway_id = module.nat_gateway.id
-  subnet_id      = module.app_snet.id
 }
 
 # plan
 resource "azurerm_service_plan" "app" {
   name                     = format("%s-%s", local.project, "app-plan")
-  location                 = azurerm_resource_group.app.location
-  resource_group_name      = azurerm_resource_group.app.name
+  location                 = data.azurerm_resource_group.app.location
+  resource_group_name      = data.azurerm_resource_group.app.name
   sku_name                 = var.app_plan_sku_name
   worker_count             = 3
   os_type                  = "Linux"
@@ -121,8 +96,8 @@ resource "azurerm_service_plan" "app" {
 # this will be replaced by a cdn endpoint in the near future
 resource "azurerm_linux_web_app" "app_fe" {
   name                       = format("%s-%s", local.project, "app-fe")
-  location                   = azurerm_resource_group.app.location
-  resource_group_name        = azurerm_resource_group.app.name
+  location                   = data.azurerm_resource_group.app.location
+  resource_group_name        = data.azurerm_resource_group.app.name
   service_plan_id            = azurerm_service_plan.app.id
   client_certificate_enabled = false
   https_only                 = true
@@ -154,7 +129,7 @@ resource "azurerm_linux_web_app" "app_fe" {
       node_version = "22-lts"
     }
     ip_restriction {
-      virtual_network_subnet_id = azurerm_subnet.agw.id
+      virtual_network_subnet_id = data.azurerm_subnet.agw.id
       name                      = "rule"
     }
   }
@@ -181,8 +156,8 @@ locals {
 # api
 resource "azurerm_linux_web_app" "app_api" {
   name                          = format("%s-%s", local.project, "app-api")
-  location                      = azurerm_resource_group.app.location
-  resource_group_name           = azurerm_resource_group.app.name
+  location                      = data.azurerm_resource_group.app.location
+  resource_group_name           = data.azurerm_resource_group.app.name
   service_plan_id               = azurerm_service_plan.app.id
   client_certificate_enabled    = false
   https_only                    = true
@@ -245,6 +220,17 @@ resource "azurerm_linux_web_app" "app_api" {
   tags = var.tags
 }
 
+# allow app service to pull secrets from kv
+resource "azurerm_key_vault_access_policy" "app_api_policy" {
+  key_vault_id            = data.azurerm_key_vault.app.id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
+  object_id               = azurerm_linux_web_app.app_api.identity[0].principal_id
+  key_permissions         = []
+  secret_permissions      = ["Get", "List"]
+  storage_permissions     = []
+  certificate_permissions = []
+}
+
 resource "azurerm_synapse_role_assignment" "api_synapse_user" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse User"
@@ -262,15 +248,15 @@ resource "azurerm_synapse_role_assignment" "api_synapse_credential_user" {
 # vnet integration
 resource "azurerm_app_service_virtual_network_swift_connection" "app_api" {
   app_service_id = azurerm_linux_web_app.app_api.id
-  subnet_id      = module.app_snet.id
+  subnet_id      = data.azurerm_subnet.app.id
 }
 
 # private endpoint
 resource "azurerm_private_endpoint" "app_api" {
   name                = format("%s-endpoint", azurerm_linux_web_app.app_api.name)
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = azurerm_subnet.private_endpoint.id
+  location            = data.azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = format("%s-endpoint", azurerm_linux_web_app.app_api.name)
     private_connection_resource_id = azurerm_linux_web_app.app_api.id
@@ -279,7 +265,7 @@ resource "azurerm_private_endpoint" "app_api" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
   }
   tags = var.tags
 }
@@ -342,7 +328,7 @@ resource "azurerm_linux_web_app_slot" "app_api_staging" {
 }
 
 resource "azurerm_key_vault_access_policy" "app_api_staging_policy" {
-  key_vault_id            = module.key_vault_app.id
+  key_vault_id            = data.azurerm_key_vault.app.id
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = azurerm_linux_web_app_slot.app_api_staging.identity[0].principal_id
   key_permissions         = []
@@ -354,16 +340,16 @@ resource "azurerm_key_vault_access_policy" "app_api_staging_policy" {
 resource "azurerm_app_service_slot_virtual_network_swift_connection" "app_api_staging" {
   slot_name      = azurerm_linux_web_app_slot.app_api_staging.name
   app_service_id = azurerm_linux_web_app.app_api.id
-  subnet_id      = module.app_snet.id
+  subnet_id      = data.azurerm_subnet.app.id
 
   depends_on = [azurerm_linux_web_app_slot.app_api_staging]
 }
 
 resource "azurerm_private_endpoint" "app_api_staging" {
   name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  subnet_id           = azurerm_subnet.private_endpoint.id
+  location            = data.azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
     name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
     private_connection_resource_id = azurerm_linux_web_app.app_api.id
@@ -373,7 +359,7 @@ resource "azurerm_private_endpoint" "app_api_staging" {
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.privatelink_azurewebsites_net.id]
+    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
   }
   tags = var.tags
 }

@@ -2,17 +2,19 @@
 # azuread groups
 #
 data "azuread_group" "adgroup_admins" {
-  display_name = format("%s-%s", local.project, "adgroup-admin")
+  display_name = "${local.project}-adgroup-admin"
 }
 
 data "azuread_group" "adgroup_developers" {
-  display_name = format("%s-adgroup-developers", local.project)
+  display_name = "${local.project}-adgroup-developers"
 }
 
-data "azuread_group" "adgroup_externals" {
-  display_name = format("%s-adgroup-externals", local.project)
+#
+# azuread apps
+#
+data "azuread_application" "portalefatturazione" {
+  # hardcoded, created in eng-azure-authorization
+  display_name = format("%s-%s", local.project, "portalefatturazione")
 }
 
-data "azuread_group" "adgroup_security" {
-  display_name = format("%s-adgroup-security", local.project)
-}
+
