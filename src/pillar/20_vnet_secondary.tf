@@ -28,13 +28,14 @@ resource "azurerm_subnet" "private_endpoint_secondary" {
 
 # peering between vnets
 module "vnet_peering_between_primary_secondary" {
-  source                           = "./.terraform/modules/__v4__/virtual_network_peering/"
+  source = "./.terraform/modules/__v4__/virtual_network_peering/"
+
   source_resource_group_name       = azurerm_resource_group.networking.name
   source_virtual_network_name      = azurerm_virtual_network.primary.name
   source_remote_virtual_network_id = azurerm_virtual_network.primary.id
-  source_allow_gateway_transit     = true # needed by vpn gateway for enabling routing from vnet to vnet_integration
+  source_allow_gateway_transit     = var.vpn_enabled
   target_resource_group_name       = azurerm_resource_group.networking.name
   target_virtual_network_name      = azurerm_virtual_network.secondary.name
   target_remote_virtual_network_id = azurerm_virtual_network.secondary.id
-  target_use_remote_gateways       = true # needed by vpn gateway for enabling routing from vnet to vnet_integration
+  target_use_remote_gateways       = var.vpn_enabled
 }
