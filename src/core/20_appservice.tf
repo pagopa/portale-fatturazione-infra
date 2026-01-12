@@ -88,7 +88,7 @@ resource "azurerm_service_plan" "app" {
   worker_count             = 3
   os_type                  = "Linux"
   per_site_scaling_enabled = false
-  zone_balancing_enabled   = true
+  zone_balancing_enabled   = var.app_plan_zone_balancing_enabled
   tags                     = var.tags
 }
 
@@ -271,6 +271,8 @@ resource "azurerm_private_endpoint" "app_api" {
 }
 
 resource "azurerm_linux_web_app_slot" "app_api_staging" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   app_service_id                = azurerm_linux_web_app.app_api.id
   name                          = "staging"
   client_certificate_enabled    = false
@@ -328,9 +330,11 @@ resource "azurerm_linux_web_app_slot" "app_api_staging" {
 }
 
 resource "azurerm_key_vault_access_policy" "app_api_staging_policy" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   key_vault_id            = data.azurerm_key_vault.app.id
   tenant_id               = data.azurerm_client_config.current.tenant_id
-  object_id               = azurerm_linux_web_app_slot.app_api_staging.identity[0].principal_id
+  object_id               = azurerm_linux_web_app_slot.app_api_staging[0].identity[0].principal_id
   key_permissions         = []
   secret_permissions      = ["Get", "List"]
   storage_permissions     = []
@@ -338,24 +342,28 @@ resource "azurerm_key_vault_access_policy" "app_api_staging_policy" {
 }
 
 resource "azurerm_app_service_slot_virtual_network_swift_connection" "app_api_staging" {
-  slot_name      = azurerm_linux_web_app_slot.app_api_staging.name
+  count = var.app_staging_slot_enabled ? 1 : 0
+
+  slot_name      = azurerm_linux_web_app_slot.app_api_staging[0].name
   app_service_id = azurerm_linux_web_app.app_api.id
   subnet_id      = data.azurerm_subnet.app.id
 
-  depends_on = [azurerm_linux_web_app_slot.app_api_staging]
+  depends_on = [azurerm_linux_web_app_slot.app_api_staging[0]]
 }
 
 resource "azurerm_private_endpoint" "app_api_staging" {
-  name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
+  count = var.app_staging_slot_enabled ? 1 : 0
+
+  name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging[0].name}-endpoint"
   location            = data.azurerm_resource_group.app.location
   resource_group_name = data.azurerm_resource_group.app.name
   subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
-    name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging.name}-endpoint"
+    name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging[0].name}-endpoint"
     private_connection_resource_id = azurerm_linux_web_app.app_api.id
     is_manual_connection           = false
     # https://learn.microsoft.com/en-us/azure/app-service/overview-private-endpoint#conceptual-overview
-    subresource_names = ["sites-${azurerm_linux_web_app_slot.app_api_staging.name}"]
+    subresource_names = ["sites-${azurerm_linux_web_app_slot.app_api_staging[0].name}"]
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"

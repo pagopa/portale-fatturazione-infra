@@ -1,6 +1,8 @@
 
 # alert rule for SDI code modification
 resource "azurerm_monitor_scheduled_query_rules_alert" "detect_sdi_code_modification" {
+  count = var.alert_sdi_code_enabled ? 1 : 0
+
   name                = "[${azurerm_application_insights.application_insights.name}] SDI code modification"
   description         = "Triggered when SDI code modification is detected in application logs"
   location            = data.azurerm_resource_group.monitoring.location
@@ -26,7 +28,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "detect_sdi_code_modifica
   }
 
   action {
-    action_group  = [azurerm_monitor_action_group.notify_sdi_code_modification.id]
+    action_group  = [azurerm_monitor_action_group.notify_sdi_code_modification[0].id]
     email_subject = "Portale Fatturazione [${upper(var.env)}]: Modifica Codice SDI"
   }
 
@@ -35,12 +37,16 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "detect_sdi_code_modifica
 
 # take the destination email address from key vault
 data "azurerm_key_vault_secret" "alert_sdi_code_email_address" {
+  count = var.alert_sdi_code_enabled ? 1 : 0
+
   name         = "AlertSDICodeNotifyEmailAddress"
   key_vault_id = data.azurerm_key_vault.main.id
 }
 
 # action group for notifying SDI code modification
 resource "azurerm_monitor_action_group" "notify_sdi_code_modification" {
+  count = var.alert_sdi_code_enabled ? 1 : 0
+
   name                = "notify-sdi-code-modification"
   short_name          = "sdi-code"
   location            = "global"
@@ -48,7 +54,7 @@ resource "azurerm_monitor_action_group" "notify_sdi_code_modification" {
   enabled             = true
 
   email_receiver {
-    email_address           = data.azurerm_key_vault_secret.alert_sdi_code_email_address.value
+    email_address           = data.azurerm_key_vault_secret.alert_sdi_code_email_address[0].value
     name                    = "notify-sdi-code-modification"
     use_common_alert_schema = false
   }

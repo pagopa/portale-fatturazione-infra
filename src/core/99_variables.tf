@@ -76,79 +76,10 @@ variable "dns_external_domain" {
   default     = "pagopa.it"
 }
 
-variable "dns_api_prefix" {
-  type        = string
-  description = "dns name of the api endpoint"
-  default     = "api"
-}
-
 variable "dns_default_ttl_sec" {
   type        = number
   description = "dns ttl"
   default     = 3600
-}
-
-#
-# networking
-#
-
-variable "cidr_vnet" {
-  type        = list(string)
-  description = "cidr of the vnet"
-}
-
-variable "cidr_agw_snet" {
-  type        = list(string)
-  description = "cidr of the appgateway subnet"
-}
-
-variable "cidr_app_snet" {
-  type        = list(string)
-  description = "cidr of the appservice subnet"
-}
-
-variable "cidr_synapse_snet" {
-  type        = list(string)
-  description = "cidr of the synapse subnet"
-}
-
-variable "cidr_hsql_snet" {
-  type        = list(string)
-  description = "cidr of the hyperscale sql subnet"
-}
-
-variable "cidr_pvt_endp_snet" {
-  type        = list(string)
-  description = "cidr of the private endpoints subnet"
-}
-
-variable "cidr_vpn_snet" {
-  type        = list(string)
-  description = "cidr of the vpn subnet"
-}
-
-variable "cidr_dns_fwd_snet" {
-  type        = list(string)
-  description = "cidr of the dns forwarder subnet"
-}
-
-#
-# secondary networking
-#
-
-variable "secondary_cidr_vnet" {
-  type        = list(string)
-  description = "cidr of the secondary vnet"
-}
-
-variable "secondary_cidr_pvt_endp_snet" {
-  type        = list(string)
-  description = "cidr of the private endpoints subnet on secondary"
-}
-
-variable "vpn_gw_sku" {
-  type        = string
-  description = "sku of the vpn gateway"
 }
 
 
@@ -166,6 +97,12 @@ variable "agw_waf_enabled" {
   description = "whether to enable WAF on the app gateway"
 }
 
+variable "agw_autoscale" {
+  type        = bool
+  description = "whether to autoscale app gateway"
+  default     = true
+}
+
 
 #
 # appservice
@@ -173,6 +110,18 @@ variable "agw_waf_enabled" {
 variable "app_plan_sku_name" {
   type        = string
   description = "the name of the app plan sku"
+}
+
+variable "app_plan_zone_balancing_enabled" {
+  type        = bool
+  description = "enable zone balancing on app service"
+  default     = true
+}
+
+variable "app_staging_slot_enabled" {
+  type        = bool
+  description = "enable staging slot in app service"
+  default     = true
 }
 
 variable "app_api_config_selfcare_url" {
@@ -294,6 +243,11 @@ variable "law_daily_quota_gb" {
 #
 # alerts
 #
+variable "alert_sdi_code_enabled" {
+  type        = bool
+  description = "Feature flag for SDI code modification notification alert"
+  default     = true
+}
 variable "alert_sdi_code_frequency_mins" {
   type        = number
   description = "the frequency of evaluation of the query for the SDI code modification alert"
@@ -315,6 +269,12 @@ variable "function_app_integration_enabled" {
   default     = false
 }
 
+variable "grafana_enabled" {
+  type        = bool
+  description = "Feature flag for grafana"
+  default     = true
+}
+
 #
 # integrations
 #
@@ -322,3 +282,4 @@ variable "send_api_url" {
   type        = string
   description = "Base URL of the SEND API"
 }
+
