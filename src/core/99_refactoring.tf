@@ -39,3 +39,22 @@ moved {
   from = azurerm_resource_group.grafana_dashboard_rg
   to   = azurerm_resource_group.grafana_dashboard
 }
+
+moved {
+  from = azurerm_monitor_scheduled_query_rules_alert.detect_sdi_code_modification
+  to   = azurerm_monitor_scheduled_query_rules_alert.detect_sdi_code_modification[0]
+}
+moved {
+  from = azurerm_monitor_action_group.notify_sdi_code_modification
+  to   = azurerm_monitor_action_group.notify_sdi_code_modification[0]
+}
+
+moved {
+  from = azurerm_resource_group.grafana_dashboard
+  to   = azurerm_resource_group.grafana_dashboard[0]
+}
+moved {
+  from = azurerm_dashboard_grafana.grafana_dashboard
+  to   = azurerm_dashboard_grafana.grafana_dashboard[0]
+}
+

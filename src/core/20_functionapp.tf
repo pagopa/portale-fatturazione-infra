@@ -404,6 +404,12 @@ resource "azurerm_linux_function_app" "integration" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
+      site_config[0].application_stack,
+      site_config[0].application_stack[0],
+      site_config[0].application_stack[1],
+      site_config[0].application_stack[2],
+      site_config[0].application_stack[0].docker,
+      site_config[0].application_stack[0].docker[0],
       site_config[0].application_stack[0].docker[0].image_tag,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
@@ -464,6 +470,8 @@ resource "azurerm_private_endpoint" "integration_func" {
 
 ## SLOT for integration func
 resource "azurerm_linux_function_app_slot" "integration_staging" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   name            = "staging"
   function_app_id = azurerm_linux_function_app.integration.id
 
@@ -525,51 +533,63 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
 }
 
 resource "azurerm_role_assignment" "integration_staging_func_storage_blob_contributor" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   scope                = module.integration_func_storage.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_linux_function_app_slot.integration_staging.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app_slot.integration_staging[0].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "integration_staging_func_storage_queue_contributor" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   scope                = module.integration_func_storage.id
   role_definition_name = "Storage Queue Data Contributor"
-  principal_id         = azurerm_linux_function_app_slot.integration_staging.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app_slot.integration_staging[0].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "integration_staging_func_storage_table_contributor" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   scope                = module.integration_func_storage.id
   role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_linux_function_app_slot.integration_staging.identity[0].principal_id
+  principal_id         = azurerm_linux_function_app_slot.integration_staging[0].identity[0].principal_id
 }
 
 resource "azurerm_key_vault_access_policy" "integration_staging_func_get_secrets" {
+  count = var.app_staging_slot_enabled ? 1 : 0
+
   key_vault_id       = data.azurerm_key_vault.app.id
   tenant_id          = data.azurerm_client_config.current.tenant_id
-  object_id          = azurerm_linux_function_app_slot.integration_staging.identity[0].principal_id
+  object_id          = azurerm_linux_function_app_slot.integration_staging[0].identity[0].principal_id
   secret_permissions = ["Get"]
 }
 
 # vnet integration
 resource "azurerm_app_service_slot_virtual_network_swift_connection" "integration_func_staging" {
-  slot_name      = azurerm_linux_function_app_slot.integration_staging.name
+  count = var.app_staging_slot_enabled ? 1 : 0
+
+  slot_name      = azurerm_linux_function_app_slot.integration_staging[0].name
   app_service_id = azurerm_linux_function_app.integration.id
   subnet_id      = data.azurerm_subnet.app.id
 
-  depends_on = [azurerm_linux_function_app_slot.integration_staging]
+  depends_on = [azurerm_linux_function_app_slot.integration_staging[0]]
 }
 
 # private endpoint
 resource "azurerm_private_endpoint" "integration_staging_func" {
-  name                = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging.name}-endpoint"
+  count = var.app_staging_slot_enabled ? 1 : 0
+
+  name                = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging[0].name}-endpoint"
   location            = data.azurerm_resource_group.app.location
   resource_group_name = data.azurerm_resource_group.app.name
   subnet_id           = data.azurerm_subnet.private_endpoint.id
   private_service_connection {
-    name                           = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging.name}-endpoint"
+    name                           = "${azurerm_linux_function_app.integration.name}-${azurerm_linux_function_app_slot.integration_staging[0].name}-endpoint"
     private_connection_resource_id = azurerm_linux_function_app.integration.id
     is_manual_connection           = false
     # https://learn.microsoft.com/en-us/azure/app-service/overview-private-endpoint#conceptual-overview
-    subresource_names = ["sites-${azurerm_linux_function_app_slot.integration_staging.name}"]
+    subresource_names = ["sites-${azurerm_linux_function_app_slot.integration_staging[0].name}"]
   }
   private_dns_zone_group {
     name                 = "private-dns-zone-group"

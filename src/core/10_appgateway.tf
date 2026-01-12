@@ -44,14 +44,15 @@ module "agw" {
   resource_group_name = data.azurerm_resource_group.networking.name
   location            = data.azurerm_resource_group.networking.location
   # sku
-  sku_name    = var.agw_sku
-  sku_tier    = var.agw_sku
-  waf_enabled = var.agw_waf_enabled
+  sku_name     = var.agw_sku
+  sku_tier     = var.agw_sku
+  sku_capacity = var.agw_autoscale ? null : 1
+  waf_enabled  = var.agw_waf_enabled
   # networking
   subnet_id    = data.azurerm_subnet.agw.id
   public_ip_id = azurerm_public_ip.agw.id
   # tls config
-  ssl_profiles = [{
+  ssl_profiles = var.agw_sku == "Basic" ? [] : [{
     name                             = format("%s-%s", local.project, "ssl-profile")
     trusted_client_certificate_names = null
     verify_client_cert_issuer_dn     = false
@@ -214,6 +215,7 @@ module "agw" {
   # scaling
   app_gateway_min_capacity = 0
   app_gateway_max_capacity = 2
+  app_gateway_autoscale    = var.agw_autoscale
   # multi-az
   zones = [1, 2, 3]
   tags  = var.tags
