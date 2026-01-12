@@ -5,10 +5,11 @@
 module "key_vault" {
   source = "./.terraform/modules/__v4__/key_vault/"
 
-  name                       = "${local.project}-kv"
-  location                   = azurerm_resource_group.kv.location
+  name = "${local.project}-kv"
+  # different stuff in dev for historical reasons, ugly but true
+  location                   = var.env_short != "d" ? azurerm_resource_group.kv.location : "westeurope"
   resource_group_name        = azurerm_resource_group.kv.name
-  soft_delete_retention_days = var.kv_soft_delete_retention_days
+  soft_delete_retention_days = var.env_short != "d" ? var.kv_soft_delete_retention_days : 90
   sku_name                   = var.kv_sku_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   # this needs to be reached from azuredevops pipeline
