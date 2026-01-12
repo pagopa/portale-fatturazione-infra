@@ -36,26 +36,6 @@ variable "project_name_prefix" {
   description = "Prefix of the azure devops project"
 }
 
-variable "key_vault_name" {
-  type        = string
-  description = "Key Vault name"
-}
-
-variable "key_vault_rg_name" {
-  type        = string
-  description = "Key Vault resource group name"
-}
-
-variable "dns_zone_rg_name" {
-  type        = string
-  description = "DNS zones resource group name"
-}
-
-variable "identity_rg_name" {
-  type        = string
-  description = "Identities resource group name"
-}
-
 variable "domains" {
   type = list(object({
     dns_zone_name   = string

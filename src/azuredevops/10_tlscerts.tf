@@ -1,5 +1,5 @@
 
-# pipelines for renewing certs of the ITOPS domains
+# pipelines for renewing certs of the managed domains
 module "tlscert_renewal_pipeline" {
   source = "github.com/pagopa/azuredevops-tf-modules.git//azuredevops_build_definition_tls_cert_federated?ref=v9.2.1"
 
@@ -13,7 +13,7 @@ module "tlscert_renewal_pipeline" {
   github_service_connection_id        = azuredevops_serviceendpoint_github.github_ro.id
   dns_zone_name                       = each.value.dns_zone_name
   dns_record_name                     = each.value.dns_record_name
-  dns_zone_resource_group             = var.dns_zone_rg_name
+  dns_zone_resource_group             = data.azurerm_resource_group.dns.name
   tenant_id                           = local.tenant_id
   subscription_id                     = local.subscription_id
   subscription_name                   = local.subscription_name
@@ -21,10 +21,10 @@ module "tlscert_renewal_pipeline" {
   credential_key_vault_resource_group = data.azurerm_key_vault.this.resource_group_name
   # not in identity-rg for historical reasons, changing will require
   # re-creating many resources
-  managed_identity_resource_group_name = var.dns_zone_rg_name
+  managed_identity_resource_group_name = data.azurerm_resource_group.dns.name
 
   variables = {
-    KEY_VAULT_SERVICE_CONNECTION = module.tls_cert_service_conn.service_endpoint_name,
+    KEY_VAULT_SERVICE_CONNECTION = module.tls_cert_service_conn.service_endpoint_name
   }
   variables_secret = {}
 
