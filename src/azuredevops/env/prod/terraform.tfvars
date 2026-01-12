@@ -6,12 +6,6 @@ location  = "italynorth"
 # azuredevops
 project_name_prefix = "fatturazione"
 
-# azure existing resources
-key_vault_name    = "fat-p-kv"
-key_vault_rg_name = "fat-p-kv-rg"
-dns_zone_rg_name  = "fat-p-networking-rg"
-identity_rg_name  = "fat-p-identity-rg"
-
 # domains to manage
 domains = [
   {

@@ -1,7 +1,7 @@
 
 data "azurerm_key_vault" "this" {
-  resource_group_name = var.key_vault_rg_name
-  name                = var.key_vault_name
+  resource_group_name = data.azurerm_resource_group.keyvault.name
+  name                = "${local.project}-kv"
 }
 
 module "secret_core" {
