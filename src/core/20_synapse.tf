@@ -323,6 +323,13 @@ resource "azurerm_synapse_managed_private_endpoint" "crm_storage_blob" {
   subresource_name     = "blob"
 }
 
+resource "azurerm_synapse_managed_private_endpoint" "kv" {
+  name                 = format("%s-kv-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = data.azurerm_key_vault.app.id
+  subresource_name     = "vault"
+}
+
 # access to api func
 
 data "azurerm_function_app_host_keys" "api_func" {
@@ -355,4 +362,29 @@ resource "azurerm_synapse_managed_private_endpoint" "api_func" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = azurerm_linux_function_app.api.id
   subresource_name     = "sites"
+}
+
+resource "azurerm_synapse_role_assignment" "api_synapse_user" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse User"
+  principal_id         = azurerm_linux_web_app.app_api.identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_synapse_role_assignment" "api_synapse_credential_user" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Credential User"
+  principal_id         = azurerm_linux_web_app.app_api.identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_key_vault_access_policy" "synw_app" {
+  key_vault_id = data.azurerm_key_vault.app.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_synapse_workspace.this.identity[0].principal_id
+
+  key_permissions         = []
+  secret_permissions      = ["Get", "List", ]
+  storage_permissions     = []
+  certificate_permissions = []
 }
