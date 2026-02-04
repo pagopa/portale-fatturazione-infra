@@ -336,9 +336,6 @@ locals {
       StorageContestazioni__CustomDns         = "https://${local.fqdn_storage}"
 
       WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-
-      // TODO temporary
-      DOCKER_ENABLE_CI = var.env_short != "p" ? "true" : "false"
     }
   }
 }
@@ -404,12 +401,6 @@ resource "azurerm_linux_function_app" "integration" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack,
-      site_config[0].application_stack[0],
-      site_config[0].application_stack[1],
-      site_config[0].application_stack[2],
-      site_config[0].application_stack[0].docker,
-      site_config[0].application_stack[0].docker[0],
       site_config[0].application_stack[0].docker[0].image_tag,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
