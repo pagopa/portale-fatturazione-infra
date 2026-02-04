@@ -266,7 +266,7 @@ variable "alert_sdi_code_time_window_mins" {
 variable "function_app_integration_enabled" {
   type        = bool
   description = "Feature flag for integration function app"
-  default     = false
+  default     = true
 }
 
 variable "grafana_enabled" {
