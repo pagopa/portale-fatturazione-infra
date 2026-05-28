@@ -168,7 +168,7 @@ module "agw" {
       }
     }
   }
-  rewrite_rule_sets = [{
+  rewrite_rule_sets = concat([{
     name = "integration"
     rewrite_rules = [{
       # this is because the normal X-Forwarded-For header is somehow
@@ -183,12 +183,25 @@ module "agw" {
       response_header_configurations = []
       url                            = null
     }]
-  }]
+    }], var.env_short == "d" ? [{
+    name = "cors-allow-all"
+    rewrite_rules = [{
+      name                          = "cors"
+      rule_sequence                 = 100
+      conditions                    = []
+      request_header_configurations = []
+      response_header_configurations = [{
+        header_name  = "Access-Control-Allow-Origin"
+        header_value = "*"
+      }]
+      url = null
+    }]
+  }] : [])
   routes = {
     api = {
       listener              = "api"
       backend               = "app_api"
-      rewrite_rule_set_name = null
+      rewrite_rule_set_name = var.env_short == "d" ? "cors-allow-all" : null
       priority              = 10
     }
     apex = {

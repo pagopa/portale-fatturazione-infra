@@ -261,6 +261,8 @@ resource "azurerm_synapse_managed_private_endpoint" "sql" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = azurerm_mssql_server.this.id
   subresource_name     = "sqlServer"
+
+  fully_qualified_domain_names = [azurerm_mssql_server.this.fully_qualified_domain_name]
 }
 
 # managed_private_endpoint must be manual approved on target resource
@@ -269,6 +271,8 @@ resource "azurerm_synapse_managed_private_endpoint" "sa_storage" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.sa_storage.id
   subresource_name     = "blob"
+
+  fully_qualified_domain_names = [module.sa_storage.primary_blob_host]
 }
 
 # managed_private_endpoint must be manual approved on target resource
@@ -277,6 +281,8 @@ resource "azurerm_synapse_managed_private_endpoint" "sap_storage" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.sap_storage.id
   subresource_name     = "blob"
+
+  fully_qualified_domain_names = [module.sap_storage.primary_blob_host]
 }
 
 # managed_private_endpoint must be manual approved on target resource
@@ -285,6 +291,8 @@ resource "azurerm_synapse_managed_private_endpoint" "dls_storage_blob" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.dls_storage.id
   subresource_name     = "dfs"
+
+  fully_qualified_domain_names = [replace(module.dls_storage.primary_blob_host, ".blob.", ".dfs.")] // dirty trick but module has no output
 }
 
 # managed_private_endpoint must be manual approved on target resource
@@ -293,6 +301,8 @@ resource "azurerm_synapse_managed_private_endpoint" "dls_storage_dfs" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.dls_storage.id
   subresource_name     = "blob"
+
+  fully_qualified_domain_names = [module.dls_storage.primary_blob_host]
 }
 
 # managed_private_endpoint must be manual approved on target resource
@@ -301,6 +311,8 @@ resource "azurerm_synapse_managed_private_endpoint" "public_storage" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = module.public_storage.id
   subresource_name     = "blob"
+
+  fully_qualified_domain_names = [module.public_storage.primary_blob_host]
 }
 
 # private endpoint for a CRM data lake EXTERNAL to this subscription,
@@ -312,6 +324,8 @@ resource "azurerm_synapse_managed_private_endpoint" "crm_storage_dfs" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = var.crm_storage_id
   subresource_name     = "dfs"
+
+  fully_qualified_domain_names = ["crm${var.env_short}datast.dfs.core.windows.net"]
 }
 
 resource "azurerm_synapse_managed_private_endpoint" "crm_storage_blob" {
@@ -321,6 +335,8 @@ resource "azurerm_synapse_managed_private_endpoint" "crm_storage_blob" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = var.crm_storage_id
   subresource_name     = "blob"
+
+  fully_qualified_domain_names = ["crm${var.env_short}datast.blob.core.windows.net"]
 }
 
 resource "azurerm_synapse_managed_private_endpoint" "kv" {
@@ -328,6 +344,8 @@ resource "azurerm_synapse_managed_private_endpoint" "kv" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = data.azurerm_key_vault.app.id
   subresource_name     = "vault"
+
+  fully_qualified_domain_names = ["${data.azurerm_key_vault.app.name}.vault.azure.net"]
 }
 
 # access to api func
@@ -354,6 +372,10 @@ resource "azurerm_synapse_linked_service" "api_func" {
   integration_runtime {
     name = "AutoResolveIntegrationRuntime"
   }
+
+  lifecycle {
+    ignore_changes = [type_properties_json]
+  }
 }
 
 # managed_private_endpoint must be manual approved on target resource
@@ -362,6 +384,11 @@ resource "azurerm_synapse_managed_private_endpoint" "api_func" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   target_resource_id   = azurerm_linux_function_app.api.id
   subresource_name     = "sites"
+
+  fully_qualified_domain_names = [
+    "${azurerm_linux_function_app.api.name}.azurewebsites.net",
+    "${azurerm_linux_function_app.api.name}.scm.azurewebsites.net",
+  ]
 }
 
 resource "azurerm_synapse_role_assignment" "api_synapse_user" {

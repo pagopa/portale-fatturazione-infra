@@ -147,6 +147,12 @@ resource "azurerm_linux_web_app" "app_fe" {
     }
   }
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      app_settings, # TODO: temp
+    ]
+  }
 }
 
 locals {
@@ -182,10 +188,9 @@ resource "azurerm_linux_web_app" "app_api" {
       docker_registry_url = "https://ghcr.io"
     }
     cors {
-      allowed_origins = [
-        # ACAO header is schema aware (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin)
+      allowed_origins = concat([
         "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
-      ]
+      ], var.env_short == "d" ? ["http://localhost:3000"] : [])
       support_credentials = true
     }
   }
@@ -214,6 +219,7 @@ resource "azurerm_linux_web_app" "app_api" {
       logs[0].http_logs[0].file_system[0].retention_in_days, # keeps getting change, tired of it
       site_config[0].application_stack[0].docker_image_name,
       site_config[0].application_stack[0].docker_registry_url, # weird bug, better leaving this off
+      app_settings,                                            # TODO: temp
     ]
   }
 
@@ -310,6 +316,7 @@ resource "azurerm_linux_web_app_slot" "app_api_staging" {
       logs[0].http_logs[0].file_system[0].retention_in_days, # keeps getting change, tired of it
       site_config[0].application_stack[0].docker_image_name,
       site_config[0].application_stack[0].docker_registry_url, # weird bug, better leaving this off
+      app_settings,                                            # TODO: temp
     ]
   }
 

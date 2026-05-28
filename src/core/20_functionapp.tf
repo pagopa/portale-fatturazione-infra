@@ -99,6 +99,9 @@ resource "azurerm_linux_function_app" "api" {
   functions_extension_version   = "~4"
   public_network_access_enabled = false
 
+  ftp_publish_basic_authentication_enabled       = false
+  webdeploy_publish_basic_authentication_enabled = false
+
   site_config {
     always_on                = true
     use_32_bit_worker        = false
@@ -163,6 +166,7 @@ resource "azurerm_linux_function_app" "api" {
     ignore_changes = [
       virtual_network_subnet_id,
       tags["hidden-link: /app-insights-resource-id"],
+      app_settings, # TODO: temp
     ]
   }
 }
@@ -401,10 +405,11 @@ resource "azurerm_linux_function_app" "integration" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack[0].docker[0].image_tag,
+      site_config[0].application_stack,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
+      app_settings, # TODO: temp
     ]
   }
 }
@@ -515,10 +520,11 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack[0].docker[0].image_tag,
+      site_config[0].application_stack,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
+      app_settings, # TODO: temp
     ]
   }
 }
