@@ -1,11 +1,13 @@
 resource "azurerm_log_analytics_workspace" "law" {
-  name                = format("%s-%s", local.project, "law")
-  location            = data.azurerm_resource_group.monitoring.location
-  resource_group_name = data.azurerm_resource_group.monitoring.name
-  sku                 = var.law_sku
-  retention_in_days   = var.law_retention_in_days
-  daily_quota_gb      = var.law_daily_quota_gb
-  tags                = var.tags
+  name                         = format("%s-%s", local.project, "law")
+  location                     = data.azurerm_resource_group.monitoring.location
+  resource_group_name          = data.azurerm_resource_group.monitoring.name
+  sku                          = var.law_sku
+  retention_in_days            = var.law_retention_in_days
+  daily_quota_gb               = var.law_daily_quota_gb
+  local_authentication_enabled = false
+
+  tags = var.tags
 }
 
 # Application insights
