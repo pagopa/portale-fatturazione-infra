@@ -66,7 +66,7 @@ storage_sap_rule_ips = [
 #
 # synapse
 #
-syn_spark_version = "3.4"
+syn_spark_version = "3.5"
 
 #
 # feature flags
