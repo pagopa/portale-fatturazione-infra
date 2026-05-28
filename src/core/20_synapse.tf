@@ -65,7 +65,7 @@ resource "azurerm_role_assignment" "synw_dls_storage_blob_data_contributor" {
 }
 
 resource "azurerm_role_assignment" "synw_sap_storage_blob_data_contributor" {
-  scope                = module.sap_storage.id
+  scope                = local.sap_storage_id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
@@ -105,7 +105,7 @@ resource "azurerm_synapse_linked_service" "sap_storage" {
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-    "serviceEndpoint": "https://${module.sap_storage.name}.blob.core.windows.net/",
+    "serviceEndpoint": "https://${local.sap_storage_name}.blob.core.windows.net/",
     "accountKind": "StorageV2"
   }
   JSON
@@ -279,10 +279,10 @@ resource "azurerm_synapse_managed_private_endpoint" "sa_storage" {
 resource "azurerm_synapse_managed_private_endpoint" "sap_storage" {
   name                 = format("%s-sap-storage-endpoint", azurerm_synapse_workspace.this.name)
   synapse_workspace_id = azurerm_synapse_workspace.this.id
-  target_resource_id   = module.sap_storage.id
+  target_resource_id   = local.sap_storage_id
   subresource_name     = "blob"
 
-  fully_qualified_domain_names = [module.sap_storage.primary_blob_host]
+  fully_qualified_domain_names = [local.sap_storage_blob_host]
 }
 
 # managed_private_endpoint must be manual approved on target resource
