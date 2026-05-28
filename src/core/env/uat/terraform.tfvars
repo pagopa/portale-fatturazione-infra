@@ -65,7 +65,7 @@ crm_storage_id = "/subscriptions/57cfa745-48f4-4ad8-91ab-fb63aebc57ec/resourceGr
 #
 # synapse
 #
-syn_spark_version = "3.4"
+syn_spark_version = "3.5"
 
 #
 # feature flags
