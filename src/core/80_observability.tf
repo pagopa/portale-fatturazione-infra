@@ -47,7 +47,7 @@ resource "azurerm_monitor_diagnostic_setting" "app_api" {
   count = var.env_short == "p" ? 0 : 1
 
   name                           = azurerm_log_analytics_workspace.law.name
-  target_resource_id             = azurerm_linux_web_app.app_api.id
+  target_resource_id             = module.app_api.id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.law.id
   log_analytics_destination_type = "Dedicated"
 

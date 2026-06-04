@@ -58,3 +58,36 @@ moved {
   to   = azurerm_dashboard_grafana.grafana_dashboard[0]
 }
 
+# app_api hand-written resources moved into module.app_api.
+# Migrates existing state to the new module addresses, avoiding destroy/recreate.
+# Safe to remove once applied across all envs.
+moved {
+  from = azurerm_linux_web_app.app_api
+  to   = module.app_api.azurerm_linux_web_app.this
+}
+
+moved {
+  from = azurerm_app_service_virtual_network_swift_connection.app_api
+  to   = module.app_api.azurerm_app_service_virtual_network_swift_connection.app[0]
+}
+
+moved {
+  from = azurerm_private_endpoint.app_api
+  to   = module.app_api.azurerm_private_endpoint.app[0]
+}
+
+moved {
+  from = azurerm_linux_web_app_slot.app_api_staging[0]
+  to   = module.app_api.azurerm_linux_web_app_slot.staging[0]
+}
+
+moved {
+  from = azurerm_app_service_slot_virtual_network_swift_connection.app_api_staging[0]
+  to   = module.app_api.azurerm_app_service_slot_virtual_network_swift_connection.staging[0]
+}
+
+moved {
+  from = azurerm_private_endpoint.app_api_staging[0]
+  to   = module.app_api.azurerm_private_endpoint.staging[0]
+}
+

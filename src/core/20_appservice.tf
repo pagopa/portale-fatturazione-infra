@@ -1,31 +1,26 @@
 locals {
   app_api = {
     app_settings = {
-      APPINSIGHTS_SAMPLING_PERCENTAGE     = 5               # would have been inherited from module
-      WEBSITE_DNS_SERVER                  = "168.63.129.16" # would have been inherited from module
-      WEBSITES_ENABLE_APP_SERVICE_STORAGE = false           # disable SMB mount across scale instances of /home
-      WEBSITES_PORT                       = 8080            # look at EXPOSE port in Dockerfile of container
-      ASPNETCORE_ENVIRONMENT              = "Production"
-      CONNECTION_STRING                   = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
-      JWT_SECRET                          = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=JwtSecret)"
-      ADMIN_KEY                           = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=AdminKey)"
-      JWT_VALID_AUDIENCE                  = local.fqdn_api
-      JWT_VALID_ISSUER                    = local.fqdn_api
-      KEY_VAULT_NAME                      = data.azurerm_key_vault.app.name
-      SELFCARE_CERT_ENDPOINT              = "/.well-known/jwks.json"
-      SELF_CARE_URI                       = var.app_api_config_selfcare_url
-      SELF_CARE_TIMEOUT                   = var.env_short == "p"
-      SELF_CARE_AUDIENCE                  = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+      ASPNETCORE_ENVIRONMENT = "Production"
+      CONNECTION_STRING      = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
+      JWT_SECRET             = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=JwtSecret)"
+      ADMIN_KEY              = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=AdminKey)"
+      JWT_VALID_AUDIENCE     = local.fqdn_api
+      JWT_VALID_ISSUER       = local.fqdn_api
+      KEY_VAULT_NAME         = data.azurerm_key_vault.app.name
+      SELFCARE_CERT_ENDPOINT = "/.well-known/jwks.json"
+      SELF_CARE_URI          = var.app_api_config_selfcare_url
+      SELF_CARE_TIMEOUT      = var.env_short == "p"
+      SELF_CARE_AUDIENCE     = "${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
       # CORS_ORIGINS is used to prevent the API execution in case it is called by the "wrong" frontend
       # out-of-the-box CORS does not prevent the execution, it prevents the browser to read the answer
-      CORS_ORIGINS = "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+      CORS_ORIGINS = format("https://%s.%s%s", var.dns_zone_portalefatturazione_prefix, var.dns_external_domain, var.env_short == "d" ? ";http://localhost:3000" : "")
 
-      # appinsights
+      # appinsights (TODO: review these!)
       APPLICATION_INSIGHTS                            = azurerm_application_insights.application_insights.connection_string
-      APPINSIGHTS_INSTRUMENTATIONKEY                  = azurerm_application_insights.application_insights.instrumentation_key
+      APPINSIGHTS_SAMPLING_PERCENTAGE                 = 5
       APPINSIGHTS_PROFILERFEATURE_VERSION             = "1.0.0"
       APPINSIGHTS_SNAPSHOTFEATURE_VERSION             = "1.0.0"
-      APPLICATIONINSIGHTS_CONNECTION_STRING           = azurerm_application_insights.application_insights.connection_string
       APPLICATIONINSIGHTS_ENABLESQLQUERYCOLLECTION    = "disabled"
       DISABLE_APPINSIGHTS_SDK                         = "disabled"
       IGNORE_APPINSIGHTS_SDK                          = "disabled"
@@ -160,68 +155,32 @@ locals {
 }
 
 # api
-resource "azurerm_linux_web_app" "app_api" {
-  name                          = format("%s-%s", local.project, "app-api")
-  location                      = data.azurerm_resource_group.app.location
-  resource_group_name           = data.azurerm_resource_group.app.name
-  service_plan_id               = azurerm_service_plan.app.id
-  client_certificate_enabled    = false
-  https_only                    = true
-  client_affinity_enabled       = false
-  public_network_access_enabled = false
+module "app_api" {
+  source = "./_modules/azure_app_service"
 
-  app_settings = local.app_api.app_settings
+  name                = "${local.project}-app-api"
+  location            = data.azurerm_resource_group.app.location
+  resource_group_name = data.azurerm_resource_group.app.name
 
-  site_config {
-    always_on                         = true
-    use_32_bit_worker                 = false
-    ftps_state                        = "Disabled"
-    http2_enabled                     = true
-    minimum_tls_version               = "1.2"
-    scm_minimum_tls_version           = "1.2"
-    vnet_route_all_enabled            = true
-    health_check_path                 = "/health"
-    health_check_eviction_time_in_min = 2
+  service_plan_id   = azurerm_service_plan.app.id
+  health_check_path = "/health"
+  app_port          = 8080
 
-    application_stack {
-      docker_image_name   = "pagopa/portale-fatturazione-be:latest" // ignored, will be managed from ci/cd pipeline
-      docker_registry_url = "https://ghcr.io"
-    }
-    cors {
-      allowed_origins = concat([
-        "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
-      ], var.env_short == "d" ? ["http://localhost:3000"] : [])
-      support_credentials = true
-    }
-  }
+  subnet_id                  = data.azurerm_subnet.app.id
+  private_endpoint_subnet_id = data.azurerm_subnet.private_endpoint.id
+  private_link_dns_zone_ids  = [local.privatelink_dns_zone_ids.appservice]
 
-  identity {
-    type = "SystemAssigned"
-  }
+  appinsights_instrumentation_key = azurerm_application_insights.application_insights.instrumentation_key
+  appinsights_connection_string   = azurerm_application_insights.application_insights.connection_string
 
-  logs {
-    detailed_error_messages = false
-    failed_request_tracing  = false
-    http_logs {
-      file_system {
-        retention_in_days = 7
-        retention_in_mb   = 100
-      }
-    }
-  }
+  custom_app_settings = local.app_api.app_settings
 
-  lifecycle {
-    ignore_changes = [
-      virtual_network_subnet_id,
-      tags["hidden-link: /app-insights-conn-string"],
-      tags["hidden-link: /app-insights-instrumentation-key"],
-      tags["hidden-link: /app-insights-resource-id"],
-      logs[0].http_logs[0].file_system[0].retention_in_days, # keeps getting change, tired of it
-      site_config[0].application_stack[0].docker_image_name,
-      site_config[0].application_stack[0].docker_registry_url, # weird bug, better leaving this off
-      app_settings,                                            # TODO: temp
-    ]
-  }
+  cors_allowed_origins = concat([
+    "https://${var.dns_zone_portalefatturazione_prefix}.${var.dns_external_domain}"
+  ], var.env_short == "d" ? ["http://localhost:3000"] : [])
+  cors_support_credentials = true
+
+  app_staging_slot_enabled = var.app_staging_slot_enabled
 
   tags = var.tags
 }
@@ -230,97 +189,11 @@ resource "azurerm_linux_web_app" "app_api" {
 resource "azurerm_key_vault_access_policy" "app_api_policy" {
   key_vault_id            = data.azurerm_key_vault.app.id
   tenant_id               = data.azurerm_client_config.current.tenant_id
-  object_id               = azurerm_linux_web_app.app_api.identity[0].principal_id
+  object_id               = module.app_api.principal_id
   key_permissions         = []
   secret_permissions      = ["Get", "List"]
   storage_permissions     = []
   certificate_permissions = []
-}
-
-
-# vnet integration
-resource "azurerm_app_service_virtual_network_swift_connection" "app_api" {
-  app_service_id = azurerm_linux_web_app.app_api.id
-  subnet_id      = data.azurerm_subnet.app.id
-}
-
-# private endpoint
-resource "azurerm_private_endpoint" "app_api" {
-  name                = format("%s-endpoint", azurerm_linux_web_app.app_api.name)
-  location            = data.azurerm_resource_group.app.location
-  resource_group_name = data.azurerm_resource_group.app.name
-  subnet_id           = data.azurerm_subnet.private_endpoint.id
-  private_service_connection {
-    name                           = format("%s-endpoint", azurerm_linux_web_app.app_api.name)
-    private_connection_resource_id = azurerm_linux_web_app.app_api.id
-    is_manual_connection           = false
-    subresource_names              = ["sites"]
-  }
-  private_dns_zone_group {
-    name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
-  }
-  tags = var.tags
-}
-
-resource "azurerm_linux_web_app_slot" "app_api_staging" {
-  count = var.app_staging_slot_enabled ? 1 : 0
-
-  app_service_id                = azurerm_linux_web_app.app_api.id
-  name                          = "staging"
-  client_certificate_enabled    = false
-  https_only                    = true
-  client_affinity_enabled       = false
-  public_network_access_enabled = false
-
-  app_settings = local.app_api.app_settings
-
-  site_config {
-    always_on                         = true
-    use_32_bit_worker                 = false
-    ftps_state                        = "Disabled"
-    http2_enabled                     = true
-    minimum_tls_version               = "1.2"
-    scm_minimum_tls_version           = "1.2"
-    vnet_route_all_enabled            = true
-    health_check_path                 = "/health"
-    health_check_eviction_time_in_min = 2
-
-    application_stack {
-      docker_image_name   = "pagopa/portale-fatturazione-be:latest" // ignored, will be managed from ci/cd pipeline
-      docker_registry_url = "https://ghcr.io"
-    }
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  logs {
-    detailed_error_messages = false
-    failed_request_tracing  = false
-    http_logs {
-      file_system {
-        retention_in_days = 7
-        retention_in_mb   = 100
-      }
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      virtual_network_subnet_id,
-      tags["hidden-link: /app-insights-conn-string"],
-      tags["hidden-link: /app-insights-instrumentation-key"],
-      tags["hidden-link: /app-insights-resource-id"],
-      logs[0].http_logs[0].file_system[0].retention_in_days, # keeps getting change, tired of it
-      site_config[0].application_stack[0].docker_image_name,
-      site_config[0].application_stack[0].docker_registry_url, # weird bug, better leaving this off
-      app_settings,                                            # TODO: temp
-    ]
-  }
-
-  tags = var.tags
 }
 
 resource "azurerm_key_vault_access_policy" "app_api_staging_policy" {
@@ -328,40 +201,9 @@ resource "azurerm_key_vault_access_policy" "app_api_staging_policy" {
 
   key_vault_id            = data.azurerm_key_vault.app.id
   tenant_id               = data.azurerm_client_config.current.tenant_id
-  object_id               = azurerm_linux_web_app_slot.app_api_staging[0].identity[0].principal_id
+  object_id               = module.app_api.staging_principal_id
   key_permissions         = []
   secret_permissions      = ["Get", "List"]
   storage_permissions     = []
   certificate_permissions = []
-}
-
-resource "azurerm_app_service_slot_virtual_network_swift_connection" "app_api_staging" {
-  count = var.app_staging_slot_enabled ? 1 : 0
-
-  slot_name      = azurerm_linux_web_app_slot.app_api_staging[0].name
-  app_service_id = azurerm_linux_web_app.app_api.id
-  subnet_id      = data.azurerm_subnet.app.id
-
-  depends_on = [azurerm_linux_web_app_slot.app_api_staging[0]]
-}
-
-resource "azurerm_private_endpoint" "app_api_staging" {
-  count = var.app_staging_slot_enabled ? 1 : 0
-
-  name                = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging[0].name}-endpoint"
-  location            = data.azurerm_resource_group.app.location
-  resource_group_name = data.azurerm_resource_group.app.name
-  subnet_id           = data.azurerm_subnet.private_endpoint.id
-  private_service_connection {
-    name                           = "${azurerm_linux_web_app.app_api.name}-${azurerm_linux_web_app_slot.app_api_staging[0].name}-endpoint"
-    private_connection_resource_id = azurerm_linux_web_app.app_api.id
-    is_manual_connection           = false
-    # https://learn.microsoft.com/en-us/azure/app-service/overview-private-endpoint#conceptual-overview
-    subresource_names = ["sites-${azurerm_linux_web_app_slot.app_api_staging[0].name}"]
-  }
-  private_dns_zone_group {
-    name                 = "private-dns-zone-group"
-    private_dns_zone_ids = [local.privatelink_dns_zone_ids.appservice]
-  }
-  tags = var.tags
 }
