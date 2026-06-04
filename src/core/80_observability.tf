@@ -36,11 +36,6 @@ resource "azurerm_monitor_diagnostic_setting" "agw" {
     category = "ApplicationGatewayFirewallLog"
   }
 
-  metric {
-    category = "AllMetrics"
-    enabled  = false
-  }
-
   lifecycle {
     # it keeps getting changed
     ignore_changes = [log_analytics_destination_type]
@@ -70,11 +65,6 @@ resource "azurerm_monitor_diagnostic_setting" "app_api" {
   }
   enabled_log {
     category = "AppServicePlatformLogs"
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = false
   }
 
   lifecycle {
@@ -108,11 +98,6 @@ resource "azurerm_monitor_diagnostic_setting" "app_fe" {
     category = "AppServicePlatformLogs"
   }
 
-  metric {
-    category = "AllMetrics"
-    enabled  = false
-  }
-
   lifecycle {
     # it keeps getting changed
     ignore_changes = [log_analytics_destination_type]
@@ -130,11 +115,6 @@ resource "azurerm_monitor_diagnostic_setting" "func_api" {
     category = "FunctionAppLogs"
   }
 
-  metric {
-    category = "AllMetrics"
-    enabled  = false
-  }
-
   lifecycle {
     # it keeps getting changed
     ignore_changes = [log_analytics_destination_type]
@@ -150,11 +130,6 @@ resource "azurerm_monitor_diagnostic_setting" "func_integration" {
 
   enabled_log {
     category = "FunctionAppLogs"
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = false
   }
 
   lifecycle {
