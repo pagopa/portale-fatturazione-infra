@@ -32,4 +32,11 @@ repositories = [
       },
     ]
   },
+  {
+    name                 = "portale-fatturazione-quadrature"
+    description          = "Account balancing service for Portale Fatturazione"
+    topics               = []
+    visibility           = "private"
+    rule_bypassing_teams = ["portalefatturazione-admin"]
+  },
 ]
