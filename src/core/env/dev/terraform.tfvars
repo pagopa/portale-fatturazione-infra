@@ -79,4 +79,5 @@ grafana_enabled                  = false
 #
 # integration
 #
-send_api_url = "https://api.dev.notifichedigitali.it"
+send_api_url                = "https://api.dev.notifichedigitali.it"
+app_api_config_selfcare_url = "https://uat.selfcare.pagopa.it"
