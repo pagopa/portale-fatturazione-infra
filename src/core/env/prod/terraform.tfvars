@@ -44,6 +44,10 @@ storage_sa_rule_ips = [
   "18.159.227.69",
   "18.192.147.151",
   "3.126.198.129",
+  "52.29.215.8",   # dl
+  "52.29.74.207",  # dl
+  "63.181.230.22", # dl
+
   "93.42.64.143" # unknown ip
 ]
 
@@ -66,6 +70,9 @@ storage_dls_rule_ips = [
   "18.159.227.69",
   "18.192.147.151",
   "3.126.198.129",
+  "52.29.215.8",   # dl
+  "52.29.74.207",  # dl
+  "63.181.230.22", # dl
 ]
 
 crm_storage_id = "/subscriptions/59f48fac-dfdb-4063-bcc6-9322c9e5ebd0/resourceGroups/crm-p-data-rg/providers/Microsoft.Storage/storageAccounts/crmpdatast"
