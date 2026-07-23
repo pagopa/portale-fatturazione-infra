@@ -60,6 +60,12 @@ storage_sap_rule_ips = [
   "93.63.219.230",
 ]
 
+storage_dls_rule_ips = [
+  "18.159.227.69",  # dl
+  "18.192.147.151", # dl
+  "3.126.198.129",  # dl
+]
+
 crm_storage_id = "/subscriptions/57cfa745-48f4-4ad8-91ab-fb63aebc57ec/resourceGroups/crm-u-data-rg/providers/Microsoft.Storage/storageAccounts/crmudatast"
 
 #
