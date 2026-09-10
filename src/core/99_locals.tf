@@ -14,15 +14,16 @@ locals {
   # https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration
   #
   privatelink_dns_zone_names = {
-    appservice    = "privatelink.azurewebsites.net"
-    sqldatabase   = "privatelink.database.windows.net"
-    storage_blob  = "privatelink.blob.core.windows.net"
-    storage_dfs   = "privatelink.dfs.core.windows.net"
-    storage_queue = "privatelink.queue.core.windows.net"
-    storage_table = "privatelink.table.core.windows.net"
-    synapse       = "privatelink.azuresynapse.net"
-    synapse_dev   = "privatelink.dev.azuresynapse.net"
-    synapse_sql   = "privatelink.sql.azuresynapse.net"
+    appservice        = "privatelink.azurewebsites.net"
+    cognitiveservices = "privatelink.cognitiveservices.azure.com"
+    sqldatabase       = "privatelink.database.windows.net"
+    storage_blob      = "privatelink.blob.core.windows.net"
+    storage_dfs       = "privatelink.dfs.core.windows.net"
+    storage_queue     = "privatelink.queue.core.windows.net"
+    storage_table     = "privatelink.table.core.windows.net"
+    synapse           = "privatelink.azuresynapse.net"
+    synapse_dev       = "privatelink.dev.azuresynapse.net"
+    synapse_sql       = "privatelink.sql.azuresynapse.net"
     # TODO keyvault = "privatelink.vaultcore.azure.net"
   }
 
