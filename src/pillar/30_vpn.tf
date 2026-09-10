@@ -26,6 +26,9 @@ module "vpn" {
     }
   ]
 
+  random_special = true
+  random_upper   = true
+
   tags = var.tags
 }
 
