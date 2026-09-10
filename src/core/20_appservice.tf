@@ -70,6 +70,8 @@ locals {
       AzureFunctionNotificheUri         = "https://${azurerm_linux_function_app.api.default_hostname}/api/RichiestaNotificheHandler"
       # TODO use managed identity
       AzureFunctionAppKey = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=synapse-sendemail-fnkey)"
+
+      Language_Endpoint = azurerm_cognitive_account.app_ls.endpoint
     }
   }
 }
