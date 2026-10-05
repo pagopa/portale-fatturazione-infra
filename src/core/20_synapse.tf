@@ -275,6 +275,15 @@ resource "azurerm_synapse_managed_private_endpoint" "sa_storage" {
   fully_qualified_domain_names = [module.sa_storage.primary_blob_host]
 }
 
+resource "azurerm_synapse_managed_private_endpoint" "sa_dfs_storage" {
+  name                 = format("%s-sa-storage-dfs-endpoint", azurerm_synapse_workspace.this.name)
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  target_resource_id   = module.sa_storage.id
+  subresource_name     = "dfs"
+
+  fully_qualified_domain_names = [replace(module.sa_storage.primary_blob_host, ".blob.", ".dfs.")] // dirty trick but module has no output
+}
+
 # managed_private_endpoint must be manual approved on target resource
 resource "azurerm_synapse_managed_private_endpoint" "sap_storage" {
   name                 = format("%s-sap-storage-endpoint", azurerm_synapse_workspace.this.name)
