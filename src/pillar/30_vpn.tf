@@ -26,8 +26,9 @@ module "vpn" {
     }
   ]
 
-  random_special = true
-  random_upper   = true
+  # historical reasons
+  random_special = var.env_short != "d"
+  random_upper   = var.env_short != "d"
 
   tags = var.tags
 }
