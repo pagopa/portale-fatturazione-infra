@@ -71,7 +71,7 @@ locals {
       # TODO use managed identity
       AzureFunctionAppKey = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=synapse-sendemail-fnkey)"
 
-      Language_Endpoint = azurerm_cognitive_account.app_ls.endpoint
+      LANGUAGE_ENDPOINT = azurerm_cognitive_account.app_ls.endpoint
     }
   }
 }
