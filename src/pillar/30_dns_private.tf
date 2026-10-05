@@ -7,6 +7,8 @@ locals {
   private_dns_zones = [
     # app service
     "privatelink.azurewebsites.net",
+    # cognitive services
+    "privatelink.cognitiveservices.azure.com",
     # sql database
     "privatelink.database.windows.net",
     # TODO key vault
