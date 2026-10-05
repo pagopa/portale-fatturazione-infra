@@ -114,8 +114,11 @@ resource "azurerm_linux_function_app" "api" {
     # health_check_path       = "/health" TODO
 
     application_stack {
-      dotnet_version              = "8.0"
-      use_dotnet_isolated_runtime = true
+      docker {
+        image_name   = "pagopa/portale-fatturazione-apifunc"
+        image_tag    = "latest" // ignored, will be mangaed from ci/cd pipeline
+        registry_url = "https://ghcr.io"
+      }
     }
     cors {
       allowed_origins = [
@@ -126,10 +129,9 @@ resource "azurerm_linux_function_app" "api" {
   }
 
   app_settings = {
-    APPINSIGHTS_SAMPLING_PERCENTAGE        = 5
-    WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
-    WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
-    WEBSITE_RUN_FROM_PACKAGE               = "1"
+    APPINSIGHTS_SAMPLING_PERCENTAGE     = 5
+    WEBSITE_DNS_SERVER                  = "168.63.129.16" # standard azure dns
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
 
     CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
     SMTP              = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=Smtp)"
@@ -154,6 +156,14 @@ resource "azurerm_linux_function_app" "api" {
     ModuloCommessaSEND            = "${var.send_api_url}/pn-portfat-in/file-ready-event",
     ModuloCommessaSENDAccountKey  = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=SENDAccountKey)",
     ModuloCommessaSENDFileVersion = "1.0.0"
+
+    TaskHubName = "TaskHub"
+  }
+
+  sticky_settings {
+    app_setting_names = [
+      "TaskHubName",
+    ]
   }
 
   identity {
@@ -165,6 +175,9 @@ resource "azurerm_linux_function_app" "api" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
+      site_config[0].application_stack[0].docker[0],
+      tags["hidden-link: /app-insights-conn-string"],
+      tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
       app_settings, # TODO: temp
     ]
@@ -312,10 +325,9 @@ resource "azurerm_private_endpoint" "integration_func_storage_table" {
 locals {
   integration_func = {
     app_settings = {
-      APPINSIGHTS_SAMPLING_PERCENTAGE        = 5
-      WEBSITE_DNS_SERVER                     = "168.63.129.16" # standard azure dns
-      WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
-      WEBSITE_RUN_FROM_PACKAGE               = "1"
+      APPINSIGHTS_SAMPLING_PERCENTAGE     = 5
+      WEBSITE_DNS_SERVER                  = "168.63.129.16" # standard azure dns
+      WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
 
       CONNECTION_STRING                  = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=ConnectionString)"
       AES_KEY                            = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=EncryptionAesKey)"
@@ -338,8 +350,6 @@ locals {
       StorageContestazioni__AccountKey        = "@Microsoft.KeyVault(VaultName=${data.azurerm_key_vault.app.name};SecretName=PublicStorageKey)"
       StorageContestazioni__BlobContainerName = "contestazioni",
       StorageContestazioni__CustomDns         = "https://${local.fqdn_storage}"
-
-      WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     }
   }
 }
@@ -371,7 +381,7 @@ resource "azurerm_linux_function_app" "integration" {
     application_stack {
       docker {
         image_name   = "pagopa/portale-fatturazione-integration"
-        image_tag    = "latest" // ignored, will be mangaed from ci/cd pipeline
+        image_tag    = "v2.32.6-betaf7" // ignored, will be mangaed from ci/cd pipeline
         registry_url = "https://ghcr.io"
       }
     }
@@ -406,10 +416,10 @@ resource "azurerm_linux_function_app" "integration" {
     ignore_changes = [
       virtual_network_subnet_id,
       site_config[0].application_stack,
+      // site_config[0].application_stack[0].docker[0].image_tag,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
-      app_settings, # TODO: temp
     ]
   }
 }
@@ -492,7 +502,7 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
     application_stack {
       docker {
         image_name   = "pagopa/portale-fatturazione-integration"
-        image_tag    = "latest" // ignored, will be mangaed from ci/cd pipeline
+        image_tag    = "v2.32.6-betaf7" // ignored, will be mangaed from ci/cd pipeline
         registry_url = "https://ghcr.io"
       }
     }
@@ -520,11 +530,10 @@ resource "azurerm_linux_function_app_slot" "integration_staging" {
   lifecycle {
     ignore_changes = [
       virtual_network_subnet_id,
-      site_config[0].application_stack,
+      site_config[0].application_stack[0].docker[0].image_tag,
       tags["hidden-link: /app-insights-conn-string"],
       tags["hidden-link: /app-insights-instrumentation-key"],
       tags["hidden-link: /app-insights-resource-id"],
-      app_settings, # TODO: temp
     ]
   }
 }
