@@ -255,6 +255,15 @@ resource "azurerm_synapse_role_assignment" "developers" {
   principal_type       = "Group"
 }
 
+resource "azurerm_synapse_role_assignment" "ext_data_developers" {
+  count = var.env_short == "p" ? 1 : 0
+
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Contributor"
+  principal_id         = data.azuread_group.adgroup_ext_data_developers[0].object_id
+  principal_type       = "Group"
+}
+
 # managed_private_endpoint must be manual approved on target resource
 resource "azurerm_synapse_managed_private_endpoint" "sql" {
   name                 = format("%s-sql-endpoint", azurerm_synapse_workspace.this.name)
